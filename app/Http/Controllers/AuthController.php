@@ -67,7 +67,7 @@ class AuthController extends Controller
             'role' => 'user'
         ], $remember)) {
             $request->session()->regenerate();
-            return redirect()->route('user.dashboard');
+            return redirect()->route('dashboard');
         }
 
         throw ValidationException::withMessages([
