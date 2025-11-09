@@ -67,14 +67,14 @@ class AuthController extends Controller
             'role' => 'user'
         ], $remember)) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard');
+            return redirect()->route('user.dashboard');
         }
 
         throw ValidationException::withMessages([
             'email' => 'Sai tài khoản/mật khẩu hoặc không phải user.',
         ]);
     }
-
+    
     public function adminLogin(Request $request)
     {
         $credentials = $request->validate([
