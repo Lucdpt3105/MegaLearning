@@ -5,24 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+
+
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'users';
-    protected $primaryKey = 'user_id';  // <-- bảng bạn dùng user_id
-    public $incrementing = true;
-    protected $keyType = 'int';
-
-    public $timestamps = false;         // bảng không có created_at/updated_at
+    // dùng bảng mặc định 'users' và PK mặc định 'id' -> KHÔNG cần khai báo gì thêm
 
     protected $fillable = [
-        'email','password','role','status','remember_token','created_at',
-        'user_email','user_password','user_role','user_name', // nếu còn dùng bộ cũ ở chỗ nào
+        'name', 'email', 'password', 'role', 'status', 'remember_token',
     ];
-
-    protected $hidden = ['password','remember_token'];
+    protected $casts = ['password' => 'hashed'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -32,3 +29,8 @@ class User extends Authenticatable
         ];
     }
 }
+
+
+
+
+

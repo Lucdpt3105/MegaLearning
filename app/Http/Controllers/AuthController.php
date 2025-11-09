@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;   // <-- THÊM
 use App\Models\User;                   // <-- THÊM
+use Illuminate\Auth\Events\Registered;
+
 
 class AuthController extends Controller
 {
@@ -35,22 +37,20 @@ class AuthController extends Controller
         ]);
 
         // password sẽ tự hash nhờ casts 'password' => 'hashed' trong Model User
-        $user = User::create([
-            'user_name'     => $data['name'] ?? null,               // cột trong bảng của bạn
-            'email'         => $data['email'],
-            'password'      => $data['password'],                   // sẽ được hash tự động
-            'role'          => 'user',
-            'status'        => 'active',
-            // đồng bộ bộ cột cũ để tương thích
-            'user_email'    => $data['email'],
-            'user_password' => Hash::make($data['password']),
-            'user_role'     => 'user',
-            'created_at'    => now(),                               // nếu bảng có cột này
-        ]);
+         $user = User::create([
+        'name'     => $data['name'] ?? null,
+        'email'    => $data['email'],
+        'password' => $data['password'],
+        'role'     => 'user',
+        'status'   => 'active',
+    ]);// phát sự kiện để Laravel gửi email xác minh
+    
 
-        Auth::login($user);
-        $request->session()->regenerate();
-        return redirect()->route('user.dashboard');
+    // đăng nhập, nhưng chưa verified sẽ bị chặn vào dashboard
+
+
+    return redirect()->route('login')
+        ->with('success', 'Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
     }
 
     public function userLogin(Request $request)

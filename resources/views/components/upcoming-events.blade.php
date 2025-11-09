@@ -1,37 +1,75 @@
-<div class="bg-white rounded-xl shadow-sm p-6">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-bold text-gray-800">Upcoming Events</h2>
-        <button class="text-gray-400 hover:text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-            </svg>
-        </button>
-    </div>
+<?php
 
-    <div class="space-y-4">
-        @foreach([
-            ['title' => 'Final Exam: Web Development', 'date' => 'Tomorrow', 'time' => '10:00 AM', 'color' => 'red'],
-            ['title' => 'Live Session: React Hooks', 'date' => 'Nov 10', 'time' => '2:00 PM', 'color' => 'blue'],
-            ['title' => 'Assignment Due: PHP Project', 'date' => 'Nov 12', 'time' => '11:59 PM', 'color' => 'orange'],
-        ] as $event)
-        <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <div class="w-12 h-12 bg-{{ $event['color'] }}-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-{{ $event['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h3 class="font-semibold text-gray-800 mb-1">{{ $event['title'] }}</h3>
-                <div class="flex items-center space-x-3 text-sm text-gray-500">
-                    <span>📅 {{ $event['date'] }}</span>
-                    <span>🕐 {{ $event['time'] }}</span>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
+use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\AuthController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-    <button class="w-full mt-4 py-3 bg-purple-50 text-purple-600 rounded-lg font-semibold hover:bg-purple-100 transition">
-        View Calendar
-    </button>
-</div>
+// Home -> chuyển về login
+Route::get('/', fn () => redirect()->route('login'))->name('home');
+
+// Nếu file này có route auth riêng, đảm bảo KHÔNG trùng /login, /register
+require __DIR__.'/auth_admin_user.php';
+
+// ===== Guest (chưa đăng nhập) =====
+Route::middleware('guest')->group(function () {
+    // Register
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');        // form
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');      // submit
+
+    // Login
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+});
+
+// ===== User (đã đăng nhập) =====
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        // Nếu là admin mà vào /dashboard thì chuyển qua admin
+        if (auth()->user()?->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return view('dashboard'); // đảm bảo đã có resources/views/dashboard.blade.php
+    })->name('dashboard');
+
+    Route::post('/logout', function (Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login')->with('success','Đã đăng xuất.');
+    })->name('logout');
+});
+
+// ===== Admin =====
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', AdminMiddleware::class])
+    ->group(function () {
+        Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
+
+        Route::prefix('subjects')->name('subjects.')->group(function () {
+            Route::get('/', fn () => view('admin.subjects.index'))->name('index');
+            Route::get('/create', fn () => view('admin.subjects.create'))->name('create');
+            Route::get('/{id}', fn ($id) => view('admin.subjects.show', compact('id')))->name('show');
+            Route::get('/{id}/edit', fn ($id) => view('admin.subjects.edit', compact('id')))->name('edit');
+        });
+
+        Route::prefix('topics')->name('topics.')->group(function () {
+            Route::get('/', fn () => view('admin.topics.index'))->name('index');
+            Route::get('/create', fn () => view('admin.topics.create'))->name('create');
+            Route::get('/{id}/edit', fn ($id) => view('admin.topics.edit', compact('id')))->name('edit');
+        });
+
+        Route::prefix('questions')->name('questions.')->group(function () {
+            Route::get('/', fn () => view('admin.questions.index'))->name('index');
+            Route::get('/create', fn () => view('admin.questions.create'))->name('create');
+            Route::get('/{id}/edit', fn ($id) => view('admin.questions.edit', compact('id')))->name('edit');
+        });
+
+        Route::prefix('exams')->name('exams.')->group(function () {
+            Route::get('/', fn () => view('admin.exams.index'))->name('index');
+            Route::get('/create', fn () => view('admin.exams.create'))->name('create');
+            Route::get('/{id}/edit', fn ($id) => view('admin.exams.edit', compact('id')))->name('edit');
+        });
+    });

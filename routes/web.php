@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\AuthController; // <-- thêm
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 // =================== Home -> luôn tới trang login ===================
 Route::get('/', function () {
@@ -16,6 +19,8 @@ require __DIR__.'/auth_admin_user.php';
 // === Register (User) ===
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+
 
 // =================== USER AREA (chỉ vào khi đã đăng nhập) ===================
 Route::middleware('auth')->group(function () {
@@ -61,3 +66,17 @@ Route::prefix('admin')
             Route::get('/{id}/edit', fn ($id) => view('admin.exams.edit', ['id'=>$id]))->name('edit');
         });
     });
+
+ Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+
+    Route::post('/logout', function (Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login')->with('success','Đã đăng xuất.');
+    })->name('logout');
+});
