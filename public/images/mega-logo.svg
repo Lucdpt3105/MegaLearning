@@ -1,0 +1,11 @@
+<svg width="128" height="128" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MegaLearning">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee"></stop>
+      <stop offset="1" stop-color="#2563eb"></stop>
+    </linearGradient>
+  </defs>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="url(#g1)"></rect>
+  <!-- Chữ M cách điệu bằng stroke -->
+  <path d="M6 17V7L12 13L18 7V17" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>

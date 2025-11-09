@@ -1,0 +1,23 @@
+*** routes/web.php	Original
+--- routes/web.php	Modified
+***************
+*** 1,5 ****
+  <?php
+  
+  use Illuminate\Support\Facades\Route;
+  
+  Route::get('/', function () {
+      return view('welcome');
+  });
+--- 1,9 ----
+  <?php
+  
+  use Illuminate\Support\Facades\Route;
+  
+  Route::get('/', function () {
+      return view('welcome');
+  });
++ 
++ // === MegaLearning Auth (Admin & User) ===
++ // Load extra auth routes without touching Kernel.php
++ require __DIR__.'/auth_admin_user.php';

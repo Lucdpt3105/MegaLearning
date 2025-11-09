@@ -476,12 +476,104 @@ php artisan config:clear
 
 ---
 
+## 🌿 Git Workflow cho Team
+
+### **Clone Repository**
+
+```bash
+git clone https://github.com/Lucdpt3105/MegaLearning.git
+cd MegaLearning
+```
+
+### **Xem tất cả Branches**
+
+```bash
+git branch -a
+```
+
+**Output:**
+```
+* main
+  feature/webrtc-video-call
+  feature/chat-system
+  feature/forum-qna
+  feature/ai-integration
+```
+
+### **Checkout Branch để làm việc**
+
+```bash
+# Làm tính năng WebRTC Video Call
+git checkout feature/webrtc-video-call
+
+# Làm tính năng Chat System
+git checkout feature/chat-system
+
+# Làm tính năng Forum Q&A
+git checkout feature/forum-qna
+
+# Làm tính năng AI Integration
+git checkout feature/ai-integration
+```
+
+### **Commit và Push Code**
+
+```bash
+# 1. Thêm files đã thay đổi
+git add .
+
+# 2. Commit với message rõ ràng
+git commit -m "Add video call feature with WebRTC"
+
+# 3. Push lên GitHub
+git push origin feature/webrtc-video-call
+# Thay tên branch tương ứng: feature/chat-system, feature/forum-qna, v.v.
+```
+
+### **Pull code mới nhất từ GitHub**
+
+```bash
+# Cập nhật branch hiện tại
+git pull origin <branch-name>
+
+# Ví dụ:
+git pull origin feature/webrtc-video-call
+```
+
+### **Merge Branch vào Main (sau khi hoàn thành)**
+
+```bash
+# 1. Chuyển về main
+git checkout main
+
+# 2. Pull code mới nhất
+git pull origin main
+
+# 3. Merge branch feature vào main
+git merge feature/webrtc-video-call
+
+# 4. Push lên GitHub
+git push origin main
+```
+
+### **📋 Phân công Branches cho Team**
+
+| Thành viên | Branch | Nhiệm vụ |
+|-----------|--------|----------|
+| Person A | `feature/webrtc-video-call` | Video call học nhóm, screen sharing |
+| Person B | `feature/chat-system` | Real-time chat, group messaging |
+| Person C | `feature/forum-qna` | Diễn đàn Q&A, upvote/downvote |
+| Person D | `feature/ai-integration` | AI chatbot, auto-grading |
+
+---
+
 ## 📚 Tài liệu Tham khảo
 
 - [Laravel Documentation](https://laravel.com/docs/11.x)
 - [Tailwind CSS v4](https://tailwindcss.com/docs)
 - [Vite Documentation](https://vitejs.dev/)
 - [MySQL Documentation](https://dev.mysql.com/doc/)
+- [Git Documentation](https://git-scm.com/doc)
 
 ---
 
