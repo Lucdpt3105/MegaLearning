@@ -34,11 +34,11 @@ class AuthController extends Controller
 
             // Redirect based on role
             if ($user->hasRole('admin')) {
-                return redirect()->intended('/admin'); // Admin route: /admin (not /admin/dashboard)
+                return redirect()->intended('/admin'); // Admin route: /admin
             } elseif ($user->hasRole('teacher')) {
                 return redirect()->intended('/teacher/dashboard');
             } else {
-                return redirect()->intended('/dashboard'); // Student route: /dashboard
+                return redirect()->intended('/'); // Student route: / (welcome page)
             }
         }
 

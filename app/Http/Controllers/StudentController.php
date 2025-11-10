@@ -23,6 +23,6 @@ class StudentController extends Controller
         $recentExams = Exam::latest()->take(5)->get();
         $subjects = Subject::withCount('topics')->take(6)->get();
 
-        return view('dashboard', compact('stats', 'recentExams', 'subjects'));
+        return view('welcome', compact('stats', 'recentExams', 'subjects'));
     }
 }

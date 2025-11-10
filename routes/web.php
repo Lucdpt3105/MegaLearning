@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 // Student Dashboard (authenticated students)
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
+    Route::get('welcome', [StudentController::class, 'welcome'])->name('welcome');
 });
 
 // Teacher Routes
