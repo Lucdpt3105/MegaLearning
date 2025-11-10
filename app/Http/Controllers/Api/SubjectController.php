@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class SubjectController extends Controller
 {
     /**
      * Display a listing of subjects with topics count
+     * Public access - anyone can view
      */
     public function index()
     {
@@ -27,6 +29,7 @@ class SubjectController extends Controller
 
     /**
      * Store a newly created subject
+     * Permission check handled by route middleware
      */
     public function store(Request $request)
     {
