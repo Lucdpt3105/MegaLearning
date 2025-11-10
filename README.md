@@ -233,7 +233,126 @@ Mở trình duyệt và vào:
 
 ---
 
-## 📁 Cấu trúc Dự án
+## � Đồng bộ Database khi Làm việc Nhóm
+
+### ✅ Phương pháp 1: Dùng Laravel Migrations
+
+Laravel đã có sẵn hệ thống migration! Khi ai thêm bảng/sửa schema thì chỉ cần push file migration lên Git.
+
+#### 📝 Workflow: - Ví dụ 
+
+**Người A tạo bảng mới:**
+
+```bash
+# Tạo migration
+php artisan make:migration create_students_table
+
+# Chạy migration để test
+php artisan migrate
+
+# Commit file migration lên Git
+git add database/migrations/
+git commit -m "feat: Add students table migration"
+git push
+```
+
+**Người B pull code về:**
+
+```bash
+# Pull code từ Git
+git pull
+
+# Chạy migration để cập nhật DB
+php artisan migrate
+```
+
+→ **Database tự động đồng bộ!** Không cần share file `.sql` 
+
+#### 📦 Thêm dữ liệu mẫu (Seeders):
+
+```bash
+# Tạo seeder
+php artisan make:seeder StudentSeeder
+
+# Chạy seeder để thêm dữ liệu
+php artisan db:seed --class=StudentSeeder
+
+# Hoặc chạy tất cả seeders
+php artisan db:seed
+```
+
+#### 🔄 Reset database và migrate lại (khi cần):
+
+```bash
+# Rollback tất cả migrations và migrate lại từ đầu
+php artisan migrate:fresh
+
+# Migrate lại + chạy seeders
+php artisan migrate:fresh --seed
+```
+
+---
+
+### 🗄️ Phương pháp 2: Dùng file SQL (Backup/Restore)
+
+Nếu bạn cần chia sẻ database hiện tại (với dữ liệu thật):
+
+#### Export Database:
+
+```bash
+# MySQL Command Line
+mysqldump -u root -p learning3 > database/backup_$(date +%Y%m%d).sql
+
+# Hoặc dùng MySQL Workbench: Server → Data Export
+```
+
+#### Import Database:
+
+```bash
+# Tạo database trước
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS learning3;"
+
+# Import file SQL
+mysql -u root -p learning3 < database/learning3.sql
+```
+
+---
+
+### ⚠️ Lưu ý quan trọng:
+
+1. **Luôn commit file migration** vào Git, không commit file `.sql` backup vào Git (quá nặng)
+2. **Không sửa migration đã chạy**, nếu cần sửa thì tạo migration mới:
+   ```bash
+   php artisan make:migration add_column_to_students_table
+   ```
+3. **Seeders** nên chứa dữ liệu mẫu để test, không phải dữ liệu thật
+4. **File `.env`** không được commit (đã có trong `.gitignore`), mỗi người tự config local
+
+---
+
+### 🚦 Quy trình làm việc nhóm (Best Practice):
+
+```bash
+# Sáng đến pull code mới nhất
+git pull
+
+# Chạy migration để sync DB
+php artisan migrate
+
+# Code feature mới...
+
+# Trước khi commit, chạy lại migration để test
+php artisan migrate:fresh --seed
+
+# Commit và push
+git add .
+git commit -m "feat: Add new feature"
+git push
+```
+
+---
+
+## �📁 Cấu trúc Dự án
 
 ```
 MegaLearning/
