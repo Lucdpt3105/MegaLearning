@@ -77,7 +77,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard')->with('success', 'Đăng ký thành công!');
+        return redirect('/')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với MegaLearning 🎉');
     }
 
     /**
