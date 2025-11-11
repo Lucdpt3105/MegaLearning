@@ -37,6 +37,11 @@ class AIService
                 return null;
             }
 
+            // DEMO MODE: If no API key, use mock responses
+            if (empty($this->apiKey)) {
+                return $this->generateMockResponse($latestMessage);
+            }
+
             // Get conversation context (last 20 messages)
             $context = $this->buildConversationContext($room);
 
@@ -79,6 +84,56 @@ class AIService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Generate mock response for demo mode (when no API key)
+     * 
+     * @param ChatMessage $message
+     * @return string
+     */
+    protected function generateMockResponse(ChatMessage $message): string
+    {
+        $text = strtolower($message->message_text);
+        
+        // Detect topics and respond accordingly
+        if (str_contains($text, 'machine learning') || str_contains($text, 'ml')) {
+            return "Machine learning là một nhánh của AI cho phép máy tính học từ dữ liệu mà không cần lập trình chi tiết. Nó giống như cách con người học từ kinh nghiệm! 🤖 Bạn có muốn tìm hiểu thêm về các thuật toán ML không?";
+        }
+        
+        if (str_contains($text, 'python')) {
+            return "Python là một ngôn ngữ lập trình tuyệt vời! 🐍 Để học Python hiệu quả, tôi khuyên bạn:\n1. Bắt đầu với cú pháp cơ bản\n2. Thực hành với các project nhỏ\n3. Tham gia cộng đồng Python\n4. Code mỗi ngày! 💪";
+        }
+        
+        if (str_contains($text, 'ai') || str_contains($text, 'trí tuệ nhân tạo')) {
+            return "AI (Artificial Intelligence) là khả năng của máy tính thực hiện các tác vụ thường yêu cầu trí thông minh của con người. Hiện nay AI đang được ứng dụng rộng rãi trong nhiều lĩnh vực! ✨ Bạn quan tâm lĩnh vực nào của AI?";
+        }
+        
+        if (str_contains($text, 'học') || str_contains($text, 'study')) {
+            return "Để học hiệu quả, bạn nên:\n📚 Tạo lịch học rõ ràng\n🎯 Đặt mục tiêu cụ thể\n💡 Thực hành thường xuyên\n👥 Học nhóm để trao đổi\n✅ Nghỉ ngơi hợp lý\nBạn đang học về chủ đề gì vậy?";
+        }
+        
+        if (str_contains($text, 'hello') || str_contains($text, 'hi') || str_contains($text, 'chào')) {
+            return "Chào bạn! 👋 Tôi là AI Assistant của MegaLearning. Tôi có thể giúp bạn về các chủ đề học tập, lập trình, và nhiều thứ khác. Bạn cần hỗ trợ gì không?";
+        }
+        
+        if (str_contains($text, 'cảm ơn') || str_contains($text, 'thanks')) {
+            return "Không có gì! 😊 Tôi luôn sẵn sàng giúp đỡ bạn. Nếu có thắc mắc gì khác, cứ hỏi nhé!";
+        }
+        
+        if (str_contains($text, '?')) {
+            return "Đây là một câu hỏi hay! 🤔 Hiện tại tôi đang chạy ở chế độ DEMO (chưa có OpenAI API key), nên câu trả lời của tôi khá đơn giản. Để có câu trả lời chi tiết và thông minh hơn, admin cần cấu hình OPENAI_API_KEY trong file .env nhé! 💡";
+        }
+        
+        // Default responses
+        $responses = [
+            "Tôi hiểu rồi! Bạn có thể nói rõ hơn được không? 🤔",
+            "Thật thú vị! Bạn muốn tìm hiểu sâu hơn về điều này không? 💡",
+            "Được thôi! Tôi đang ở chế độ DEMO nên câu trả lời hơi đơn giản. Bạn thử hỏi về Python, AI, hoặc Machine Learning xem! 🚀",
+            "Hmm, câu hỏi hay đấy! Tôi khuyên bạn nên tìm hiểu thêm trên Google hoặc ChatGPT để có câu trả lời chi tiết hơn nhé! 📚",
+        ];
+        
+        return $responses[array_rand($responses)];
     }
 
     /**

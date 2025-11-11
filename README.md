@@ -29,16 +29,32 @@
 3. **📹 Video call học nhóm (WebRTC/Zoom API)**
 4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
 
-### 🆕 **NEW: AI Chat Integration**
+### 🆕 **NEW: Chat Realtime với AI Assistant**
 
-Hệ thống chat realtime với **AI Assistant** tích hợp:
-- ✅ Chat 1-1 hoặc nhóm với AI
-- ✅ AI hiểu ngữ cảnh cuộc trò chuyện
-- ✅ Phản hồi tự nhiên, ngắn gọn như người thật
-- ✅ Hỗ trợ học tập 24/7
-- ✅ OpenAI GPT-3.5/GPT-4 powered
+Hệ thống chat nhóm realtime tích hợp AI:
+- ✅ Chat realtime giữa nhiều người trong cùng một phòng
+- ✅ AI Assistant tự động trả lời khi được mention hoặc có câu hỏi
+- ✅ Giao diện hiện đại với Tailwind CSS
+- ✅ Broadcasting với Pusher (hoặc polling mode nếu chưa config)
+- ✅ Tạo/quản lý phòng chat dễ dàng
 
-**Quick Start:** [Setup AI Chat trong 5 phút](./docs/QUICK_START_AI_CHAT.md) | [Full Documentation](./docs/AI_CHAT_GUIDE.md)
+**🚀 Quick Start:**
+1. Truy cập: `http://localhost:8000/chat-demo`
+2. Tạo phòng mới hoặc chọn phòng có sẵn
+3. Bắt đầu chat! AI sẽ tự động trả lời khi bạn:
+   - Mention AI: "AI ơi...", "bot help..."
+   - Đặt câu hỏi: "Làm thế nào...?", "Giải thích..."
+
+**⚙️ Cấu hình (Optional):**
+- **Pusher realtime**: Thêm `PUSHER_APP_KEY`, `PUSHER_APP_SECRET`, `PUSHER_APP_ID` vào `.env`
+- **AI với OpenAI GPT-3.5**: 
+  - **Cách nhanh**: Chạy `setup-openai.bat` và paste API key
+  - **Hoặc**: Thêm `OPENAI_API_KEY=sk-...` vào `.env`
+  - Test: `php test-openai-simple.php`
+  - Start worker: `php artisan queue:work`
+- **AI Demo Mode (miễn phí)**: Để `OPENAI_API_KEY` trống, AI sẽ dùng mock responses
+
+📖 **Chi tiết**: Xem `CHAT_GUIDE.md` và `OPENAI_SETUP.md`
 
 ---
 

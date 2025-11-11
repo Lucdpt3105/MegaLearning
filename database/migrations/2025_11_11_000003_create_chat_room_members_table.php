@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('room_id');
             $table->unsignedBigInteger('user_id');
-            $table->enum('role', ['admin', 'member'])->default('member');
+            $table->enum('role', ['admin', 'member', 'bot'])->default('member');
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamps();
 
