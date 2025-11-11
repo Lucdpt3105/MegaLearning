@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Firebase service account key (contains private key)
+megalearning-firebase-adminsdk-fbsvc-a6a6cad3f7.json

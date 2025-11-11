@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\ChatController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -92,4 +93,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/exams/{id}/edit', function ($id) {
         return view('admin.exams.edit', ['id' => $id]);
     })->name('exams.edit');
+});
+
+// Chat Routes (authenticated users)
+Route::middleware('auth')->prefix('chat')->name('chat.')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/room/{roomId}', [ChatController::class, 'show'])->name('room');
+    Route::post('/room/{roomId}/message', [ChatController::class, 'sendMessage'])->name('send');
+    Route::get('/room/{roomId}/messages', [ChatController::class, 'getMessages'])->name('messages');
+    Route::post('/room/create', [ChatController::class, 'createRoom'])->name('create');
 });
