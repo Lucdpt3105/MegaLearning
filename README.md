@@ -1,525 +1,188 @@
-# MegaLearning - Full Stack E-Learning Platform# MegaLearning - Full Stack E-Learning Platform# 🎓 MegaLearning - Hệ Thống E-Learning
+# 🎓 MegaLearning - Hệ Thống E-Learning
 
-
-
-**New Tech Stack**: Spring Boot (Java) + ReactJS + MySQL
-
-
-
-## 🎯 What Changed?**Tech Stack**: Spring Boot (Backend) + ReactJS (Frontend)> **Môn học:** Nhập Môn Công Nghệ Phần Mềm  
-
-
-
-❌ **Old Stack** (Removed):> **Năm học:** 2025-2026  
-
-- Laravel (PHP)
-
-- Blade Templates## 🎯 Project Structure> **Team:** Nhóm 5
-
-- Laravel Mix
-
-
-
-✅ **New Stack** (Current):
-
-- **Backend**: Spring Boot 3.2 (Java 17)```---
-
-- **Frontend**: React 18 + Vite
-
-- **Database**: MySQL (same)MegaLearning/
-
-- **Auth**: JWT Tokens
-
-- **Real-time**: WebSocket (STOMP)├── backend/              # Spring Boot REST API## 📋 Mục Lục
-
-- **AI**: OpenAI Integration
-
-│   ├── src/
+> **Môn học:** Nhập Môn Công Nghệ Phần Mềm  
+> **Năm học:** 2025-2026  
+> **Team:** Nhóm 5
 
 ---
 
-│   ├── pom.xml- [Giới thiệu](#-giới-thiệu)
-
-## 📁 Project Structure
-
-│   └── run.bat- [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
-
-```
-
-MegaLearning/│- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
-
-├── backend/              # Spring Boot REST API
-
-│   ├── src/main/java/com/megalearning/├── frontend/            # React + Vite- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
-
-│   │   ├── config/      # Security, CORS, WebSocket
-
-│   │   ├── controller/  # REST endpoints│   ├── src/- [Cấu hình Database](#-cấu-hình-database)
-
-│   │   ├── entity/      # JPA entities
-
-│   │   ├── repository/  # Data access│   ├── package.json- [Chạy dự án](#-chạy-dự-án)
-
-│   │   ├── service/     # Business logic
-
-│   │   └── security/    # JWT, auth│   └── run.bat- [Cấu trúc dự án](#-cấu-trúc-dự-án)
-
-│   ├── pom.xml
-
-│   └── run.bat          # Quick start script│- [API Documentation](#-api-documentation)
-
-│
-
-├── frontend/            # React SPA└── README_FULLSTACK.md  # Complete documentation- [Troubleshooting](#-troubleshooting)
-
-│   ├── src/
-
-│   │   ├── components/  # Reusable UI```
-
-│   │   ├── context/     # Auth state
-
-│   │   ├── pages/       # Login, Dashboard, Chat, etc.---
-
-│   │   └── services/    # API, WebSocket
-
-│   ├── package.json## 🚀 Quick Start
-
-│   └── run.bat          # Quick start script
-
-│## 🌟 Giới thiệu
-
-└── README_FULLSTACK.md  # Detailed documentation
-
-```### 1. Backend (Spring Boot)
-
-
-
----```bash**MegaLearning** là hệ thống E-Learning fullstack với 4 chức năng chính:
-
-
-
-## 🚀 Quick Startcd backend
-
-
-
-### Prerequisitesmvn clean install1. **📚 Quản lý môn học, tài liệu, đề thi**
-
-- ☕ Java 17+
-
-- 📦 Maven 3.8+mvn spring-boot:run2. **💬 Chat nhóm và diễn đàn Q&A với AI 🤖**
-
-- 🟢 Node.js 18+
-
-- 🐬 MySQL 8+```3. **📹 Video call học nhóm (WebRTC/Zoom API)**
-
-
-
-### 1️⃣ Setup DatabaseOr run: `backend\run.bat`4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
-
-```sql
-
-CREATE DATABASE learning3;
-
-```
-
-**URL**: http://localhost:8080/api### 🆕 **NEW: AI Chat Integration**
-
-### 2️⃣ Configure Backend
-
-Edit `backend/src/main/resources/application.properties`:
-
-
-
-```properties### 2. Frontend (React)Hệ thống chat realtime với **AI Assistant** tích hợp:
-
-# Database
-
-spring.datasource.password=YOUR_MYSQL_PASSWORD```bash- ✅ Chat 1-1 hoặc nhóm với AI
-
-
-
-# JWT Secret (generate random 256-bit string)cd frontend- ✅ AI hiểu ngữ cảnh cuộc trò chuyện
-
-jwt.secret=your-secret-key-min-256-bits-required
-
-npm install- ✅ Phản hồi tự nhiên, ngắn gọn như người thật
-
-# OpenAI (optional, for AI chat)
-
-openai.api.key=sk-your-openai-key-herenpm run dev- ✅ Hỗ trợ học tập 24/7
-
-```
-
-```- ✅ OpenAI GPT-3.5/GPT-4 powered
-
-### 3️⃣ Run Backend
-
-```bashOr run: `frontend\run.bat`
-
-cd backend
-
-mvn clean install**Quick Start:** [Setup AI Chat trong 5 phút](./docs/QUICK_START_AI_CHAT.md) | [Full Documentation](./docs/AI_CHAT_GUIDE.md)
-
-mvn spring-boot:run
-
-```**URL**: http://localhost:5173
-
-Or double-click: **`backend\run.bat`**
+## 📋 Mục Lục
+
+- [Giới thiệu](#-giới-thiệu)
+- [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
+- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
+- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
+- [Cấu hình Database](#-cấu-hình-database)
+- [Chạy dự án](#-chạy-dự-án)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [API Documentation](#-api-documentation)
+- [Troubleshooting](#-troubleshooting)
 
 ---
 
-✅ Backend running at: **http://localhost:8080/api**
+## 🌟 Giới thiệu
 
-## 👤 Demo Login
+**MegaLearning** là hệ thống E-Learning fullstack với 4 chức năng chính:
 
-### 4️⃣ Run Frontend
+1. **📚 Quản lý môn học, tài liệu, đề thi**
+2. **💬 Chat nhóm và diễn đàn Q&A với AI 🤖**
+3. **📹 Video call học nhóm (WebRTC/Zoom API)**
+4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
 
-Open new terminal:## 💻 Yêu cầu Hệ thống
+### 🆕 **NEW: AI Chat Integration**
+
+Hệ thống chat realtime với **AI Assistant** tích hợp:
+- ✅ Chat 1-1 hoặc nhóm với AI
+- ✅ AI hiểu ngữ cảnh cuộc trò chuyện
+- ✅ Phản hồi tự nhiên, ngắn gọn như người thật
+- ✅ Hỗ trợ học tập 24/7
+- ✅ OpenAI GPT-3.5/GPT-4 powered
+
+**Quick Start:** [Setup AI Chat trong 5 phút](./docs/QUICK_START_AI_CHAT.md) | [Full Documentation](./docs/AI_CHAT_GUIDE.md)
+
+---
+
+## 💻 Yêu cầu Hệ thống
+
+Trước khi bắt đầu, hãy đảm bảo máy tính đã cài đặt:
+
+- **PHP** >= 8.2
+- **Composer** >= 2.x
+- **Node.js** >= 18.x và **npm**
+- **MySQL** >= 8.0 (hoặc MariaDB)
+- **Git**
+
+### Kiểm tra version:
 
 ```bash
-
-cd frontend| Email | Password | Role |
-
-npm install
-
-npm run dev|-------|----------|------|Trước khi bắt đầu, hãy đảm bảo máy tính đã cài đặt:
-
+php -v
+composer -V
+node -v
+npm -v
+mysql --version
+git --version
 ```
 
-Or double-click: **`frontend\run.bat`**| student1@test.com | 123456 | Student |
-
-
-
-✅ Frontend running at: **http://localhost:5173**| teacher@test.com | 123456 | Teacher |- **PHP** >= 8.2
-
-
-
----| admin@test.com | 123456 | Admin |- **Composer** >= 2.x
-
-
-
-## 👤 Demo Login- **Node.js** >= 18.x và **npm**
-
-
-
-| Email | Password | Role |## ⚙️ Configuration- **MySQL** >= 8.0 (hoặc MariaDB)
-
-|-------|----------|------|
-
-| student1@test.com | 123456 | Student |- **Git**
-
-| teacher@test.com | 123456 | Teacher |
-
-| admin@test.com | 123456 | Admin |### Backend
-
-
-
-> **Note**: You need to seed database first (see Full Documentation)Edit `backend/src/main/resources/application.properties`:### Kiểm tra version:
-
-
-
----- Database password
-
-
-
-## 🎨 Features- JWT secret key```bash
-
-
-
-### ✅ Implemented- OpenAI API key (optional)php -v
-
-- [x] User Authentication (JWT)
-
-- [x] Login/Registercomposer -V
-
-- [x] Role-based Access (Admin/Teacher/Student)
-
-- [x] Real-time Chat (WebSocket)### Databasenode -v
-
-- [x] AI-powered Chat Responses
-
-- [x] Subject Management```sqlnpm -v
-
-- [x] Responsive UI (Tailwind CSS)
-
-- [x] Protected RoutesCREATE DATABASE learning3;mysql --version
-
-- [x] API Security (CORS, JWT)
-
-```git --version
-
-### 🔜 Coming Soon
-
-- [ ] Topic Management```
-
-- [ ] Question Bank
-
-- [ ] Exam Creation & Taking## 📚 Full Documentation
-
-- [ ] Progress Tracking
-
-- [ ] File UploadsSee `README_FULLSTACK.md` for complete setup guide and API documentation.### ⚙️ Cấu hình PHP Extensions (Quan trọng!)
-
-- [ ] Video Integration
-
-
-
----
-
-## 🎨 Features**Nếu cài Composer bị lỗi hoặc `composer install` không hoạt động**, cần bật extension ZIP trong PHP:
-
-## 📡 API Endpoints
-
-- ✅ JWT Authentication
-
-### Authentication
-
-```- ✅ Real-time Chat (WebSocket)1. **Tìm file `php.ini`:**
-
-POST /api/auth/register  - Register new user
-
-POST /api/auth/login     - Login user- ✅ AI-powered Responses   ```bash
-
-```
-
-- ✅ Subject Management   php --ini
-
-### Chat
-
-```- ✅ Role-based Access Control   ```
-
-GET  /api/chat/rooms                     - Get user's rooms
-
-GET  /api/chat/rooms/{id}/messages       - Get messages   _(Output sẽ hiển thị đường dẫn đến file `php.ini`)_
-
-POST /api/chat/rooms/{id}/messages       - Send message
-
-POST /api/chat/rooms                     - Create room---
-
-```
-
-*Old Laravel project cleaned up. New stack: Spring Boot + React*2. **Mở file `php.ini` bằng Notepad/VS Code**
-
-### Subjects
-
-```
-
-GET    /api/subjects      - List all subjects3. **Tìm dòng sau và xóa dấu `;` ở đầu dòng:**
-
-GET    /api/subjects/{id} - Get subject   ```ini
-
-POST   /api/subjects      - Create (Admin/Teacher)   ;extension=zip
-
-PUT    /api/subjects/{id} - Update (Admin/Teacher)   ```
-
-DELETE /api/subjects/{id} - Delete (Admin/Teacher)   **Sửa thành:**
-
-```   ```ini
-
+### ⚙️ Cấu hình PHP Extensions (Quan trọng!)
+
+**Nếu cài Composer bị lỗi hoặc `composer install` không hoạt động**, cần bật extension ZIP trong PHP:
+
+1. **Tìm file `php.ini`:**
+   ```bash
+   php --ini
+   ```
+   _(Output sẽ hiển thị đường dẫn đến file `php.ini`)_
+
+2. **Mở file `php.ini` bằng Notepad/VS Code**
+
+3. **Tìm dòng sau và xóa dấu `;` ở đầu dòng:**
+   ```ini
+   ;extension=zip
+   ```
+   **Sửa thành:**
+   ```ini
    extension=zip
+   ```
 
-### WebSocket   ```
+4. **Lưu file và restart terminal**, sau đó thử lại:
+   ```bash
+   composer -V
+   ```
 
-```
+**📌 Note:** Extension `zip` cần thiết để Composer có thể giải nén packages từ Packagist.
 
-Connect: ws://localhost:8080/api/ws4. **Lưu file và restart terminal**, sau đó thử lại:
+---
 
-Subscribe: /topic/room/{roomId}   ```bash
+## 🛠️ Công nghệ Sử dụng
 
-Send: /app/chat/{roomId}   composer -V
-
-```   ```
-
-
-
----**📌 Note:** Extension `zip` cần thiết để Composer có thể giải nén packages từ Packagist.
-
-
-
-## 🔧 Development---
-
-
-
-### Backend (Spring Boot)## 🛠️ Công nghệ Sử dụng
-
-```bash
-
-cd backend### Backend:
-
+### Backend:
 - **Laravel 11** - PHP Framework
+- **MySQL** - Database
+- **Eloquent ORM** - Database management
 
-# Run with hot reload- **MySQL** - Database
-
-mvn spring-boot:run- **Eloquent ORM** - Database management
-
-
-
-# Build JAR### Frontend:
-
-mvn clean package- **Blade Templates** - Laravel template engine
-
+### Frontend:
+- **Blade Templates** - Laravel template engine
 - **Tailwind CSS v4** - Utility-first CSS
-
-# Run tests- **Vite** - Frontend build tool
-
-mvn test- **Alpine.js / Vanilla JS** - JavaScript framework
-
-```
+- **Vite** - Frontend build tool
+- **Alpine.js / Vanilla JS** - JavaScript framework
 
 ### Tools:
-
-### Frontend (React)- **Thunder Client** - API testing (VS Code extension)
-
-```bash- **Laravel Artisan** - CLI commands
-
-cd frontend
+- **Thunder Client** - API testing (VS Code extension)
+- **Laravel Artisan** - CLI commands
 
 ---
 
-# Development server
+## 📥 Hướng dẫn Cài đặt
 
-npm run dev## 📥 Hướng dẫn Cài đặt
-
-
-
-# Build for production### Bước 1: Clone Repository
-
-npm run build
+### Bước 1: Clone Repository
 
 ```bash
-
-# Preview production buildgit clone https://github.com/Lucdpt3105/MegaLearning.git
-
-npm run previewcd MegaLearning
-
-``````
-
-
-
----### Bước 2: Cài đặt Dependencies
-
-
-
-## 🐛 Troubleshooting#### Backend (PHP):
-
-```bash
-
-### Backend won't startcomposer install
-
-- ✅ Check Java version: `java -version` (need 17+)```
-
-- ✅ Check MySQL is running
-
-- ✅ Verify database `learning3` exists#### Frontend (Node.js):
-
-- ✅ Check `application.properties` settings```bash
-
-npm install
-
-### Frontend won't start```
-
-- ✅ Check Node version: `node -v` (need 18+)
-
-- ✅ Delete `node_modules` and run `npm install`### Bước 3: Tạo file Environment
-
-- ✅ Check if port 5173 is free
-
-```bash
-
-### Can't login# Windows (PowerShell)
-
-- ✅ Make sure backend is running on port 8080copy .env.example .env
-
-- ✅ Check browser console for errors
-
-- ✅ Verify CORS settings in backend# Linux/Mac
-
-- ✅ Check if users exist in databasecp .env.example .env
-
+git clone https://github.com/Lucdpt3105/MegaLearning.git
+cd MegaLearning
 ```
 
-### WebSocket not connecting
+### Bước 2: Cài đặt Dependencies
 
-- ✅ Check backend WebSocket endpoint: `ws://localhost:8080/api/ws`### Bước 4: Generate Application Key
+#### Backend (PHP):
+```bash
+composer install
+```
 
-- ✅ Verify SockJS configuration
+#### Frontend (Node.js):
+```bash
+npm install
+```
 
-- ✅ Check browser console```bash
+### Bước 3: Tạo file Environment
 
+```bash
+# Windows (PowerShell)
+copy .env.example .env
+
+# Linux/Mac
+cp .env.example .env
+```
+
+### Bước 4: Generate Application Key
+
+```bash
 php artisan key:generate
+```
 
----```
+---
 
+## 🗄️ Cấu hình Database
 
+### Bước 1: Tạo Database trong MySQL
 
-## 📚 Full Documentation---
+Mở **MySQL Workbench** hoặc **Command Line**:
 
-
-
-For complete setup guide, API documentation, and architecture details:## 🗄️ Cấu hình Database
-
-
-
-👉 **See [README_FULLSTACK.md](./README_FULLSTACK.md)**### Bước 1: Tạo Database trong MySQL
-
-
-
----Mở **MySQL Workbench** hoặc **Command Line**:
-
-
-
-## 🗑️ Old Laravel Files```sql
-
+```sql
 CREATE DATABASE learning3;
+```
 
-All old Laravel code has been removed:```
-
-- ❌ `app/`, `routes/`, `resources/` (Laravel)
-
-- ❌ `composer.json`, `artisan` (PHP)### Bước 2: Cấu hình `.env`
-
-- ❌ Old documentation
+### Bước 2: Cấu hình `.env`
 
 Mở file `.env` và chỉnh sửa thông tin database:
 
-Clean slate with modern Spring Boot + React!
-
 ```env
-
----DB_CONNECTION=mysql
-
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-
-## 📝 LicenseDB_PORT=3306
-
+DB_PORT=3306
 DB_DATABASE=learning3
-
-MIT License - MegaLearning Team 2025DB_USERNAME=root
-
+DB_USERNAME=root
 DB_PASSWORD=your_password_here
+```
 
----```
-
-
-
-## 🙋 Support**⚠️ LƯU Ý:**
-
+**⚠️ LƯU Ý:**
 - Thay `your_password_here` bằng password MySQL của bạn
+- Nếu dùng XAMPP/WAMP, password mặc định thường là rỗng (xóa `your_password_here`)
 
-Having issues? Check:- Nếu dùng XAMPP/WAMP, password mặc định thường là rỗng (xóa `your_password_here`)
+### Bước 3: Chạy Migration và Seed Data
 
-1. [README_FULLSTACK.md](./README_FULLSTACK.md) - Complete guide
-
-2. [Troubleshooting](#-troubleshooting) section above### Bước 3: Chạy Migration và Seed Data
-
-3. Backend logs in terminal
-
-4. Frontend browser console (F12)```bash
-
+```bash
 php artisan migrate:fresh --seed
-
-**Happy Learning! 🚀**```
-
+```
 
 Lệnh này sẽ:
 - ✅ Tạo tất cả bảng trong database
