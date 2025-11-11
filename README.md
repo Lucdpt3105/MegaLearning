@@ -150,21 +150,7 @@ Mở **MySQL Workbench** hoặc **Command Line**:
 CREATE DATABASE learning3;
 ```
 
-### Bước 2: Import Database Structure
-
-**Option 1: Import file SQL có sẵn** 
-
-```bash
-mysql -u root -p learning3 < database/learning3.sql
-```
-
-**Option 2: Chạy migrations Laravel**
-
-```bash
-php artisan migrate
-```
-
-### Bước 3: Cấu hình `.env`
+### Bước 2: Cấu hình `.env`
 
 Mở file `.env` và chỉnh sửa thông tin database:
 
@@ -180,6 +166,24 @@ DB_PASSWORD=your_password_here
 **⚠️ LƯU Ý:**
 - Thay `your_password_here` bằng password MySQL của bạn
 - Nếu dùng XAMPP/WAMP, password mặc định thường là rỗng (xóa `your_password_here`)
+
+### Bước 3: Chạy Migration và Seed Data
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+Lệnh này sẽ:
+- ✅ Tạo tất cả bảng trong database
+- ✅ Tạo sẵn 3 tài khoản demo với roles (Admin, Teacher, Student)
+
+**🎯 Tài khoản demo sau khi seed:**
+
+| Role | Email | Password |
+|------|-------|----------|
+| 👑 Admin | `admin@megalearning.com` | `password` |
+| 👨‍🏫 Teacher | `teacher@megalearning.com` | `password` |
+| 🎓 Student | `student@megalearning.com` | `password` |
 
 ### Bước 4: Kiểm tra kết nối Database
 
