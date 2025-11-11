@@ -18,32 +18,73 @@
             top: 0;
             left: 0;
         }
+        
+        /* � Diagonal Stripes Background */
+        html::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(216, 74, 92, 0.03),
+                rgba(216, 74, 92, 0.03) 20px,
+                rgba(224, 137, 118, 0.02) 20px,
+                rgba(224, 137, 118, 0.02) 40px
+            );
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* 🌊 Subtle Floating Orbs */
         body::before {
             content: '';
             position: absolute;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(216, 74, 92, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(216, 74, 92, 0.08) 0%, transparent 70%);
             top: -200px;
             right: -200px;
             border-radius: 50%;
             animation: float 6s ease-in-out infinite;
+            z-index: 0;
         }
         body::after {
             content: '';
             position: absolute;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(139, 53, 88, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(139, 53, 88, 0.06) 0%, transparent 70%);
             bottom: -150px;
             left: -150px;
             border-radius: 50%;
             animation: float 8s ease-in-out infinite reverse;
+            z-index: 0;
         }
+        
+        /* 🖼️ Background Image Overlay */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/images/background.avif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
         @keyframes float {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-30px) scale(1.05); }
         }
+        
         .glass-card {
             background: rgba(26, 35, 50, 0.7);
             backdrop-filter: blur(20px);
@@ -57,55 +98,25 @@
             background: #1a2332;
             color: white;
         }
-        .login-container {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        .login-container::-webkit-scrollbar {
-            display: none;
-        }
-        .login-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
     </style>
 </head>
-<body>
-    <div class="login-container relative z-10">
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- 🖼️ Background Image -->
+    <div class="bg-image"></div>
+    
+    <div class="w-full max-w-lg relative z-10">
     <!--📌 Demo: admin@megalearning.com / teacher@megalearning.com / student@megalearning.com | password-->
     
-    <div class="w-full max-w-md relative z-10">
-        <!-- Logo & Title -->
-        <div class="text-center mb-8">
-            <div class="flex justify-center mb-4">
-                {{-- 🎨 THAY LOGO TẠI ĐÂY: --}}
-                {{-- Option 1: File trong public/images/ (Khuyến nghị) --}}
-                <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning" class="w-20 h-20 drop-shadow-2xl">
-                
-                {{-- Option 2: Nếu dùng PNG thay vì SVG --}}
-                {{-- <img src="{{ asset('images/logo.png') }}" alt="MegaLearning" class="w-20 h-20 drop-shadow-2xl"> --}}
-                
-                {{-- Option 3: URL từ internet --}}
-                {{-- <img src="https://yourwebsite.com/logo.png" alt="MegaLearning" class="w-20 h-20 drop-shadow-2xl"> --}}
-                
-                {{-- Option 4: Base64 image (inline) --}}
-                {{-- <img src="data:image/png;base64,iVBORw0KG..." alt="MegaLearning" class="w-20 h-20 drop-shadow-2xl"> --}}
-            </div>
-            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D84A5C] to-[#E08976] mb-2">
-                MegaLearning
-            </h1>
-            <p class="text-gray-400 text-sm">Learn. Practice. Grow.</p>
-        </div>
-
         <!-- Login Card -->
-        <div class="glass-card rounded-3xl p-8 mb-6">
-            <h2 class="text-2xl font-bold text-white mb-2">Chào mừng trở lại! 👋</h2>
-            <p class="text-gray-400 text-sm mb-6">Đăng nhập để tiếp tục học tập</p>
+        <div class="glass-card rounded-3xl p-10 mb-6">
+            <!-- Logo + Title in one line -->
+            <div class="flex items-center gap-4 mb-6">
+                <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning" class="w-16 h-16 drop-shadow-2xl flex-shrink-0">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Đăng nhập</h2>
+                    <p class="text-gray-400 text-sm mt-1">Chào mừng trở lại!</p>
+                </div>
+            </div>
 
             @if ($errors->any())
                 <div class="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
