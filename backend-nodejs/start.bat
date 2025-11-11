@@ -1,3 +1,0 @@
-@echo off
-echo Starting MegaLearning Backend...
-npm run dev
