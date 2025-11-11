@@ -25,9 +25,20 @@
 **MegaLearning** là hệ thống E-Learning fullstack với 4 chức năng chính:
 
 1. **📚 Quản lý môn học, tài liệu, đề thi**
-2. **💬 Chat nhóm và diễn đàn Q&A**
+2. **💬 Chat nhóm và diễn đàn Q&A với AI 🤖**
 3. **📹 Video call học nhóm (WebRTC/Zoom API)**
 4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
+
+### 🆕 **NEW: AI Chat Integration**
+
+Hệ thống chat realtime với **AI Assistant** tích hợp:
+- ✅ Chat 1-1 hoặc nhóm với AI
+- ✅ AI hiểu ngữ cảnh cuộc trò chuyện
+- ✅ Phản hồi tự nhiên, ngắn gọn như người thật
+- ✅ Hỗ trợ học tập 24/7
+- ✅ OpenAI GPT-3.5/GPT-4 powered
+
+**Quick Start:** [Setup AI Chat trong 5 phút](./docs/QUICK_START_AI_CHAT.md) | [Full Documentation](./docs/AI_CHAT_GUIDE.md)
 
 ---
 
