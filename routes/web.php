@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\ChatController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -14,6 +15,16 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+// Chat Routes (accessible by authenticated users)
+Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/{roomId}', [ChatController::class, 'show'])->name('show');
+    Route::post('/create', [ChatController::class, 'store'])->name('store');
+    Route::post('/{roomId}/send', [ChatController::class, 'sendMessage'])->name('sendMessage');
+    Route::post('/{roomId}/join', [ChatController::class, 'join'])->name('join');
+    Route::post('/{roomId}/leave', [ChatController::class, 'leave'])->name('leave');
 });
 
 // Student Dashboard (authenticated students)

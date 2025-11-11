@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ExamController;
+use App\Http\Controllers\Api\ChatApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,18 @@ Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::get('/me', [AuthApiController::class, 'me']);
+});
+
+// Chat API Routes
+Route::prefix('chat')->group(function () {
+    // Public routes
+    Route::get('/rooms', [ChatApiController::class, 'getRooms']);
+    Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages']);
+    Route::post('/rooms', [ChatApiController::class, 'createRoom']);
+    Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage']);
+    Route::post('/rooms/{roomId}/join', [ChatApiController::class, 'joinRoom']);
+    Route::post('/rooms/{roomId}/leave', [ChatApiController::class, 'leaveRoom']);
+    Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage']);
 });
 
 // API Version 1
