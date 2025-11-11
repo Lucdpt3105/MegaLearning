@@ -33,7 +33,9 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat-room.' . $this->message->room_id),
+            // Use a public channel so test UI can subscribe without auth.
+            // For private/presence channels re-enable PrivateChannel/PresenceChannel
+            new Channel('chat-room.' . $this->message->room_id),
         ];
     }
 

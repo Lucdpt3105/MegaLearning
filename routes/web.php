@@ -17,14 +17,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public chat demo (for testing without auth)
+Route::get('/chat-demo', function () {
+    return view('chat.index');
+})->name('chat.demo');
+
 // Chat Routes (accessible by authenticated users)
 Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
     Route::get('/', [ChatController::class, 'index'])->name('index');
-    Route::get('/{roomId}', [ChatController::class, 'show'])->name('show');
-    Route::post('/create', [ChatController::class, 'store'])->name('store');
-    Route::post('/{roomId}/send', [ChatController::class, 'sendMessage'])->name('sendMessage');
-    Route::post('/{roomId}/join', [ChatController::class, 'join'])->name('join');
-    Route::post('/{roomId}/leave', [ChatController::class, 'leave'])->name('leave');
 });
 
 // Student Dashboard (authenticated students)
