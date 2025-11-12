@@ -532,7 +532,8 @@ CREATE TABLE `forumanswers` (
   `forum_question_id` int DEFAULT NULL,
   `user_id` int DEFAULT NULL,
   `answer_content` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `parent_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
