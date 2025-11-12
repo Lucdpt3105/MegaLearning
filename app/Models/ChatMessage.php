@@ -7,10 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ChatMessage extends Model
 {
-    protected $table = 'chat_messages';
-    protected $primaryKey = 'message_id';
-    public $timestamps = true;
-
     protected $fillable = [
         'room_id',
         'user_id',
@@ -35,7 +31,7 @@ class ChatMessage extends Model
      */
     public function room(): BelongsTo
     {
-        return $this->belongsTo(ChatRoom::class, 'room_id', 'room_id');
+        return $this->belongsTo(ChatRoom::class, 'room_id');
     }
 
     /**
@@ -43,7 +39,7 @@ class ChatMessage extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

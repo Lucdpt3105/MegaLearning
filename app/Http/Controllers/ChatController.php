@@ -129,7 +129,7 @@ class ChatController extends Controller
             }
         }
 
-        return redirect()->route('chat.show', $room->room_id)
+        return redirect()->route('chat.show', $room->id)
             ->with('success', 'Chat room created successfully');
     }
 
@@ -206,7 +206,7 @@ class ChatController extends Controller
             if ($aiResponse) {
                 // Create AI message
                 $aiMessage = ChatMessage::create([
-                    'room_id' => $room->room_id,
+                    'room_id' => $room->id,
                     'user_id' => $this->aiService->getAIUser()->id,
                     'message_text' => $aiResponse,
                     'message_type' => 'text',
@@ -221,7 +221,7 @@ class ChatController extends Controller
         } catch (\Exception $e) {
             \Log::error('AI Response Error', [
                 'error' => $e->getMessage(),
-                'room_id' => $room->room_id
+                'room_id' => $room->id
             ]);
         }
     }

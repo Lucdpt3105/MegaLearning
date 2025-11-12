@@ -3,31 +3,61 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subject extends Model
 {
-    protected $table = 'subjects';
-    protected $primaryKey = 'subject_id';
-    public $timestamps = false;
-
     protected $fillable = [
-        'subject_name'
+        'name',
+        'code',
+        'description',
+        'teacher_id',
+        'status',
+        'settings',
     ];
 
-    /**
-     * Get all topics for this subject
-     */
-    public function topics(): HasMany
+    protected $casts = [
+        'settings' => 'array',
+    ];
+
+    public function teacher(): BelongsTo
     {
-        return $this->hasMany(Topic::class, 'topic_subject_id', 'subject_id');
+        return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    /**
-     * Get all exams for this subject
-     */
+    public function topics(): HasMany
+    {
+        return $this->hasMany(Topic::class);
+    }
+
     public function exams(): HasMany
     {
-        return $this->hasMany(Exam::class, 'exam_subject_id', 'subject_id');
+        return $this->hasMany(Exam::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    public function classRooms(): HasMany
+    {
+        return $this->hasMany(ClassRoom::class);
+    }
+
+    public function forumThreads(): HasMany
+    {
+        return $this->hasMany(ForumThread::class);
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class);
     }
 }

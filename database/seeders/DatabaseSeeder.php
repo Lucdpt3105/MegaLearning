@@ -15,10 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Chạy seeder theo thứ tự: Roles -> Users -> Private Chat
+        // Chạy seeder theo thứ tự: Roles -> Users -> Subjects -> Private Chat
         $this->call([
-            RoleSeeder::class,
+            RolePermissionSeeder::class,
             UserSeeder::class,
+            SubjectSeeder::class,
             PrivateChatSeeder::class,
         ]);
     }

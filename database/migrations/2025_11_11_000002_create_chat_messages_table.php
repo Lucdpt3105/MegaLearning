@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chat_messages', function (Blueprint $table) {
-            $table->id('message_id');
+            $table->id(); // Use default 'id' instead of 'message_id'
             $table->unsignedBigInteger('room_id');
             $table->unsignedBigInteger('user_id');
             $table->text('message_text');
@@ -24,7 +24,7 @@ return new class extends Migration
 
             // Foreign keys
             $table->foreign('room_id')
-                  ->references('room_id')
+                  ->references('id') // Reference to chat_rooms.id
                   ->on('chat_rooms')
                   ->onDelete('cascade');
 

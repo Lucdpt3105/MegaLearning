@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chat_rooms', function (Blueprint $table) {
-            $table->id('room_id');
+            $table->id(); // Use default 'id' instead of 'room_id'
             $table->string('room_name', 255);
             $table->enum('room_type', ['group', 'private', 'subject'])->default('group');
             $table->unsignedBigInteger('subject_id')->nullable();

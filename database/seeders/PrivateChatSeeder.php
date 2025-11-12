@@ -313,7 +313,7 @@ class PrivateChatSeeder extends Seeder
         $timestamp = $timestamp ?? now();
         
         ChatMessage::create([
-            'room_id' => $room->room_id,
+            'room_id' => $room->id, // Use 'id' instead of 'room_id'
             'user_id' => $user->id,
             'message_text' => $text,
             'message_type' => 'text',

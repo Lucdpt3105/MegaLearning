@@ -8,10 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ChatRoom extends Model
 {
-    protected $table = 'chat_rooms';
-    protected $primaryKey = 'room_id';
-    public $timestamps = true;
-
     protected $fillable = [
         'room_name',
         'room_type', // 'group', 'private', 'subject'
@@ -31,7 +27,7 @@ class ChatRoom extends Model
      */
     public function messages(): HasMany
     {
-        return $this->hasMany(ChatMessage::class, 'room_id', 'room_id')
+        return $this->hasMany(ChatMessage::class, 'room_id', 'id')
                     ->orderBy('created_at', 'desc');
     }
 
@@ -44,7 +40,9 @@ class ChatRoom extends Model
             User::class,
             'chat_room_members',
             'room_id',
-            'user_id'
+            'user_id',
+            'id', // Parent key (chat_rooms.id)
+            'id'  // Related key (users.id)
         )->withPivot('joined_at', 'role')
           ->withTimestamps();
     }
@@ -70,7 +68,7 @@ class ChatRoom extends Model
      */
     public function latestMessage()
     {
-        return $this->hasOne(ChatMessage::class, 'room_id', 'room_id')
+        return $this->hasOne(ChatMessage::class, 'room_id', 'id')
                     ->latest('created_at');
     }
 }

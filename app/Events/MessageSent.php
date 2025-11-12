@@ -22,7 +22,7 @@ class MessageSent implements ShouldBroadcast
      */
     public function __construct(ChatMessage $message)
     {
-        $this->message = $message->load('user:id,name,email');
+        $this->message = $message->load(['user:id,name,email', 'room:id']);
     }
 
     /**
@@ -35,7 +35,7 @@ class MessageSent implements ShouldBroadcast
         return [
             // Use a public channel so test UI can subscribe without auth.
             // For private/presence channels re-enable PrivateChannel/PresenceChannel
-            new Channel('chat-room.' . $this->message->room_id),
+            new Channel('chat-room.' . $this->message->room->id),
         ];
     }
 
@@ -53,11 +53,13 @@ class MessageSent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message_id' => $this->message->message_id,
+            'id' => $this->message->id,
+            'message_id' => $this->message->id, // Backward compatibility
             'room_id' => $this->message->room_id,
             'user' => [
                 'id' => $this->message->user->id,
                 'name' => $this->message->user->name,
+                'email' => $this->message->user->email,
             ],
             'message_text' => $this->message->message_text,
             'message_type' => $this->message->message_type,

@@ -89,6 +89,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return view('admin.dashboard');
     })->name('dashboard');
 
+    // User Management (UC-ADM-010 to UC-ADM-015)
+    Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
+    Route::post('users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
+    Route::post('users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
+
     // Subjects Management
     Route::get('/subjects', function () {
         return view('admin.subjects.index');
