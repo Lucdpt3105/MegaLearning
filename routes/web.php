@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\Api\ForumQuestionController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -92,4 +93,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/exams/{id}/edit', function ($id) {
         return view('admin.exams.edit', ['id' => $id]);
     })->name('exams.edit');
+});
+
+// forum routes
+
+Route::prefix('forum')->middleware(['auth'])->group(function () {
+    Route::get('/forum', [ForumQuestionController::class, 'index'])->name('forum.index');
+    Route::get('/forum/create', [ForumQuestionController::class, 'create'])->name('forum.create');
+    Route::post('/forum', [ForumQuestionController::class, 'store'])->name('forum.store');
+    Route::get('/forum/{id}', [ForumQuestionController::class, 'show'])->name('forum.show');
+    Route::get('/forum/{id}/edit', [ForumQuestionController::class, 'edit'])->name('forum.edit');
+    Route::put('/forum/{id}', [ForumQuestionController::class, 'update'])->name('forum.update');
+    Route::delete('/forum/{id}', [ForumQuestionController::class, 'destroy'])->name('forum.destroy');
 });

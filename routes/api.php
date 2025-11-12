@@ -22,6 +22,18 @@ use App\Http\Controllers\Api\ExamController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+use App\Http\Controllers\Api\ForumQuestionController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/forum/questions', [ForumQuestionController::class, 'index']);
+    Route::get('/forum/questions/{id}', [ForumQuestionController::class, 'show']);
+    Route::post('/forum/questions', [ForumQuestionController::class, 'store']);
+    Route::put('/forum/questions/{id}', [ForumQuestionController::class, 'update']);
+    Route::delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
+});
+Route::middleware(['auth:sanctum', 'role:admin'])->delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
+
+
 
 // Authentication Routes (Public)
 Route::post('/login', [AuthApiController::class, 'login']);
