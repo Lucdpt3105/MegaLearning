@@ -54,13 +54,20 @@
             
             <!-- Sidebar - Rooms List -->
             <div class="w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
-                <!-- Sidebar Header -->
-                <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600">
-                    <h2 class="text-white font-semibold text-lg">Phòng Chat</h2>
+                <!-- Sidebar Header with Tabs -->
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600">
+                    <div class="flex border-b border-white/20">
+                        <button onclick="switchTab('rooms')" id="tabRooms" class="flex-1 text-white font-semibold text-sm py-3 px-4 border-b-2 border-white">
+                            Phòng Chat
+                        </button>
+                        <button onclick="switchTab('users')" id="tabUsers" class="flex-1 text-white/70 font-semibold text-sm py-3 px-4 border-b-2 border-transparent hover:text-white">
+                            Người Dùng
+                        </button>
+                    </div>
                 </div>
                 
-                <!-- Create Room Button -->
-                <div class="p-4 border-b border-gray-200">
+                <!-- Create Room Button (only show in Rooms tab) -->
+                <div id="createRoomBtn" class="p-4 border-b border-gray-200">
                     <button onclick="showCreateRoomModal()" 
                             class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +84,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                         </svg>
                         <p class="text-sm">Đang tải phòng chat...</p>
+                    </div>
+                </div>
+                
+                <!-- Users List (hidden by default) -->
+                <div id="usersList" class="flex-1 overflow-y-auto scrollbar-hide hidden">
+                    <div class="p-4 text-center text-gray-400">
+                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <p class="text-sm">Đang tải người dùng...</p>
                     </div>
                 </div>
             </div>
@@ -537,7 +554,130 @@
                 }
             } catch (error) {
                 console.error('Error creating room:', error);
-                showNotification('Lỗi khi tạo phòng', 'error');
+                    showNotification('Lỗi khi tạo phòng', 'error');
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            const roomsTab = document.getElementById('tabRooms');
+            const usersTab = document.getElementById('tabUsers');
+            const roomsList = document.getElementById('roomsList');
+            const usersList = document.getElementById('usersList');
+            const createRoomBtn = document.getElementById('createRoomBtn');
+
+            if (tab === 'rooms') {
+                roomsTab.classList.add('border-white', 'text-white');
+                roomsTab.classList.remove('border-transparent', 'text-white/70');
+                usersTab.classList.add('border-transparent', 'text-white/70');
+                usersTab.classList.remove('border-white', 'text-white');
+                roomsList.classList.remove('hidden');
+                usersList.classList.add('hidden');
+                createRoomBtn.classList.remove('hidden');
+            } else {
+                usersTab.classList.add('border-white', 'text-white');
+                usersTab.classList.remove('border-transparent', 'text-white/70');
+                roomsTab.classList.add('border-transparent', 'text-white/70');
+                roomsTab.classList.remove('border-white', 'text-white');
+                usersList.classList.remove('hidden');
+                roomsList.classList.add('hidden');
+                createRoomBtn.classList.add('hidden');
+                loadUsers();
+            }
+        }
+
+        // Load users list
+        async function loadUsers() {
+            try {
+                    const response = await fetch(`${API_URL}/users`);
+                const data = await response.json();
+                
+                const usersList = document.getElementById('usersList');
+                
+                if (data.success && data.data.length > 0) {
+                    usersList.innerHTML = data.data.map(user => {
+                        const roleColors = {
+                            'admin': 'bg-red-100 text-red-800',
+                            'teacher': 'bg-blue-100 text-blue-800',
+                            'student': 'bg-green-100 text-green-800'
+                        };
+                        const roleNames = {
+                            'admin': 'Admin',
+                            'teacher': 'Giáo viên',
+                            'student': 'Học sinh'
+                        };
+                        
+                        return `
+                        <div 
+                            onclick="startPrivateChat(${user.id}, '${escapeHtml(user.name)}')" 
+                            class="p-4 hover:bg-white cursor-pointer transition-all duration-200 border-b border-gray-100"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                    ${user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-semibold text-gray-800 truncate">${escapeHtml(user.name)}</h4>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-xs ${roleColors[user.role] || 'bg-gray-100 text-gray-800'} px-2 py-0.5 rounded-full font-medium">
+                                            ${roleNames[user.role] || user.role}
+                                        </span>
+                                        ${user.email === 'ai@megalearning.com' ? '<span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-medium">🤖 AI</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    usersList.innerHTML = `
+                        <div class="p-8 text-center text-gray-400">
+                            <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            <p class="text-sm">Không có người dùng</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('Không thể tải danh sách người dùng', 'error');
+            }
+        }
+
+        // Start private chat with a user
+        async function startPrivateChat(userId, userName) {
+            try {
+                showNotification(`Đang tạo phòng chat với ${userName}...`, 'info');
+                
+                const response = await fetch(`${API_URL}/rooms/private`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        other_user_id: userId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(data.message || 'Đã tạo phòng chat!', 'success');
+                    
+                    // Switch back to rooms tab
+                    switchTab('rooms');
+                    
+                    // Reload rooms and select the new/existing room
+                    await loadRooms();
+                    setTimeout(() => selectRoom(data.data.room_id), 300);
+                } else {
+                    showNotification('Không thể tạo phòng chat', 'error');
+                }
+            } catch (error) {
+                console.error('Error starting private chat:', error);
+                showNotification('Lỗi khi tạo phòng chat', 'error');
             }
         }
 
