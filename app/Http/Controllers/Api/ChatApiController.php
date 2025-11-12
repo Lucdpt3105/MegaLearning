@@ -24,10 +24,22 @@ class ChatApiController extends Controller
      */
     public function getRooms(Request $request)
     {
-        // Get all public rooms if not authenticated
+        // Get current user (guest user ID 1 for now)
+        $userId = 1;
+        
+        // Get all group rooms and private rooms for the current user
         $rooms = ChatRoom::where('is_active', true)
-            ->where('room_type', 'group')
+            ->where(function($query) use ($userId) {
+                $query->where('room_type', 'group')
+                      ->orWhere(function($q) use ($userId) {
+                          $q->where('room_type', 'private')
+                            ->whereHas('members', function($m) use ($userId) {
+                                $m->where('user_id', $userId);
+                            });
+                      });
+            })
             ->with(['latestMessage.user', 'members'])
+            ->withCount('members')
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -259,4 +271,104 @@ class ChatApiController extends Controller
             'message' => 'Message deleted successfully'
         ]);
     }
+
+    /**
+     * Get all users for private chat
+     */
+    public function getUsers(Request $request)
+    {
+        $users = \App\Models\User::select('id', 'name', 'email')
+            ->where('id', '!=', 1) // Exclude guest user
+            ->orderBy('name')
+            ->get()
+            ->map(function($user) {
+                // Determine role based on email or add role column if exists
+                if (str_contains($user->email, 'admin')) {
+                    $user->role = 'admin';
+                } elseif (str_contains($user->email, 'teacher')) {
+                    $user->role = 'teacher';
+                } elseif (str_contains($user->email, 'ai@')) {
+                    $user->role = 'ai';
+                } else {
+                    $user->role = 'student';
+                }
+                return $user;
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+
+    /**
+     * Create or get private chat room between two users
+     */
+    public function createPrivateRoom(Request $request)
+    {
+        $validated = $request->validate([
+            'other_user_id' => 'required|exists:users,id'
+        ]);
+
+        $userId = 1; // Current user (guest for now)
+        $otherUserId = $validated['other_user_id'];
+
+        // Check if private room already exists between these two users
+        $existingRoom = ChatRoom::where('room_type', 'private')
+            ->whereHas('members', function($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->whereHas('members', function($q) use ($otherUserId) {
+                $q->where('user_id', $otherUserId);
+            })
+            ->first();
+
+        if ($existingRoom) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Phòng chat đã tồn tại',
+                'data' => [
+                    'room_id' => $existingRoom->room_id,
+                    'room_name' => $existingRoom->room_name,
+                    'room_type' => $existingRoom->room_type,
+                    'members' => $existingRoom->members
+                ]
+            ]);
+        }
+
+        // Create new private room
+        $otherUser = \App\Models\User::findOrFail($otherUserId);
+        
+        $room = ChatRoom::create([
+            'room_name' => "Chat với {$otherUser->name}",
+            'room_type' => 'private',
+            'created_by' => $userId,
+            'is_active' => true
+        ]);
+
+        // Add both users to the room
+        $room->members()->attach($userId, [
+            'role' => 'member',
+            'joined_at' => now()
+        ]);
+        
+        $room->members()->attach($otherUserId, [
+            'role' => 'member',
+            'joined_at' => now()
+        ]);
+
+        $room->load('members');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã tạo phòng chat mới',
+            'data' => [
+                'room_id' => $room->room_id,
+                'room_name' => $room->room_name,
+                'room_type' => $room->room_type,
+                'members' => $room->members
+            ]
+        ], 201);
+    }
 }
+

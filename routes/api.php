@@ -41,6 +41,10 @@ Route::prefix('chat')->group(function () {
     Route::post('/rooms/{roomId}/join', [ChatApiController::class, 'joinRoom']);
     Route::post('/rooms/{roomId}/leave', [ChatApiController::class, 'leaveRoom']);
     Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage']);
+    
+    // Private chat routes
+    Route::get('/users', [ChatApiController::class, 'getUsers']);
+    Route::post('/rooms/private', [ChatApiController::class, 'createPrivateRoom']);
 });
 
 // API Version 1

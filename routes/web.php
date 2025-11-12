@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -13,23 +15,62 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Forgot Password Routes (UC-GLOBAL-003)
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
+
+// Profile Routes (UC-GLOBAL-004: Manage Profile)
+Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
+    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+    Route::put('/update', [ProfileController::class, 'update'])->name('update');
+    Route::get('/password', [ProfileController::class, 'editPassword'])->name('password');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::delete('/avatar', [ProfileController::class, 'deleteAvatar'])->name('avatar.delete');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Public chat demo (for testing without auth)
+// Public chat route (for demo/testing without auth)
+Route::get('/chat', function () {
+    return view('chat.index');
+})->name('chat');
+
+// Chat demo (alternative route)
 Route::get('/chat-demo', function () {
     return view('chat.index');
 })->name('chat.demo');
 
-// Chat Routes (accessible by authenticated users)
-Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
-    Route::get('/', [ChatController::class, 'index'])->name('index');
+// Chat Routes (accessible by authenticated users) - if you need authenticated version
+Route::middleware(['auth'])->prefix('chat-auth')->name('chat.auth.')->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('index');
+});
+
+// Universal Dashboard Route (redirects based on role)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('teacher')) {
+            return redirect()->route('teacher.dashboard');
+        } elseif ($user->hasRole('student')) {
+            return redirect()->route('student.dashboard');
+        }
+        
+        // Default fallback
+        return view('dashboard.index');
+    })->name('dashboard');
 });
 
 // Student Dashboard (authenticated students)
-Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('welcome', [StudentController::class, 'welcome'])->name('welcome');
+Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
+    Route::get('/dashboard', [StudentController::class, 'welcome'])->name('dashboard');
+    Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
 });
 
 // Teacher Routes

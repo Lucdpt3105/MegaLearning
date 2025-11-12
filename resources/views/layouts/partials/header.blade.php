@@ -35,19 +35,37 @@
         <div class="w-px h-8 bg-gray-200"></div>
 
         <!-- User Profile -->
-        <div class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg px-3 py-2 transition">
-            <img 
-                src="https://ui-avatars.com/api/?name=John+Doe&background=6366f1&color=fff&bold=true" 
-                alt="Profile" 
-                class="w-10 h-10 rounded-full ring-2 ring-purple-100"
-            >
-            <div class="text-left">
-                <p class="font-semibold text-sm text-gray-800">John Doe</p>
-                <p class="text-xs text-gray-500">Student</p>
-            </div>
+        <a href="{{ route('profile.edit') }}" class="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2 transition">
+            @auth
+                @if(Auth::user()->avatar)
+                    <img 
+                        src="{{ asset('storage/' . Auth::user()->avatar) }}" 
+                        alt="{{ Auth::user()->name }}" 
+                        class="w-10 h-10 rounded-full ring-2 ring-purple-100 object-cover"
+                    >
+                @else
+                    <div class="w-10 h-10 rounded-full ring-2 ring-purple-100 bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div class="text-left">
+                    <p class="font-semibold text-sm text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->roles->first()?->name ?? 'User') }}</p>
+                </div>
+            @else
+                <img 
+                    src="https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff&bold=true" 
+                    alt="Guest" 
+                    class="w-10 h-10 rounded-full ring-2 ring-purple-100"
+                >
+                <div class="text-left">
+                    <p class="font-semibold text-sm text-gray-800">Guest</p>
+                    <p class="text-xs text-gray-500">Not logged in</p>
+                </div>
+            @endauth
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
             </svg>
-        </div>
+        </a>
     </div>
 </header>

@@ -33,6 +33,17 @@ class ChatDemoSeeder extends Seeder
         $teacherRole = Role::firstOrCreate(['name' => 'teacher']);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
 
+        // Create Guest User (ID will be 1 if this is the first user)
+        $guest = User::firstOrCreate(
+            ['email' => 'guest@megalearning.local'],
+            [
+                'name' => 'Guest User',
+                'password' => Hash::make('guest123'),
+                'email_verified_at' => now()
+            ]
+        );
+        $guest->syncRoles(['student']);
+
         // Create demo users (easy passwords for testing)
         $admin = User::firstOrCreate(
             ['email' => 'admin@test.com'],
@@ -84,6 +95,19 @@ class ChatDemoSeeder extends Seeder
         );
         $student3->syncRoles(['student']);
 
+        // Create Gemini AI User
+        $geminiAI = User::firstOrCreate(
+            ['email' => 'ai@megalearning.local'],
+            [
+                'name' => 'Gemini AI',
+                'password' => Hash::make('no-login'),
+                'email_verified_at' => now()
+            ]
+        );
+        // Create AI role if not exists
+        $aiRole = Role::firstOrCreate(['name' => 'ai']);
+        $geminiAI->syncRoles(['ai']);
+
         $this->command->info('💬 Creating chat rooms...');
 
         // Room 1: General Discussion
@@ -95,11 +119,13 @@ class ChatDemoSeeder extends Seeder
         ]);
 
         // Add members to room 1
+        $room1->members()->attach($guest->id, ['role' => 'member', 'joined_at' => now()]);
         $room1->members()->attach($admin->id, ['role' => 'admin', 'joined_at' => now()]);
         $room1->members()->attach($teacher->id, ['role' => 'member', 'joined_at' => now()]);
         $room1->members()->attach($student1->id, ['role' => 'member', 'joined_at' => now()]);
         $room1->members()->attach($student2->id, ['role' => 'member', 'joined_at' => now()]);
         $room1->members()->attach($student3->id, ['role' => 'member', 'joined_at' => now()]);
+        $room1->members()->attach($geminiAI->id, ['role' => 'member', 'joined_at' => now()]);
 
         // Room 2: Laravel Study Group
         $room2 = ChatRoom::create([
@@ -109,9 +135,11 @@ class ChatDemoSeeder extends Seeder
             'is_active' => true
         ]);
 
+        $room2->members()->attach($guest->id, ['role' => 'member', 'joined_at' => now()]);
         $room2->members()->attach($teacher->id, ['role' => 'admin', 'joined_at' => now()]);
         $room2->members()->attach($student1->id, ['role' => 'member', 'joined_at' => now()]);
         $room2->members()->attach($student2->id, ['role' => 'member', 'joined_at' => now()]);
+        $room2->members()->attach($geminiAI->id, ['role' => 'member', 'joined_at' => now()]);
 
         // Room 3: Private Chat (Teacher & Student)
         $room3 = ChatRoom::create([
@@ -153,11 +181,13 @@ class ChatDemoSeeder extends Seeder
         $this->command->table(
             ['Email', 'Password', 'Role'],
             [
+                ['guest@megalearning.local', 'guest123', 'Guest (Default)'],
                 ['admin@test.com', '123456', 'Admin'],
                 ['teacher@test.com', '123456', 'Teacher'],
                 ['student1@test.com', '123456', 'Student (Alice)'],
                 ['student2@test.com', '123456', 'Student (Bob)'],
                 ['student3@test.com', '123456', 'Student (Charlie)'],
+                ['ai@megalearning.local', 'no-login', 'Gemini AI (Bot)'],
             ]
         );
         $this->command->newLine();

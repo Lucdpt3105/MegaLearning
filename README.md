@@ -381,58 +381,136 @@ git push
 
 ---
 
-## �📁 Cấu trúc Dự án
+## 📁 Cấu trúc Dự án
 
 ```
 MegaLearning/
-├── app/
+├── 📂 app/                             # Core Application Logic
+│   ├── Console/                        # Artisan Commands
+│   ├── Events/                         # Event Classes
+│   │   └── MessageSent.php            # Chat message broadcast event
 │   ├── Http/
-│   │   └── Controllers/
-│   │       └── Api/                    # API Controllers
-│   │           ├── SubjectController.php
-│   │           ├── TopicController.php
-│   │           ├── QuestionController.php
-│   │           └── ExamController.php
-│   └── Models/                         # Eloquent Models
-│       ├── Subject.php
-│       ├── Topic.php
-│       ├── Question.php
-│       ├── Answer.php
-│       ├── Exam.php
-│       └── User.php
+│   │   ├── Controllers/
+│   │   │   ├── Api/                   # API Controllers
+│   │   │   │   ├── AuthApiController.php
+│   │   │   │   ├── ChatApiController.php    # ⭐ Chat API
+│   │   │   │   ├── ExamController.php
+│   │   │   │   ├── QuestionController.php
+│   │   │   │   ├── SubjectController.php
+│   │   │   │   └── TopicController.php
+│   │   │   ├── AuthController.php
+│   │   │   ├── ChatController.php           # ⭐ Chat Web Controller
+│   │   │   ├── StudentController.php
+│   │   │   └── TeacherController.php
+│   │   └── Middleware/
+│   ├── Models/                         # Eloquent ORM Models
+│   │   ├── Answer.php                 # Đáp án câu hỏi
+│   │   ├── ChatMessage.php            # ⭐ Tin nhắn chat
+│   │   ├── ChatRoom.php               # ⭐ Phòng chat
+│   │   ├── Exam.php                   # Bài thi
+│   │   ├── Question.php               # Câu hỏi
+│   │   ├── Subject.php                # Môn học
+│   │   ├── Topic.php                  # Chủ đề
+│   │   └── User.php                   # Người dùng
+│   ├── Providers/
+│   │   └── AppServiceProvider.php
+│   └── Services/
+│       └── AIService.php               # ⭐ Gemini AI Service
 │
-├── database/
-│   ├── learning3.sql                   # Database dump
-│   └── migrations/                     # Database migrations
+├── 📂 bootstrap/                       # Bootstrap files
+├── 📂 config/                          # Configuration files
+│   ├── app.php
+│   ├── database.php
+│   ├── broadcasting.php               # Pusher Config
+│   ├── services.php                   # ⭐ Gemini API Config
+│   └── permission.php                 # Spatie Permissions
 │
-├── resources/
-│   ├── views/
-│   │   ├── admin/                      # Admin Dashboard Views
-│   │   │   ├── layout.blade.php
-│   │   │   ├── dashboard.blade.php
-│   │   │   ├── partials/
-│   │   │   │   ├── sidebar.blade.php
-│   │   │   │   └── header.blade.php
-│   │   │   └── subjects/
-│   │   │       ├── index.blade.php
-│   │   │       └── create.blade.php
-│   │   └── components/                 # Reusable Components
+├── 📂 database/
+│   ├── learning3.sql                  # Database backup
+│   ├── factories/
+│   │   └── UserFactory.php
+│   ├── migrations/                    # Database migrations
+│   │   ├── *_create_users_table.php
+│   │   ├── *_create_subjects_table.php
+│   │   ├── *_create_chat_rooms_table.php       # ⭐
+│   │   ├── *_create_chat_messages_table.php    # ⭐
+│   │   └── *_create_chat_room_members_table.php # ⭐
+│   └── seeders/
+│       ├── ChatDemoSeeder.php         # ⭐ Demo data cho chat
+│       └── DatabaseSeeder.php
+│
+├── 📂 docs/                            # Documentation
+│   ├── README.md                      # Docs index
+│   ├── api/                           # API documentation
+│   ├── requirements/                  # Requirements docs
+│   │   └── Nhom5-Đe5.pdf
+│   ├── setup/                         # Setup guides
+│   └── uml/                           # UML diagrams
+│       ├── admin+hethong.jpg
+│       ├── giaovien.jpg
+│       └── học sinh.jpg
+│
+├── 📂 public/                          # Public web root
+│   ├── index.php                      # Entry point
+│   └── images/
+│
+├── 📂 resources/
 │   ├── css/
-│   │   └── app.css                     # Tailwind CSS
-│   └── js/
-│       └── app.js
+│   │   └── app.css                    # Tailwind CSS
+│   ├── js/
+│   │   ├── app.js
+│   │   └── bootstrap.js               # Laravel Echo, Pusher
+│   └── views/                         # Blade Templates
+│       ├── admin/                     # Admin Dashboard
+│       ├── auth/                      # Login, Register
+│       ├── chat/                      # ⭐ Chat Interface
+│       │   └── index.blade.php       # ⭐ Chat UI chính
+│       ├── components/                # Reusable Components
+│       ├── dashboard/                 # Main Dashboard
+│       ├── layouts/                   # Layout Templates
+│       │   ├── app.blade.php
+│       │   └── partials/
+│       │       ├── header.blade.php
+│       │       └── sidebar.blade.php
+│       ├── teacher/                   # Teacher Dashboard
+│       └── welcome.blade.php          # Landing Page
 │
-├── routes/
-│   ├── web.php                         # Web Routes (Admin UI)
-│   └── api.php                         # API Routes (RESTful)
+├── 📂 routes/
+│   ├── api.php                        # API Routes (REST API)
+│   ├── channels.php                   # Broadcasting Channels
+│   ├── console.php                    # Artisan Commands
+│   └── web.php                        # Web Routes
 │
-├── public/                             # Public assets
-├── storage/                            # File storage
-├── .env                                # Environment variables
-├── composer.json                       # PHP dependencies
-├── package.json                        # Node dependencies
-└── vite.config.js                      # Vite configuration
+├── 📂 scripts/                         # ⭐ Utility Scripts (NEW!)
+│   ├── README.md                      # Scripts documentation
+│   ├── setup-gemini.bat              # Setup Gemini AI
+│   ├── chat-start.bat                # Start chat server
+│   ├── test-gemini.php               # Test Gemini API
+│   ├── test-chat-direct.php          # Test chat API
+│   ├── test-chat-api.ps1             # PowerShell test
+│   ├── list-gemini-models.php        # List Gemini models
+│   └── *.bat, *.ps1                  # Other utilities
+│
+├── 📂 storage/                         # Storage (logs, cache, uploads)
+├── 📂 tests/                           # PHPUnit tests
+│   ├── Feature/
+│   │   └── Chat/                      # ⭐ Chat feature tests
+│   └── Unit/
+│
+├── 📂 vendor/                          # Composer dependencies
+├── 📂 node_modules/                    # NPM dependencies
+│
+├── 📄 .env                             # Environment variables
+├── 📄 .env.example                     # Example environment
+├── 📄 composer.json                    # PHP dependencies
+├── 📄 package.json                     # JS dependencies
+├── 📄 vite.config.js                   # Vite build config
+├── 📄 tailwind.config.js               # Tailwind CSS config
+├── 📄 phpunit.xml                      # PHPUnit config
+└── 📄 README.md                        # This file
 ```
+
+**⭐ = Tính năng Chat Realtime mới**
 
 ---
 

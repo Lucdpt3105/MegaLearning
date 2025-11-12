@@ -16,9 +16,9 @@ echo 60 requests/phut - Du de chat!
 echo.
 echo Buoc 2: Nhap API Key
 echo ----------------------------------------
-set /p APIKEY="AIzaSyA-QxSigqfMdIkxxml3cUX-TknanxkBT7A"
+set /p APIKEY="Nhap API key cua ban: "
 
-if "%APIKEY%"=="AIzaSyA-QxSigqfMdIkxxml3cUX-TknanxkBT7A" (
+if "%APIKEY%"=="" (
     echo ERROR: Ban chua nhap API key!
     pause
     exit /b 1

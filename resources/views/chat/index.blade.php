@@ -17,6 +17,14 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideOutRight {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100px); }
+        }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -37,7 +45,17 @@
                         <p class="text-sm text-gray-500">Chat realtime với AI Assistant 🤖</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-4">
+                    <!-- Home Button -->
+                    <a href="/" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span class="font-medium">Trang chủ</span>
+                    </a>
+                    
+                    <!-- Connection Status -->
                     <span id="connectionStatus" class="flex items-center space-x-2 text-sm">
                         <span class="relative flex h-3 w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
@@ -271,17 +289,27 @@
                 const roomsList = document.getElementById('roomsList');
                 
                 if (data.success && data.data.length > 0) {
-                    roomsList.innerHTML = data.data.map(room => `
+                    roomsList.innerHTML = data.data.map(room => {
+                        // For private rooms, show the other user's name
+                        let displayName = room.room_name;
+                        if (room.room_type === 'private' && room.members && room.members.length > 0) {
+                            const otherUser = room.members.find(m => m.id !== currentUser.id);
+                            if (otherUser) {
+                                displayName = otherUser.name;
+                            }
+                        }
+                        
+                        return `
                         <div 
                             onclick="selectRoom(${room.room_id})" 
                             class="p-4 hover:bg-white cursor-pointer transition-all duration-200 border-b border-gray-100 ${currentRoom?.room_id === room.room_id ? 'bg-white border-l-4 border-l-indigo-600' : ''}"
                         >
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    ${room.room_name.charAt(0).toUpperCase()}
+                                    ${displayName.charAt(0).toUpperCase()}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-800 truncate">${escapeHtml(room.room_name)}</h4>
+                                    <h4 class="font-semibold text-gray-800 truncate">${escapeHtml(displayName)}</h4>
                                     <p class="text-xs text-gray-500 flex items-center space-x-2">
                                         <span class="inline-flex items-center">
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -290,13 +318,13 @@
                                             ${room.members_count || 0} thành viên
                                         </span>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${room.room_type === 'group' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
-                                            ${room.room_type}
+                                            ${room.room_type === 'group' ? 'Nhóm' : 'Riêng tư'}
                                         </span>
                                     </p>
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 } else {
                     roomsList.innerHTML = `
                         <div class="p-8 text-center text-gray-400">
@@ -338,13 +366,23 @@
                     return;
                 }
 
+                // Determine display name for private rooms
+                let displayName = currentRoom.room_name;
+                if (currentRoom.room_type === 'private' && currentRoom.members && currentRoom.members.length > 0) {
+                    const otherUser = currentRoom.members.find(m => m.id !== currentUser.id);
+                    if (otherUser) {
+                        displayName = otherUser.name;
+                    }
+                }
+
                 // Update UI
-                document.getElementById('currentRoomName').textContent = currentRoom.room_name;
+                document.getElementById('currentRoomName').textContent = displayName;
                 document.getElementById('currentRoomMembers').textContent = `${currentRoom.members_count || 0} thành viên`;
                 
                 // Enable input
                 document.getElementById('messageInput').disabled = false;
                 document.getElementById('sendButton').disabled = false;
+                document.getElementById('messageInput').placeholder = 'Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)';
 
                 // Display messages
                 displayMessages(messagesData.data.data || []);
@@ -589,7 +627,7 @@
         // Load users list
         async function loadUsers() {
             try {
-                    const response = await fetch(`${API_URL}/users`);
+                const response = await fetch(`${API_URL}/users`);
                 const data = await response.json();
                 
                 const usersList = document.getElementById('usersList');
@@ -599,17 +637,19 @@
                         const roleColors = {
                             'admin': 'bg-red-100 text-red-800',
                             'teacher': 'bg-blue-100 text-blue-800',
-                            'student': 'bg-green-100 text-green-800'
+                            'student': 'bg-green-100 text-green-800',
+                            'ai': 'bg-purple-100 text-purple-800'
                         };
                         const roleNames = {
                             'admin': 'Admin',
                             'teacher': 'Giáo viên',
-                            'student': 'Học sinh'
+                            'student': 'Học sinh',
+                            'ai': 'AI Assistant'
                         };
                         
                         return `
                         <div 
-                            onclick="startPrivateChat(${user.id}, '${escapeHtml(user.name)}')" 
+                            onclick="startPrivateChat(${user.id}, ${JSON.stringify(user.name).replace(/"/g, '&quot;')})" 
                             class="p-4 hover:bg-white cursor-pointer transition-all duration-200 border-b border-gray-100"
                         >
                             <div class="flex items-center space-x-3">
@@ -622,7 +662,7 @@
                                         <span class="text-xs ${roleColors[user.role] || 'bg-gray-100 text-gray-800'} px-2 py-0.5 rounded-full font-medium">
                                             ${roleNames[user.role] || user.role}
                                         </span>
-                                        ${user.email === 'ai@megalearning.com' ? '<span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-medium">🤖 AI</span>' : ''}
+                                        ${user.role === 'ai' ? '<span class="text-xs">🤖</span>' : ''}
                                     </div>
                                 </div>
                             </div>
@@ -648,7 +688,8 @@
         // Start private chat with a user
         async function startPrivateChat(userId, userName) {
             try {
-                showNotification(`Đang tạo phòng chat với ${userName}...`, 'info');
+                // Don't show notification immediately, show loading state instead
+                console.log(`Starting private chat with user ${userId} (${userName})`);
                 
                 const response = await fetch(`${API_URL}/rooms/private`, {
                     method: 'POST',
@@ -663,21 +704,27 @@
 
                 const data = await response.json();
 
-                if (data.success) {
-                    showNotification(data.message || 'Đã tạo phòng chat!', 'success');
+                if (data.success && data.data && data.data.room_id) {
+                    console.log('Private room created/found:', data.data);
                     
                     // Switch back to rooms tab
                     switchTab('rooms');
                     
                     // Reload rooms and select the new/existing room
                     await loadRooms();
-                    setTimeout(() => selectRoom(data.data.room_id), 300);
+                    
+                    // Wait a bit for rooms to load, then select the room
+                    setTimeout(() => {
+                        selectRoom(data.data.room_id);
+                        showNotification(data.message || `Đã mở phòng chat với ${userName}`, 'success');
+                    }, 400);
                 } else {
-                    showNotification('Không thể tạo phòng chat', 'error');
+                    console.error('Failed to create private room:', data);
+                    showNotification(data.message || 'Không thể tạo phòng chat', 'error');
                 }
             } catch (error) {
                 console.error('Error starting private chat:', error);
-                showNotification('Lỗi khi tạo phòng chat', 'error');
+                showNotification('Lỗi khi tạo phòng chat. Vui lòng thử lại.', 'error');
             }
         }
 
@@ -733,12 +780,14 @@
             };
 
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-bounce`;
+            notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transition-all duration-300 transform translate-x-0`;
+            notification.style.animation = 'slideInRight 0.3s ease-out';
             notification.textContent = message;
             document.body.appendChild(notification);
 
             setTimeout(() => {
-                notification.remove();
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
 
