@@ -94,13 +94,12 @@ class ChatApiController extends Controller
         // Broadcast event
         broadcast(new MessageSent($message))->toOthers();
 
-        // Trigger AI response if AI is a member
+        // Trigger AI response if AI is a member (run immediately, not after response)
         if ($this->aiService->isConfigured()) {
             $aiUser = $this->aiService->getAIUser();
             if ($aiUser && $room->members->contains($aiUser->id)) {
-                dispatch(function () use ($room, $message) {
-                    $this->handleAIResponse($room, $message);
-                })->afterResponse();
+                // Run AI response asynchronously
+                $this->handleAIResponse($room, $message);
             }
         }
 
@@ -118,26 +117,47 @@ class ChatApiController extends Controller
     {
         try {
             // Don't respond to AI's own messages
-            if ($userMessage->user_id === $this->aiService->getAIUser()->id) {
+            $aiUser = $this->aiService->getAIUser();
+            if (!$aiUser || $userMessage->user_id === $aiUser->id) {
                 return;
             }
+
+            \Log::info('AI processing message', [
+                'room_id' => $room->room_id,
+                'message' => substr($userMessage->message_text, 0, 50)
+            ]);
 
             $aiResponse = $this->aiService->generateResponse($room, $userMessage);
 
             if ($aiResponse) {
+                \Log::info('AI generated response', [
+                    'response' => substr($aiResponse, 0, 100)
+                ]);
+
                 $aiMessage = ChatMessage::create([
                     'room_id' => $room->room_id,
-                    'user_id' => $this->aiService->getAIUser()->id,
+                    'user_id' => $aiUser->id,
                     'message_text' => $aiResponse,
                     'message_type' => 'text',
                 ]);
 
                 $aiMessage->load('user:id,name,email');
+                
+                \Log::info('AI message created', [
+                    'message_id' => $aiMessage->message_id
+                ]);
+
+                // Broadcast to everyone
                 broadcast(new MessageSent($aiMessage));
+                
+                \Log::info('AI message broadcasted');
+            } else {
+                \Log::info('AI decided not to respond');
             }
         } catch (\Exception $e) {
             \Log::error('AI Response Error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'room_id' => $room->room_id
             ]);
         }
