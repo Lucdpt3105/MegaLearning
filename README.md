@@ -29,32 +29,30 @@
 3. **📹 Video call học nhóm (WebRTC/Zoom API)**
 4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
 
-### 🆕 **NEW: Chat Realtime với AI Assistant**
+### 🆕 **NEW: Chat Realtime với Gemini AI (MIỄN PHÍ!)**
 
-Hệ thống chat nhóm realtime tích hợp AI:
+Hệ thống chat nhóm realtime tích hợp Google Gemini AI:
 - ✅ Chat realtime giữa nhiều người trong cùng một phòng
-- ✅ AI Assistant tự động trả lời khi được mention hoặc có câu hỏi
+- ✅ **Gemini AI** tự động trả lời (MIỄN PHÍ - không cần thẻ tín dụng!)
 - ✅ Giao diện hiện đại với Tailwind CSS
-- ✅ Broadcasting với Pusher (hoặc polling mode nếu chưa config)
+- ✅ Broadcasting với Pusher (hoặc polling mode)
 - ✅ Tạo/quản lý phòng chat dễ dàng
 
-**🚀 Quick Start:**
-1. Truy cập: `http://localhost:8000/chat-demo`
-2. Tạo phòng mới hoặc chọn phòng có sẵn
-3. Bắt đầu chat! AI sẽ tự động trả lời khi bạn:
-   - Mention AI: "AI ơi...", "bot help..."
-   - Đặt câu hỏi: "Làm thế nào...?", "Giải thích..."
+**🚀 Truy cập ngay:** `http://localhost:8000/chat-demo`
 
-**⚙️ Cấu hình (Optional):**
-- **Pusher realtime**: Thêm `PUSHER_APP_KEY`, `PUSHER_APP_SECRET`, `PUSHER_APP_ID` vào `.env`
-- **AI với OpenAI GPT-3.5**: 
-  - **Cách nhanh**: Chạy `setup-openai.bat` và paste API key
-  - **Hoặc**: Thêm `OPENAI_API_KEY=sk-...` vào `.env`
-  - Test: `php test-openai-simple.php`
-  - Start worker: `php artisan queue:work`
-- **AI Demo Mode (miễn phí)**: Để `OPENAI_API_KEY` trống, AI sẽ dùng mock responses
+**⚙️ Setup Gemini AI (Tùy chọn - 2 phút):**
 
-📖 **Chi tiết**: Xem `CHAT_GUIDE.md` và `OPENAI_SETUP.md`
+Hiện AI đang chạy ở chế độ Demo (miễn phí). Để nâng cấp lên Gemini Pro:
+
+```bash
+# 1. Lấy API key: https://makersuite.google.com/app/apikey (MIỄN PHÍ!)
+# 2. Setup:
+setup-gemini.bat
+# 3. Test:
+php test-gemini.php
+```
+
+**📖 Xem thêm:** `AI_SETUP_QUICK.md`, `GEMINI_SETUP.md`, `CHAT_GUIDE.md`
 
 ---
 

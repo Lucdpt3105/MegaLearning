@@ -16,10 +16,10 @@ class AIService
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.api_key');
-        $this->apiUrl = config('services.openai.api_url', 'https://api.openai.com/v1/chat/completions');
-        $this->model = config('services.openai.model', 'gpt-3.5-turbo');
-        $this->aiName = config('services.openai.ai_name', 'AI Assistant');
+        $this->apiKey = config('services.gemini.api_key');
+        $this->model = config('services.gemini.model', 'gemini-2.5-flash');
+        $this->apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' . $this->model . ':generateContent';
+        $this->aiName = config('services.gemini.ai_name', 'Gemini AI');
     }
 
     /**
@@ -48,29 +48,65 @@ class AIService
             // Build system prompt
             $systemPrompt = $this->buildSystemPrompt($room);
 
-            // Call OpenAI API
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(30)->post($this->apiUrl, [
-                'model' => $this->model,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ...$context
-                ],
-                'max_tokens' => 150,
-                'temperature' => 0.7,
-                'top_p' => 0.9,
-                'frequency_penalty' => 0.5,
-                'presence_penalty' => 0.5,
+            // Call Gemini API
+            return $this->callGeminiAPI($context, $systemPrompt);
+
+        } catch (\Exception $e) {
+            Log::error('AI Service Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Call Google Gemini API
+     * 
+     * @param array $context
+     * @param string $systemPrompt
+     * @return string|null
+     */
+    protected function callGeminiAPI(array $context, string $systemPrompt): ?string
+    {
+        try {
+            // Build conversation for Gemini (different format than OpenAI)
+            $contents = [];
+            
+            // Add system prompt as first user message
+            $contents[] = [
+                'role' => 'user',
+                'parts' => [['text' => $systemPrompt]]
+            ];
+            
+            // Add conversation history
+            foreach ($context as $message) {
+                $role = $message['role'] === 'assistant' ? 'model' : 'user';
+                $contents[] = [
+                    'role' => $role,
+                    'parts' => [['text' => $message['content']]]
+                ];
+            }
+
+            // Make API call
+            $url = $this->apiUrl . '?key=' . $this->apiKey;
+            
+            $response = Http::timeout(30)->post($url, [
+                'contents' => $contents,
+                'generationConfig' => [
+                    'temperature' => 0.7,
+                    'topK' => 40,
+                    'topP' => 0.95,
+                    'maxOutputTokens' => 500,
+                ]
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
-                return trim($data['choices'][0]['message']['content'] ?? null);
+                return trim($data['candidates'][0]['content']['parts'][0]['text'] ?? null);
             }
 
-            Log::error('OpenAI API Error', [
+            Log::error('Gemini API Error', [
                 'status' => $response->status(),
                 'body' => $response->body()
             ]);
@@ -78,9 +114,8 @@ class AIService
             return null;
 
         } catch (\Exception $e) {
-            Log::error('AI Service Exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+            Log::error('Gemini API Exception', [
+                'message' => $e->getMessage()
             ]);
             return null;
         }
