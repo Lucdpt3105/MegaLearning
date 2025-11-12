@@ -104,7 +104,7 @@ class ChatApiController extends Controller
         $message->load('user:id,name,email');
 
         // Broadcast event
-        broadcast(new MessageSent($message))->toOthers();
+        broadcast(new MessageSent($message));
 
         // Trigger AI response if AI is a member (run immediately, not after response)
         if ($this->aiService->isConfigured()) {
@@ -135,7 +135,7 @@ class ChatApiController extends Controller
             }
 
             \Log::info('AI processing message', [
-                'room_id' => $room->room_id,
+                'room_id' => $room->id,
                 'message' => substr($userMessage->message_text, 0, 50)
             ]);
 
@@ -147,7 +147,7 @@ class ChatApiController extends Controller
                 ]);
 
                 $aiMessage = ChatMessage::create([
-                    'room_id' => $room->room_id,
+                    'room_id' => $room->id,
                     'user_id' => $aiUser->id,
                     'message_text' => $aiResponse,
                     'message_type' => 'text',
@@ -156,7 +156,7 @@ class ChatApiController extends Controller
                 $aiMessage->load('user:id,name,email');
                 
                 \Log::info('AI message created', [
-                    'message_id' => $aiMessage->message_id
+                    'message_id' => $aiMessage->id
                 ]);
 
                 // Broadcast to everyone
@@ -170,7 +170,7 @@ class ChatApiController extends Controller
             \Log::error('AI Response Error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'room_id' => $room->room_id
+                'room_id' => $room->id
             ]);
         }
     }
@@ -226,7 +226,18 @@ class ChatApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Chat room created successfully',
-            'data' => $room
+            'data' => [
+                'id' => $room->id,
+                'room_name' => $room->room_name,
+                'room_type' => $room->room_type,
+                'subject_id' => $room->subject_id,
+                'created_by' => $room->created_by,
+                'is_active' => $room->is_active,
+                'members' => $room->members,
+                'members_count' => $room->members->count(),
+                'created_at' => $room->created_at,
+                'updated_at' => $room->updated_at
+            ]
         ], 201);
     }
 
@@ -328,7 +339,8 @@ class ChatApiController extends Controller
                 'success' => true,
                 'message' => 'Phòng chat đã tồn tại',
                 'data' => [
-                    'room_id' => $existingRoom->room_id,
+                    'id' => $existingRoom->id,
+                    'room_id' => $existingRoom->id, // Backward compatibility
                     'room_name' => $existingRoom->room_name,
                     'room_type' => $existingRoom->room_type,
                     'members' => $existingRoom->members
@@ -363,7 +375,8 @@ class ChatApiController extends Controller
             'success' => true,
             'message' => 'Đã tạo phòng chat mới',
             'data' => [
-                'room_id' => $room->room_id,
+                'id' => $room->id,
+                'room_id' => $room->id, // Backward compatibility
                 'room_name' => $room->room_name,
                 'room_type' => $room->room_type,
                 'members' => $room->members

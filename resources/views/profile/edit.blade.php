@@ -7,7 +7,7 @@
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
+            <h1 class="text-3xl font-bold text-black-900 dark:text-blue-400">Edit Profile</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">Update your account information and settings</p>
         </div>
 

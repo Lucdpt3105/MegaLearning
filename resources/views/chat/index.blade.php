@@ -301,8 +301,8 @@
                         
                         return `
                         <div 
-                            onclick="selectRoom(${room.room_id})" 
-                            class="p-4 hover:bg-white cursor-pointer transition-all duration-200 border-b border-gray-100 ${currentRoom?.room_id === room.room_id ? 'bg-white border-l-4 border-l-indigo-600' : ''}"
+                            onclick="selectRoom(${room.id})" 
+                            class="p-4 hover:bg-white cursor-pointer transition-all duration-200 border-b border-gray-100 ${currentRoom?.id === room.id ? 'bg-white border-l-4 border-l-indigo-600' : ''}"
                         >
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
@@ -345,9 +345,15 @@
         // Select room and load messages
         async function selectRoom(roomId) {
             try {
+                // Clear polling interval if exists
+                if (window.pollingInterval) {
+                    clearInterval(window.pollingInterval);
+                    window.pollingInterval = null;
+                }
+                
                 // Unsubscribe from previous room
                 if (currentRoom && echoInstance) {
-                    echoInstance.leaveChannel(`chat-room.${currentRoom.room_id}`);
+                    echoInstance.leaveChannel(`chat-room.${currentRoom.id}`);
                 }
 
                 // Fetch room details and messages
@@ -359,7 +365,7 @@
                 const roomsData = await roomResponse.json();
                 const messagesData = await messagesResponse.json();
 
-                currentRoom = roomsData.data.find(r => r.room_id === roomId);
+                currentRoom = roomsData.data.find(r => r.id === roomId);
                 
                 if (!currentRoom) {
                     showNotification('Không tìm thấy phòng', 'error');
@@ -402,8 +408,13 @@
         // Subscribe to room channel
         function subscribeToRoom(roomId) {
             if (!echoInstance) {
-                console.log('📡 Polling mode - checking for new messages every 5s');
-                setInterval(() => loadMessagesPolling(roomId), 5000);
+                console.log('📡 Polling mode - checking for new messages every 2s');
+                // Clear any existing polling interval
+                if (window.pollingInterval) {
+                    clearInterval(window.pollingInterval);
+                }
+                // Poll every 2 seconds for faster AI response
+                window.pollingInterval = setInterval(() => loadMessagesPolling(roomId), 2000);
                 return;
             }
 
@@ -416,7 +427,7 @@
 
         // Polling fallback for when Pusher is not configured
         async function loadMessagesPolling(roomId) {
-            if (currentRoom?.room_id !== roomId) return;
+            if (currentRoom?.id !== roomId) return;
             
             try {
                 const response = await fetch(`${API_URL}/rooms/${roomId}/messages`);
@@ -426,8 +437,16 @@
                         .map(el => el.dataset.messageId);
                     
                     data.data.data.forEach(msg => {
-                        if (!currentMessageIds.includes(String(msg.message_id))) {
-                            appendMessage(msg);
+                        // Use 'id' instead of 'message_id'
+                        const msgId = msg.id || msg.message_id;
+                        if (!currentMessageIds.includes(String(msgId))) {
+                            appendMessage({
+                                message_id: msgId,
+                                id: msgId,
+                                user: msg.user,
+                                message_text: msg.message_text,
+                                created_at: msg.created_at
+                            });
                         }
                     });
                 }
@@ -461,9 +480,10 @@
         function renderMessage(msg) {
             const isAI = msg.user?.email === 'ai@megalearning.local';
             const isCurrentUser = msg.user?.id === currentUser.id;
+            const msgId = msg.id || msg.message_id; // Support both id and message_id
             
             return `
-                <div data-message-id="${msg.message_id}" class="chat-message flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
+                <div data-message-id="${msgId}" class="chat-message flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
                     <div class="flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2 max-w-2xl">
                         <div class="flex-shrink-0 w-8 h-8 rounded-full ${isAI ? 'bg-gradient-to-r from-purple-500 to-pink-500' : isCurrentUser ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-400'} flex items-center justify-center text-white text-sm font-medium shadow-md">
                             ${isAI ? '🤖' : (msg.user?.name?.charAt(0) || 'U')}
@@ -502,18 +522,30 @@
                 container.innerHTML = '';
             }
 
+            // Use id or message_id
+            const msgId = msgData.id || msgData.message_id;
+            
             // Check if message already exists
-            if (container.querySelector(`[data-message-id="${msgData.message_id}"]`)) {
+            if (container.querySelector(`[data-message-id="${msgId}"]`)) {
+                console.log('Message already exists:', msgId);
                 return;
             }
 
+            // Hide AI typing indicator if this is an AI message
+            const isAI = msgData.user?.email === 'ai@megalearning.local';
+            if (isAI) {
+                hideAITyping();
+            }
+
             const msg = {
-                message_id: msgData.message_id,
+                id: msgId,
+                message_id: msgId,
                 user: msgData.user,
                 message_text: msgData.message_text,
                 created_at: msgData.created_at
             };
 
+            console.log('📩 Appending message:', msg);
             container.insertAdjacentHTML('beforeend', renderMessage(msg));
             scrollToBottom();
         }
@@ -526,7 +558,7 @@
             if (!text || !currentRoom) return;
 
             try {
-                const response = await fetch(`${API_URL}/rooms/${currentRoom.room_id}/messages`, {
+                const response = await fetch(`${API_URL}/rooms/${currentRoom.id}/messages`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -544,6 +576,11 @@
                     // In polling mode, add message immediately
                     if (!echoInstance) {
                         appendMessage(data.data);
+                        
+                        // Show AI typing indicator if room has AI
+                        if (currentRoom.has_ai) {
+                            showAITyping();
+                        }
                     }
                 } else {
                     showNotification('Không thể gửi tin nhắn', 'error');
@@ -551,6 +588,45 @@
             } catch (error) {
                 console.error('Error sending message:', error);
                 showNotification('Lỗi khi gửi tin nhắn', 'error');
+            }
+        }
+
+        // Show AI typing indicator
+        function showAITyping() {
+            const container = document.getElementById('messagesContainer');
+            const typingId = 'ai-typing-indicator';
+            
+            // Don't add if already exists
+            if (container.querySelector(`#${typingId}`)) return;
+            
+            const typingHTML = `
+                <div id="${typingId}" class="chat-message flex justify-start">
+                    <div class="flex items-end space-x-2 max-w-2xl">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-medium shadow-md">
+                            🤖
+                        </div>
+                        <div class="mr-2">
+                            <div class="px-4 py-3 rounded-2xl shadow-md bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200">
+                                <div class="flex space-x-1">
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', typingHTML);
+            scrollToBottom();
+        }
+
+        // Hide AI typing indicator
+        function hideAITyping() {
+            const indicator = document.getElementById('ai-typing-indicator');
+            if (indicator) {
+                indicator.remove();
             }
         }
 
@@ -579,6 +655,10 @@
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
                 if (data.success) {
@@ -586,13 +666,14 @@
                     hideCreateRoomModal();
                     nameInput.value = '';
                     await loadRooms();
-                    selectRoom(data.data.room_id);
+                    selectRoom(data.data.id);
                 } else {
-                    showNotification('Không thể tạo phòng', 'error');
+                    console.error('Create room failed:', data);
+                    showNotification(data.message || 'Không thể tạo phòng', 'error');
                 }
             } catch (error) {
                 console.error('Error creating room:', error);
-                    showNotification('Lỗi khi tạo phòng', 'error');
+                showNotification('Lỗi khi tạo phòng: ' + error.message, 'error');
             }
         }
 
@@ -702,9 +783,13 @@
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
-                if (data.success && data.data && data.data.room_id) {
+                if (data.success && data.data && data.data.id) {
                     console.log('Private room created/found:', data.data);
                     
                     // Switch back to rooms tab
@@ -715,7 +800,7 @@
                     
                     // Wait a bit for rooms to load, then select the room
                     setTimeout(() => {
-                        selectRoom(data.data.room_id);
+                        selectRoom(data.data.id);
                         showNotification(data.message || `Đã mở phòng chat với ${userName}`, 'success');
                     }, 400);
                 } else {
@@ -724,7 +809,7 @@
                 }
             } catch (error) {
                 console.error('Error starting private chat:', error);
-                showNotification('Lỗi khi tạo phòng chat. Vui lòng thử lại.', 'error');
+                showNotification('Lỗi khi tạo phòng chat: ' + error.message, 'error');
             }
         }
 

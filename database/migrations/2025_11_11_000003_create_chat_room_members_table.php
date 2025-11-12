@@ -21,7 +21,7 @@ return new class extends Migration
 
             // Foreign keys
             $table->foreign('room_id')
-                  ->references('room_id')
+                  ->references('id') // Reference to chat_rooms.id
                   ->on('chat_rooms')
                   ->onDelete('cascade');
 
