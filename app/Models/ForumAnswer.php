@@ -9,7 +9,7 @@ class ForumAnswer extends Model
     protected $primaryKey = 'forum_answer_id';
     public $incrementing = true;
     protected $keyType = 'int';
-    // Only created_at exists; disable automatic timestamps so updated_at is never referenced.
+    // Only created_at exists in table; disable automatic timestamps to avoid updated_at inserts
     public $timestamps = false;
     const UPDATED_AT = null;
     protected $fillable = ['forum_question_id', 'user_id', 'answer_content', 'parent_id'];

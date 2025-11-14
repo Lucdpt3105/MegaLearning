@@ -45,7 +45,7 @@
 			@if(session('success-answer'))
 				<div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">{{ session('success-answer') }}</div>
 			@endif
-			<form method="POST" action="{{ route('forum.answer.store', $question->getKey()) }}" class="space-y-4">
+			<form method="POST" action="{{ route('forum.answer.store', $question->getKey()) }}" class="space-y-4 js-answer-form" data-parent-id="" id="new-answer-form">
 				@csrf
 				<div>
 					<textarea name="answer_content" rows="4" required placeholder="Nhập câu trả lời của bạn" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('answer_content') }}</textarea>
@@ -190,6 +190,77 @@
 		} else if(e.target.classList.contains('cancel-reply')){
 			const formEl = e.target.closest('#'+e.target.closest('[id]').id);
 			if(formEl){ formEl.classList.add('hidden'); }
+		}
+	});
+})();
+</script>
+<script>
+// AJAX create & delete answers (no reload)
+(function(){
+	const wrapper = document.getElementById('answers-wrapper');
+	if(!wrapper) return;
+	const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('[data-csrf]')?.getAttribute('data-csrf');
+
+	async function submitAnswer(form){
+		const url = form.getAttribute('action');
+		const fd = new FormData(form);
+		try {
+			const res = await fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':csrf,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}, body: fd });
+			if(!res.ok) throw new Error('Failed');
+			const data = await res.json();
+			if(data.html){ insertAnswerHtml(data); }
+			form.reset();
+			if(form.dataset.parentId){ const replyWrap = form.closest('#reply-form-'+form.dataset.parentId); replyWrap && replyWrap.classList.add('hidden'); }
+		} catch(e){ console.error(e); alert('Post failed'); }
+	}
+
+	function insertAnswerHtml(data){
+		const temp = document.createElement('div'); temp.innerHTML = data.html.trim();
+		const answerEl = temp.firstElementChild; if(!answerEl) return;
+		if(!data.parent_id){
+			wrapper.appendChild(answerEl);
+		} else {
+			const parentEl = wrapper.querySelector('[data-answer-id="'+data.parent_id+'"]');
+			if(parentEl){
+				let childrenWrap = parentEl.querySelector('.children-wrapper');
+				if(!childrenWrap){
+					childrenWrap = document.createElement('div');
+					childrenWrap.className = 'mt-3 space-y-4 children-wrapper';
+					parentEl.appendChild(childrenWrap);
+				}
+				childrenWrap.appendChild(answerEl);
+			} else {
+				wrapper.appendChild(answerEl);
+			}
+		}
+	}
+
+	document.addEventListener('submit', function(e){
+		const form = e.target;
+		if(form.classList.contains('js-answer-form')){
+			e.preventDefault();
+			const ta = form.querySelector('textarea[name="answer_content"]');
+			if(!ta || ta.value.trim().length===0){ alert('Content required'); return; }
+			submitAnswer(form);
+		}
+	});
+
+	document.addEventListener('submit', function(e){
+		const form = e.target;
+		if(form.matches('form[action*="/answers/"]') && form.querySelector('input[name="_method"][value="DELETE"]')){
+			e.preventDefault();
+			if(!confirm('Delete this answer and its replies?')) return;
+			const url = form.getAttribute('action');
+			const fd = new FormData(form);
+			fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':csrf,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}, body: fd })
+				.then(r=>r.json())
+				.then(data=>{
+					if(data.deleted){
+						const el = wrapper.querySelector('[data-answer-id="'+data.answer_id+'"]');
+						if(el){ el.remove(); }
+					}
+				})
+				.catch(err=>console.error(err));
 		}
 	});
 })();

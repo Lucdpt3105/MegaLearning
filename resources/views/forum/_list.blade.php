@@ -10,7 +10,7 @@
     <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
         <span>👤 {{ optional($q->user)->name }}</span>
         <span>👍 {{ $q->votes_sum ?? 0 }}</span>
-        <span>💬 {{ $q->comments_count ?? 0 }}</span>
+        <span>💬 {{ $q->answers_count ?? 0 }}</span>
         <span>🕓 {{ $q->created_at->diffForHumans() }}</span>
         @if($q->updated_at)
             <span>🔄 edited: {{ $q->updated_at->diffForHumans() }}</span>

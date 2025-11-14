@@ -12,7 +12,7 @@
                 <select id="sort" name="sort" class="w-44 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="latest"   @selected(request('sort','latest') === 'latest')>Latest</option>
                         <option value="votes"    @selected(request('sort') === 'votes')>Most votes</option>
-                        <option value="comments" @selected(request('sort') === 'comments')>Most answers</option>
+                        <option value="answers" @selected(request('sort') === 'answers')>Most answers</option>
                         <option value="my_post"  @selected(request('sort') === 'my_post')>My posts</option>
                 </select>
                 @foreach(request()->except('sort','page') as $k => $v)
