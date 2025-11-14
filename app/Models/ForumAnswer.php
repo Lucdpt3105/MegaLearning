@@ -6,10 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 class ForumAnswer extends Model
 {
     protected $table = 'forumanswers';
+    protected $primaryKey = 'forum_answer_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    // Only created_at exists; disable automatic timestamps so updated_at is never referenced.
+    public $timestamps = false;
+    const UPDATED_AT = null;
     protected $fillable = ['forum_question_id', 'user_id', 'answer_content', 'parent_id'];
+    protected $casts = [
+        'created_at' => 'datetime', // ensure Carbon instance for diffForHumans()
+    ];
 
     public function question() {
-        return $this->belongsTo(ForumQuestion::class, 'forum_question_id');
+        return $this->belongsTo(ForumQuestion::class, 'forum_question_id', 'forum_question_id');
     }
 
     public function user() {
@@ -21,10 +30,10 @@ class ForumAnswer extends Model
     }
 
     public function parent() {
-        return $this->belongsTo(ForumAnswer::class, 'parent_id');
+        return $this->belongsTo(ForumAnswer::class, 'parent_id', 'forum_answer_id');
     }
 
     public function children() {
-        return $this->hasMany(ForumAnswer::class, 'parent_id');
+        return $this->hasMany(ForumAnswer::class, 'parent_id', 'forum_answer_id');
     }
 }

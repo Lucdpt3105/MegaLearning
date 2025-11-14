@@ -10,7 +10,7 @@ use App\Policies\ForumQuestionPolicy;
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        \App\Models\ForumQuestion::class => \App\Policies\ForumQuestionPolicy::class,
+        ForumQuestion::class => ForumQuestionPolicy::class,
     ];
 
     public function boot()
