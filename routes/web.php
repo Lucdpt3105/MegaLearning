@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\Api\ForumQuestionController;
+use App\Http\Controllers\ForumQuestionController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -98,11 +98,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 // forum routes
 
 Route::prefix('forum')->middleware(['auth'])->group(function () {
-    Route::get('/forum', [ForumQuestionController::class, 'index'])->name('forum.index');
-    Route::get('/forum/create', [ForumQuestionController::class, 'create'])->name('forum.create');
-    Route::post('/forum', [ForumQuestionController::class, 'store'])->name('forum.store');
-    Route::get('/forum/{id}', [ForumQuestionController::class, 'show'])->name('forum.show');
-    Route::get('/forum/{id}/edit', [ForumQuestionController::class, 'edit'])->name('forum.edit');
-    Route::put('/forum/{id}', [ForumQuestionController::class, 'update'])->name('forum.update');
-    Route::delete('/forum/{id}', [ForumQuestionController::class, 'destroy'])->name('forum.destroy');
+    Route::get('/', [ForumQuestionController::class, 'index'])->name('forum.index');
+    Route::get('/back', [ForumQuestionController::class, 'back'])->name('forum.back');
+    Route::get('/create', [ForumQuestionController::class, 'create'])->name('forum.create');
+    Route::post('/', [ForumQuestionController::class, 'store'])->name('forum.store');
+    Route::get('/{forumQuestion}', [ForumQuestionController::class, 'show'])->name('forum.show');
+    Route::get('/{forumQuestion}/edit', [ForumQuestionController::class, 'edit'])->name('forum.edit');
+    Route::put('/{forumQuestion}', [ForumQuestionController::class, 'update'])->name('forum.update');
+    Route::delete('/{forumQuestion}', [ForumQuestionController::class, 'destroy'])->name('forum.destroy');
+    Route::post('/{forumQuestion}/vote/up', [ForumQuestionController::class, 'voteUp'])->name('forum.vote.up');
+    Route::post('/{forumQuestion}/vote/down', [ForumQuestionController::class, 'voteDown'])->name('forum.vote.down');
+    Route::post('/{forumQuestion}/answers', [ForumQuestionController::class, 'storeAnswer'])->name('forum.answer.store');
+    Route::post('/{forumQuestion}/answers/{forumAnswer}/vote/up', [ForumQuestionController::class, 'voteAnswerUp'])->name('forum.answer.vote.up');
+    Route::post('/{forumQuestion}/answers/{forumAnswer}/vote/down', [ForumQuestionController::class, 'voteAnswerDown'])->name('forum.answer.vote.down');
+    Route::delete('/{forumQuestion}/answers/{forumAnswer}', [ForumQuestionController::class, 'destroyAnswer'])->name('forum.answer.destroy');
 });

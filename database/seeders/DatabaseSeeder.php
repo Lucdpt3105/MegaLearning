@@ -17,8 +17,9 @@ class DatabaseSeeder extends Seeder
     {
         // Chạy seeder theo thứ tự: Roles -> Users
         $this->call([
-            RoleSeeder::class,
-            UserSeeder::class,
+            // RoleSeeder::class,
+            // UserSeeder::class,
+           // ForumSeeder::class,
         ]);
     }
 }

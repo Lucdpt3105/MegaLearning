@@ -12,10 +12,10 @@ class Vote extends Model
     }
 
     public function question() {
-        return $this->belongsTo(ForumQuestion::class, 'forumquestion_id');
+        return $this->belongsTo(ForumQuestion::class, 'forum_question_id', 'forum_question_id');
     }
 
     public function answer() {
-        return $this->belongsTo(ForumAnswer::class, 'forumanswer_id');
+        return $this->belongsTo(ForumAnswer::class, 'forum_answer_id', 'forum_answer_id');
     }
 }

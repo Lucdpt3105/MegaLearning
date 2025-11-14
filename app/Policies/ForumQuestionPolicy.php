@@ -27,23 +27,23 @@ class ForumQuestionPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response|bool
     {
-        return false;
+        return $user->id ? Response::allow() : Response::deny('Bạn cần đăng nhập để xem.');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, ForumQuestion $forumQuestion): bool
+    public function view(User $user, ForumQuestion $forumQuestion): Response|bool
     {
-        return false;
+        return Response::allow();
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response|bool
     {
         return $user->id ? Response::allow() : Response::deny('Bạn cần đăng nhập để tạo bài.');
     }
@@ -51,7 +51,7 @@ class ForumQuestionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, ForumQuestion $forumQuestion): bool
+    public function update(User $user, ForumQuestion $forumQuestion): Response|bool
     {
         return $user->id === $forumQuestion->user_id
             ? Response::allow()
@@ -61,7 +61,7 @@ class ForumQuestionPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, ForumQuestion $forumQuestion): bool
+    public function delete(User $user, ForumQuestion $forumQuestion): Response|bool
     {
          return $user->id === $forumQuestion->user_id
             ? Response::allow()
