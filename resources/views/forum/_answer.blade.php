@@ -13,8 +13,9 @@
     $cardClasses = 'rounded-lg border bg-white p-4 shadow-sm';
     $cardClasses .= $isChild ? ' border-l-4 border-indigo-200 bg-indigo-50/70' : ' border-gray-200';
 @endphp
-<div class="relative" style="margin-left: {{$indent}}px" data-answer-id="{{$answer->getKey()}}">
+<div class="relative" style="margin-left: {{$indent}}px" data-answer-id="{{$answer->getKey()}}" data-depth="{{$depth}}">
     <div class="{{$cardClasses}}">
+        <!-- {{ $answer }} -->
         <div class="flex items-start gap-4">
             <div class="flex flex-col items-center" 
                  data-answer-vote-box
@@ -30,7 +31,9 @@
             <div class="flex-1">
                 <div class="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                     <span>👤 {{ optional($answer->user)->name ?? 'Unknown' }}</span>
-                    <span>🕓 {{ $answer->created_at->diffForHumans() }}</span>
+                    <span>
+                        🕓 {{ $answer->created_at ? (\Illuminate\Support\Carbon::parse($answer->created_at)->diffForHumans()) : '' }}
+                    </span>
                 </div>
                 <p class="text-sm text-gray-700 whitespace-pre-line">{{ $answer->answer_content }}</p>
                 <div class="mt-3 flex items-center gap-2">
@@ -44,7 +47,7 @@
                     @endif
                 </div>
                 <div id="reply-form-{{$answer->getKey()}}" class="hidden mt-3">
-                    <form method="POST" action="{{ route('forum.answer.store', $answer->forum_question_id) }}" class="space-y-2">
+                    <form method="POST" action="{{ route('forum.answer.store', $answer->forum_question_id) }}" class="space-y-2 js-answer-form" data-parent-id="{{$answer->getKey()}}">
                         @csrf
                         <input type="hidden" name="parent_id" value="{{$answer->getKey()}}" />
                         <textarea name="answer_content" rows="3" required placeholder="Your reply" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
@@ -58,7 +61,7 @@
         </div>
     </div>
     @if(!empty($children))
-        <div class="mt-3 space-y-4">
+        <div class="mt-3 space-y-4 children-wrapper">
             @foreach($children as $child)
                 @include('forum._answer', ['node'=>$child])
             @endforeach

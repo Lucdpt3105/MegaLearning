@@ -24,9 +24,8 @@ class ForumQuestionController extends Controller
             ->withSum(['votes as votes_sum' => function ($q) {
                 $q->whereNull('forum_answer_id');
             }], 'value')
-            ->withCount(['answers as comments_count' => function ($q) {
-                $q->whereNull('parent_id');
-            }]);
+            // Count ALL answers (including nested), not just top-level
+            ->withCount('answers as answers_count');
 
         switch ($sort) {
             case 'votes':
@@ -34,8 +33,8 @@ class ForumQuestionController extends Controller
                     ->orderByDesc('created_at');
                 break;
 
-            case 'comments':
-                $query->orderByDesc('comments_count')
+            case 'answers':
+                $query->orderByDesc('answers_count')
                     ->orderByDesc('created_at');
                 break;
             case 'my_post':
@@ -71,8 +70,6 @@ class ForumQuestionController extends Controller
             'title' => $request->title,
             'content' => $request->content,
             'user_id' => auth()->id(),
-            'created_at' => now(),
-            'updated_at' => null,
         ]);
 
         return redirect()->route('forum.index', ['sort' => 'my_post'])->with('success', 'Successfully created!');
@@ -116,9 +113,8 @@ class ForumQuestionController extends Controller
     public function storeAnswer(Request $request, ForumQuestion $forumQuestion)
     {
         $request->validate([
-            'answer_content' => 'required|string|min:3'
+            'answer_content' => 'required|string|min:1'
         ]);
-
         $parentId = $request->input('parent_id');
         if ($parentId) {
             $parent = ForumAnswer::where('forum_answer_id', $parentId)
@@ -129,14 +125,29 @@ class ForumQuestionController extends Controller
                     ->with('error', 'Invalid parent answer');
             }
         }
-
-        ForumAnswer::create([
+        $answer = ForumAnswer::create([
             'forum_question_id' => $forumQuestion->getKey(),
             'user_id' => auth()->id(),
             'answer_content' => $request->answer_content,
             'parent_id' => $parentId,
         ]);
-
+        if ($request->ajax()) {
+            $depth = $this->computeAnswerDepth($answer);
+            $html = view('forum._answer', [
+                'node' => [
+                    'model' => $answer->load('user:id,name')->loadSum('votes as votes_sum', 'value'),
+                    'depth' => $depth,
+                    'children' => []
+                ]
+            ])->render();
+            return response()->json([
+                'ok' => true,
+                'answer_id' => $answer->getKey(),
+                'parent_id' => $parentId,
+                'depth' => $depth,
+                'html' => $html,
+            ], 201);
+        }
         return redirect()->route('forum.show', $forumQuestion->getKey())
             ->with('success-answer', 'Answer posted successfully');
     }
@@ -296,6 +307,9 @@ class ForumQuestionController extends Controller
             abort(403);
         }
         $this->deleteAnswerRecursive($forumAnswer);
+        if (request()->ajax()) {
+            return response()->json(['ok' => true, 'deleted' => true, 'answer_id' => $forumAnswer->getKey()]);
+        }
         return redirect()->route('forum.show', $forumQuestion->getKey())
             ->with('success-answer', 'Answer deleted');
     }
@@ -308,5 +322,17 @@ class ForumQuestionController extends Controller
             $this->deleteAnswerRecursive($child);
         }
         $answer->delete();
+    }
+
+    protected function computeAnswerDepth(ForumAnswer $answer): int
+    {
+        $depth = 0;
+        $current = $answer;
+        while ($current->parent_id) {
+            $depth++;
+            $current = ForumAnswer::find($current->parent_id);
+            if (!$current) break;
+        }
+        return $depth;
     }
 }
