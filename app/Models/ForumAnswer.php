@@ -12,12 +12,9 @@ class ForumAnswer extends Model
     // Only created_at exists in table; disable automatic timestamps to avoid updated_at inserts
     // public $timestamps = false;
     const UPDATED_AT = null;
-    protected $fillable = ['forum_question_id', 'user_id', 'answer_content', 'parent_id', 'toxicity', 'toxicity_scores', 'is_hidden', 'moderation_status'];
+    protected $fillable = ['forum_question_id', 'user_id', 'answer_content', 'parent_id'];
     protected $casts = [
-        'created_at' => 'datetime',
-        'toxicity' => 'float',
-        'toxicity_scores' => 'array',
-        'is_hidden' => 'boolean',
+        'created_at' => 'datetime', // ensure Carbon instance for diffForHumans()
     ];
 
     public function question() {
@@ -38,19 +35,5 @@ class ForumAnswer extends Model
 
     public function children() {
         return $this->hasMany(ForumAnswer::class, 'parent_id', 'forum_answer_id');
-    }
-
-    protected static function booted(): void
-    {
-        static::creating(function (ForumAnswer $model) {
-            if (!$model->moderation_status) {
-                $model->moderation_status = 'pending';
-            }
-        });
-    }
-
-    public function scopeVisible($query)
-    {
-        return $query->where('is_hidden', false);
     }
 }

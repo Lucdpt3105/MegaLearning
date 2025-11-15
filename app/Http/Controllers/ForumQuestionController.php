@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ForumQuestion;
 use App\Models\Vote;
 use App\Models\ForumAnswer;
-use App\Services\ToxicityService;
-use App\Jobs\ScoreToxicity;
 use Illuminate\Http\Request;
 
 class ForumQuestionController extends Controller
@@ -47,9 +45,6 @@ class ForumQuestionController extends Controller
                 $query->orderByDesc('created_at');
         }
 
-        if (!auth()->user()->hasRole('admin')) {
-            $query->visible();
-        }
         $questions = $query->paginate(10)->appends(['sort' => $sort]);
 
         if ($request->ajax() || $request->boolean('partial')) {
@@ -64,33 +59,18 @@ class ForumQuestionController extends Controller
         return view('forum.create');
     }
 
-    public function store(Request $request, ToxicityService $toxicityService)
+    public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
-        $question = ForumQuestion::create([
+
+        ForumQuestion::create([
             'title' => $request->title,
             'content' => $request->content,
             'user_id' => auth()->id(),
         ]);
-        if (config('toxicity.async')) {
-            ScoreToxicity::dispatch($question, 'content');
-        } else {
-            $result = $toxicityService->scoreText($question->content);
-            $moderation = $toxicityService->applyModeration($result['toxicity']);
-            if ($moderation['moderation_status'] === 'blocked') {
-                $question->delete();
-                return redirect()->route('forum.index')->with('error', 'Question rejected (toxic content)');
-            }
-            $question->update([
-                'toxicity' => $result['toxicity'],
-                'toxicity_scores' => $result['scores'],
-                'is_hidden' => $moderation['is_hidden'],
-                'moderation_status' => $moderation['moderation_status'],
-            ]);
-        }
 
         return redirect()->route('forum.index', ['sort' => 'my_post'])->with('success', 'Successfully created!');
     }
@@ -98,18 +78,12 @@ class ForumQuestionController extends Controller
     public function show(ForumQuestion $forumQuestion)
     {
         $forumQuestion->load(['user:id,name']);
-        // Hide question if auto-hidden and not admin
-        if (!auth()->user()->hasRole('admin') && $forumQuestion->is_hidden) {
-            abort(404);
-        }
-        $answersQuery = ForumAnswer::where('forum_question_id', $forumQuestion->getKey())
+        // Eager load answers (flat) with user and votes sum
+        $answers = ForumAnswer::where('forum_question_id', $forumQuestion->getKey())
             ->with('user:id,name')
             ->withSum('votes as votes_sum', 'value')
-            ->orderBy('forum_answer_id');
-        if (!auth()->user()->hasRole('admin')) {
-            $answersQuery->visible();
-        }
-        $answers = $answersQuery->get();
+            ->orderBy('forum_answer_id')
+            ->get();
         $answers_count = $answers->count();
         $votes_sum = $forumQuestion->votes()->whereNull('forum_answer_id')->sum('value');
         $my_vote = (int) ($forumQuestion->votes()
@@ -137,7 +111,7 @@ class ForumQuestionController extends Controller
         ]);
     }
 
-    public function storeAnswer(Request $request, ForumQuestion $forumQuestion, ToxicityService $toxicityService)
+    public function storeAnswer(Request $request, ForumQuestion $forumQuestion)
     {
         $this->authorize('create', \App\Models\ForumAnswer::class);
         $request->validate([
@@ -159,26 +133,6 @@ class ForumQuestionController extends Controller
             'answer_content' => $request->answer_content,
             'parent_id' => $parentId,
         ]);
-        if (config('toxicity.async')) {
-            ScoreToxicity::dispatch($answer, 'answer_content');
-        } else {
-            $result = $toxicityService->scoreText($answer->answer_content);
-            $moderation = $toxicityService->applyModeration($result['toxicity']);
-            if ($moderation['moderation_status'] === 'blocked') {
-                $answer->delete();
-                if ($request->ajax()) {
-                    return response()->json(['ok' => false, 'error' => 'Answer rejected (toxic content)'], 422);
-                }
-                return redirect()->route('forum.show', $forumQuestion->getKey())
-                    ->with('error', 'Answer rejected (toxic content)');
-            }
-            $answer->update([
-                'toxicity' => $result['toxicity'],
-                'toxicity_scores' => $result['scores'],
-                'is_hidden' => $moderation['is_hidden'],
-                'moderation_status' => $moderation['moderation_status'],
-            ]);
-        }
         if ($request->ajax()) {
             $depth = $this->computeAnswerDepth($answer);
             $html = view('forum._answer', [
@@ -188,14 +142,6 @@ class ForumQuestionController extends Controller
                     'children' => []
                 ]
             ])->render();
-            if ($answer->is_hidden) {
-                return response()->json([
-                    'ok' => false,
-                    'hidden' => true,
-                    'message' => 'Answer auto-hidden due to toxicity',
-                    'answer_id' => $answer->getKey(),
-                ], 201);
-            }
             return response()->json([
                 'ok' => true,
                 'answer_id' => $answer->getKey(),
@@ -203,10 +149,6 @@ class ForumQuestionController extends Controller
                 'depth' => $depth,
                 'html' => $html,
             ], 201);
-        }
-        if ($answer->is_hidden) {
-            return redirect()->route('forum.show', $forumQuestion->getKey())
-                ->with('warning', 'Answer submitted but hidden due to toxicity');
         }
         return redirect()->route('forum.show', $forumQuestion->getKey())
             ->with('success-answer', 'Answer posted successfully');
