@@ -15,17 +15,18 @@ class RoomUpdated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $roomId;
-    public $unreadCount;
-    public $lastMessage;
+    public $userId;
 
     /**
      * Create a new event instance.
+     * 
+     * @param int $roomId - Room that was updated
+     * @param int $userId - User who marked as read (to exclude from badge updates)
      */
-    public function __construct($roomId, $unreadCount = 0, $lastMessage = null)
+    public function __construct($roomId, $userId = null)
     {
         $this->roomId = $roomId;
-        $this->unreadCount = $unreadCount;
-        $this->lastMessage = $lastMessage;
+        $this->userId = $userId;
     }
 
     /**
@@ -55,8 +56,8 @@ class RoomUpdated implements ShouldBroadcast
     {
         return [
             'room_id' => $this->roomId,
-            'unread_count' => $this->unreadCount,
-            'last_message' => $this->lastMessage,
+            'user_id' => $this->userId,
+            'timestamp' => now()->toISOString(),
         ];
     }
 }

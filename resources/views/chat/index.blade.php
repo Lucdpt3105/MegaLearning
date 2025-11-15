@@ -331,6 +331,13 @@
                             }
                         }
                         
+                        // Badge for unread messages
+                        const unreadBadge = room.unread_count > 0 ? `
+                            <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full">
+                                ${room.unread_count > 99 ? '99+' : room.unread_count}
+                            </span>
+                        ` : '';
+                        
                         return `
                         <div 
                             onclick="selectRoom(${room.id})" 
@@ -341,7 +348,10 @@
                                     ${displayName.charAt(0).toUpperCase()}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-800 truncate">${escapeHtml(displayName)}</h4>
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-semibold text-gray-800 truncate">${escapeHtml(displayName)}</h4>
+                                        ${unreadBadge}
+                                    </div>
                                     <p class="text-xs text-gray-500 flex items-center space-x-2">
                                         <span class="inline-flex items-center">
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -454,6 +464,37 @@
                 .listen('.message.sent', (e) => {
                     console.log('📨 New message received:', e);
                     appendMessage(e);
+                    
+                    // If message is from another user and we're not in this room, update badge
+                    if (e.user.id !== currentUser.id && currentRoom?.id !== roomId) {
+                        updateRoomBadge(roomId, 1);
+                    }
+                });
+        }
+
+        // Subscribe to room updates for all rooms (for badge updates)
+        function subscribeToRoomUpdates() {
+            if (!echoInstance) {
+                console.log('📡 Polling mode - no room update subscription');
+                return;
+            }
+
+            // Subscribe to all rooms the user is in
+            fetch(`${API_URL}/rooms`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        data.data.forEach(room => {
+                            echoInstance.channel(`room-updates.${room.id}`)
+                                .listen('.room.updated', (e) => {
+                                    console.log('🔔 Room updated:', e);
+                                    // Reload rooms to update badge counts
+                                    if (e.user_id !== currentUser.id) {
+                                        loadRooms();
+                                    }
+                                });
+                        });
+                    }
                 });
         }
 
@@ -1137,6 +1178,7 @@
         async function initializeChat() {
             initializeEcho();
             await loadRooms();
+            subscribeToRoomUpdates();
         }
     </script>
 </body>

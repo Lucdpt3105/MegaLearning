@@ -44,6 +44,7 @@ Route::prefix('chat')->middleware(['web'])->group(function () {
     Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage']);
     Route::post('/rooms/{roomId}/join', [ChatApiController::class, 'joinRoom']);
     Route::post('/rooms/{roomId}/leave', [ChatApiController::class, 'leaveRoom']);
+    Route::post('/rooms/{roomId}/mark-read', [ChatApiController::class, 'markRoomAsRead']);
     Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage']);
     
     // Private chat routes

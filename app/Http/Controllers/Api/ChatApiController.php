@@ -126,6 +126,11 @@ class ChatApiController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
+        // Add unread count for each room
+        $rooms->each(function($room) use ($userId) {
+            $room->unread_count = $this->getUnreadCount($room->id, $userId);
+        });
+
         \Log::info('GetRooms result', [
             'user_id' => $userId,
             'rooms_count' => $rooms->count(),
@@ -153,6 +158,10 @@ class ChatApiController extends Controller
             ->active()
             ->orderBy('created_at', 'asc')
             ->paginate(50);
+
+        // Mark messages as read for current user
+        $userId = $this->getCurrentUserId();
+        $this->markAsRead($roomId, $userId);
 
         return response()->json([
             'success' => true,
@@ -194,6 +203,9 @@ class ChatApiController extends Controller
 
         // Broadcast event
         broadcast(new MessageSent($message));
+        
+        // Broadcast room update to notify other users about new messages
+        broadcast(new \App\Events\RoomUpdated($roomId, $userId));
 
         // Trigger AI response if AI is a member (run immediately, not after response)
         if ($this->aiService->isConfigured()) {
@@ -485,5 +497,65 @@ class ChatApiController extends Controller
             ]
         ], 201);
     }
-}
 
+    /**
+     * Get unread message count for a room
+     */
+    protected function getUnreadCount($roomId, $userId)
+    {
+        // Get last_read_at from pivot table
+        $member = \DB::table('chat_room_members')
+            ->where('room_id', $roomId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$member) {
+            return 0;
+        }
+
+        $lastReadAt = $member->last_read_at;
+
+        // If never read, count all messages not from this user
+        if (!$lastReadAt) {
+            return ChatMessage::where('room_id', $roomId)
+                ->where('user_id', '!=', $userId)
+                ->where('is_deleted', false)
+                ->count();
+        }
+
+        // Count messages after last_read_at and not from this user
+        return ChatMessage::where('room_id', $roomId)
+            ->where('user_id', '!=', $userId)
+            ->where('is_deleted', false)
+            ->where('created_at', '>', $lastReadAt)
+            ->count();
+    }
+
+    /**
+     * Mark messages as read for a room
+     */
+    protected function markAsRead($roomId, $userId)
+    {
+        \DB::table('chat_room_members')
+            ->where('room_id', $roomId)
+            ->where('user_id', $userId)
+            ->update(['last_read_at' => now()]);
+
+        // Broadcast room updated event to update badge for other tabs
+        broadcast(new \App\Events\RoomUpdated($roomId, $userId));
+    }
+
+    /**
+     * API endpoint to manually mark room as read
+     */
+    public function markRoomAsRead(Request $request, $roomId)
+    {
+        $userId = $this->getCurrentUserId();
+        $this->markAsRead($roomId, $userId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Room marked as read'
+        ]);
+    }
+}
