@@ -37,27 +37,15 @@
         <div class="bg-white rounded-t-2xl shadow-lg p-6 border-b-2 border-indigo-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div id="userAvatar" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
-                        ?
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
+                        M
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
-                        <p id="userInfo" class="text-sm text-gray-500">Đang tải...</p>
+                        <p class="text-sm text-gray-500">Chat realtime với AI Assistant 🤖</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Change User Button - Only show if not authenticated via Laravel -->
-                    <button 
-                        id="changeUserBtn"
-                        onclick="showSelectUserModal()"
-                        class="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl shadow-sm transition-all duration-200"
-                        style="display: none;">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                        </svg>
-                        <span class="font-medium">Đổi User</span>
-                    </button>
-                    
                     <!-- Home Button -->
                     <a href="/" 
                        class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
@@ -191,21 +179,6 @@
         </div>
     </div>
 
-    <!-- Select User Modal -->
-    <div id="selectUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
-            <h3 class="text-2xl font-bold text-gray-800 mb-2">Chào mừng đến MegaLearning Chat!</h3>
-            <p class="text-gray-600 mb-6">Vui lòng chọn tài khoản để bắt đầu trò chuyện</p>
-            
-            <div id="userSelectionList" class="space-y-2 max-h-96 overflow-y-auto scrollbar-hide">
-                <div class="text-center py-8">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-3"></div>
-                    <p class="text-gray-500">Đang tải danh sách người dùng...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Create Room Modal -->
     <div id="createRoomModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
@@ -261,7 +234,6 @@
         let currentRoom = null;
         let currentUser = { id: 1, name: 'Guest User' };
         let echoInstance = null;
-        let isAuthenticatedUser = false; // Track if user is logged in via Laravel Auth
 
         // Initialize Echo for Pusher
         function initializeEcho() {
@@ -311,12 +283,8 @@
         // Load rooms list
         async function loadRooms() {
             try {
-                console.log('📋 Loading rooms for user:', currentUser);
-                
                 const response = await fetch(`${API_URL}/rooms`);
                 const data = await response.json();
-                
-                console.log('📋 Rooms response:', data);
                 
                 const roomsList = document.getElementById('roomsList');
                 
@@ -511,8 +479,7 @@
         // Render single message
         function renderMessage(msg) {
             const isAI = msg.user?.email === 'ai@megalearning.local';
-            // Use == for loose comparison or ensure both are same type
-            const isCurrentUser = parseInt(msg.user?.id) === parseInt(currentUser.id);
+            const isCurrentUser = msg.user?.id === currentUser.id;
             const msgId = msg.id || msg.message_id; // Support both id and message_id
             
             return `
@@ -738,7 +705,7 @@
             }
         }
 
-        // Load users for private chat
+        // Load users list
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_URL}/users`);
@@ -923,221 +890,12 @@
             }
         });
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Check if user is already selected
-            await checkCurrentUser();
-        });
-
-        // Check if user is logged in
-        async function checkCurrentUser() {
-            try {
-                const response = await fetch(`${API_URL}/current-user`);
-                const data = await response.json();
-                
-                console.log('🔍 Checking current user:', data);
-                
-                if (data.success && data.data) {
-                    currentUser = data.data;
-                    console.log('✅ Current user:', currentUser);
-                    
-                    // Check if this is from Laravel Auth
-                    isAuthenticatedUser = data.data.is_authenticated || false;
-                    
-                    console.log('🔐 Is authenticated via Laravel Auth:', isAuthenticatedUser);
-                    console.log('📌 User source:', data.data.source);
-                    
-                    updateUserInfo(); // Update UI with user info
-                    
-                    if (isAuthenticatedUser) {
-                        // User logged in via Laravel Auth - hide modal and change user button
-                        hideSelectUserModal();
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'none';
-                    } else {
-                        // Manual selection mode - show change user button
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'flex';
-                        
-                        // If no user selected yet, show modal
-                        if (!currentUser || currentUser.id === 1) {
-                            await showSelectUserModal();
-                            return; // Don't initialize chat yet
-                        } else {
-                            hideSelectUserModal();
-                        }
-                    }
-                    
-                    await initializeChat();
-                } else {
-                    // No user found - show selection modal
-                    await showSelectUserModal();
-                }
-            } catch (error) {
-                console.error('Error checking current user:', error);
-                await showSelectUserModal();
-            }
-        }
-
-        // Update user info in header
-        function updateUserInfo() {
-            if (currentUser) {
-                const avatarEl = document.getElementById('userAvatar');
-                const infoEl = document.getElementById('userInfo');
-                
-                if (avatarEl) {
-                    avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
-                }
-                
-                if (infoEl) {
-                    infoEl.textContent = `Đăng nhập với: ${currentUser.name}`;
-                }
-                
-                console.log('📝 Updated user info in header:', currentUser.name);
-            }
-        }
-
-        // Show user selection modal
-        async function showSelectUserModal() {
-            // Don't show modal if user is authenticated via Laravel Auth
-            if (isAuthenticatedUser) {
-                console.log('⚠️ User is authenticated via Laravel Auth - cannot change user');
-                return;
-            }
-            
-            const modal = document.getElementById('selectUserModal');
-            const list = document.getElementById('userSelectionList');
-            modal.classList.remove('hidden');
-            
-            try {
-                // Load all users (including current user if not set)
-                const response = await fetch('{{ url("/api/chat/users") }}');
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Add all users including those that might be excluded
-                    const allUsersResponse = await fetch('{{ url("/api") }}/users');
-                    let allUsers = [];
-                    
-                    // Fallback: use test users
-                    allUsers = [
-                        { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                        { id: 2, name: 'Admin User', email: 'admin@megalearning.local', role: 'admin' },
-                        { id: 3, name: 'Teacher Nguyen', email: 'teacher@megalearning.local', role: 'teacher' },
-                        { id: 4, name: 'Student A', email: 'student1@megalearning.local', role: 'student' },
-                        { id: 5, name: 'Student B', email: 'student2@megalearning.local', role: 'student' }
-                    ];
-                    
-                    // Try to get real users from database
-                    try {
-                        const usersResp = await fetch('{{ url("/api/chat/users") }}');
-                        const usersData = await usersResp.json();
-                        if (usersData.success && usersData.data.length > 0) {
-                            // Add guest user to the list
-                            allUsers = [
-                                { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                                ...usersData.data
-                            ];
-                        }
-                    } catch (e) {
-                        console.warn('Could not fetch users, using fallback list');
-                    }
-                    
-                    list.innerHTML = allUsers.map(user => {
-                        const roleColors = {
-                            admin: 'bg-red-100 text-red-800',
-                            teacher: 'bg-blue-100 text-blue-800',
-                            student: 'bg-green-100 text-green-800',
-                            guest: 'bg-gray-100 text-gray-800',
-                            ai: 'bg-purple-100 text-purple-800'
-                        };
-                        const roleIcons = {
-                            admin: '👑',
-                            teacher: '👨‍🏫',
-                            student: '👨‍🎓',
-                            guest: '👤',
-                            ai: '🤖'
-                        };
-                        
-                        return `
-                            <button 
-                                onclick="selectUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')"
-                                class="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-indigo-300 flex items-center space-x-4 group"
-                            >
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    ${roleIcons[user.role] || user.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div class="flex-1 text-left">
-                                    <h4 class="font-semibold text-gray-800 group-hover:text-indigo-600">${escapeHtml(user.name)}</h4>
-                                    <p class="text-sm text-gray-500">${escapeHtml(user.email)}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-medium ${roleColors[user.role] || 'bg-gray-100 text-gray-800'}">
-                                    ${user.role || 'user'}
-                                </span>
-                            </button>
-                        `;
-                    }).join('');
-                } else {
-                    throw new Error('Could not load users');
-                }
-            } catch (error) {
-                console.error('Error loading users:', error);
-                list.innerHTML = `
-                    <div class="text-center py-8 text-red-500">
-                        <p>❌ Không thể tải danh sách người dùng</p>
-                        <p class="text-sm mt-2">Vui lòng thử lại sau</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Select user and set session
-        async function selectUser(userId, userName, userEmail) {
-            try {
-                // Parse userId to integer to ensure consistent comparison
-                userId = parseInt(userId);
-                
-                console.log('👤 Selecting user:', { userId, userName, userEmail });
-                
-                const response = await fetch(`${API_URL}/set-user`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ user_id: userId })
-                });
-
-                const data = await response.json();
-                
-                console.log('👤 Set user response:', data);
-
-                if (data.success) {
-                    currentUser = { id: userId, name: userName, email: userEmail };
-                    console.log('✅ User selected:', currentUser);
-                    updateUserInfo(); // Update UI with user info
-                    hideSelectUserModal();
-                    showNotification(`Đăng nhập thành công với tài khoản ${userName}`, 'success');
-                    await initializeChat();
-                } else {
-                    showNotification('Không thể chọn user', 'error');
-                }
-            } catch (error) {
-                console.error('Error selecting user:', error);
-                showNotification('Lỗi khi chọn user', 'error');
-            }
-        }
-
-        // Hide user selection modal
-        function hideSelectUserModal() {
-            document.getElementById('selectUserModal').classList.add('hidden');
-        }
-
-        // Initialize chat after user is selected
-        async function initializeChat() {
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 MegaLearning Chat initializing...');
             initializeEcho();
-            await loadRooms();
-        }
+            loadRooms();
+        });
     </script>
 </body>
 </html>

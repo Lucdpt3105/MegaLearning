@@ -20,117 +20,28 @@ class ChatApiController extends Controller
     }
 
     /**
-     * Get current user ID (from Auth or session)
-     */
-    protected function getCurrentUserId()
-    {
-        // Priority 1: Check if user is authenticated via Laravel Auth
-        if (Auth::check()) {
-            // Clear any manual session selection when using Auth
-            session()->forget('chat_user_id');
-            return Auth::id();
-        }
-        
-        // Priority 2: Check session for manually selected user (for demo/testing)
-        return session('chat_user_id', 1);
-    }
-
-    /**
-     * Set current user in session (simple login for demo)
-     */
-    public function setCurrentUser(Request $request)
-    {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id'
-        ]);
-
-        session(['chat_user_id' => $validated['user_id']]);
-        session()->save(); // Force save session
-        
-        $user = \App\Models\User::find($validated['user_id']);
-        
-        \Log::info('User set in session', [
-            'user_id' => $validated['user_id'],
-            'user_name' => $user->name,
-            'session_id' => session()->getId(),
-            'session_data' => session()->all()
-        ]);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'User set successfully',
-            'data' => [
-                'id' => (int) $user->id, // Ensure ID is integer
-                'name' => $user->name,
-                'email' => $user->email
-            ]
-        ]);
-    }
-
-    /**
-     * Get current user from session
-     */
-    public function getCurrentUser(Request $request)
-    {
-        $userId = $this->getCurrentUserId();
-        $user = \App\Models\User::find($userId);
-        
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        }
-        
-        \Log::info('Get current user', [
-            'user_id' => $userId,
-            'auth_check' => Auth::check(),
-            'auth_id' => Auth::id(),
-            'session_id' => session('chat_user_id')
-        ]);
-        
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'id' => (int) $user->id, // Ensure ID is integer
-                'name' => $user->name,
-                'email' => $user->email,
-                'is_authenticated' => Auth::check(), // Tell frontend if this is from Auth
-                'source' => Auth::check() ? 'laravel_auth' : 'manual_selection'
-            ]
-        ]);
-    }
-
-        /**
      * Get all chat rooms (public or for authenticated user)
      */
     public function getRooms(Request $request)
     {
-        // Get current user from Auth or session
-        $userId = $this->getCurrentUserId();
+        // Get current user (guest user ID 1 for now)
+        $userId = 1;
         
-        \Log::info('GetRooms called', [
-            'user_id' => $userId,
-            'auth_check' => Auth::check(),
-            'auth_id' => Auth::id(),
-            'session_user_id' => session('chat_user_id')
-        ]);
-        
-        // Only get rooms where user is a member (both group and private)
+        // Get all group rooms and private rooms for the current user
         $rooms = ChatRoom::where('is_active', true)
-            ->whereHas('members', function($query) use ($userId) {
-                $query->where('user_id', $userId);
+            ->where(function($query) use ($userId) {
+                $query->where('room_type', 'group')
+                      ->orWhere(function($q) use ($userId) {
+                          $q->where('room_type', 'private')
+                            ->whereHas('members', function($m) use ($userId) {
+                                $m->where('user_id', $userId);
+                            });
+                      });
             })
             ->with(['latestMessage.user', 'members'])
             ->withCount('members')
             ->orderBy('updated_at', 'desc')
             ->get();
-
-        \Log::info('GetRooms result', [
-            'user_id' => $userId,
-            'rooms_count' => $rooms->count(),
-            'room_ids' => $rooms->pluck('id')
-        ]);
 
         return response()->json([
             'success' => true,
@@ -173,8 +84,8 @@ class ChatApiController extends Controller
 
         $room = ChatRoom::findOrFail($roomId);
         
-        // Get current user from Auth or session
-        $userId = $this->getCurrentUserId();
+        // Use user ID 1 (guest) if not authenticated
+        $userId = 1;
 
         // No authentication check - allow public access to group rooms
 
@@ -278,8 +189,8 @@ class ChatApiController extends Controller
             'include_ai' => 'boolean'
         ]);
 
-        // Get current user from Auth or session
-        $creatorId = $this->getCurrentUserId();
+        // Use user ID 1 (guest) if not authenticated
+        $creatorId = 1;
 
         $room = ChatRoom::create([
             'room_name' => $validated['room_name'],
@@ -289,18 +200,9 @@ class ChatApiController extends Controller
             'is_active' => true
         ]);
 
-        // Add creator as admin of the room
-        $room->members()->attach($creatorId, [
-            'role' => 'admin',
-            'joined_at' => now()
-        ]);
-
         // Add other members (optional)
         if (isset($validated['members'])) {
             foreach ($validated['members'] as $memberId) {
-                // Skip if already added (creator)
-                if ($memberId == $creatorId) continue;
-                
                 $room->members()->attach($memberId, [
                     'role' => 'member',
                     'joined_at' => now()
@@ -386,11 +288,8 @@ class ChatApiController extends Controller
      */
     public function getUsers(Request $request)
     {
-        // Get current user from Auth or session
-        $currentUserId = $this->getCurrentUserId();
-        
         $users = \App\Models\User::select('id', 'name', 'email')
-            ->where('id', '!=', $currentUserId) // Exclude current user
+            ->where('id', '!=', 1) // Exclude guest user
             ->orderBy('name')
             ->get()
             ->map(function($user) {
@@ -422,8 +321,7 @@ class ChatApiController extends Controller
             'other_user_id' => 'required|exists:users,id'
         ]);
 
-        // Get current user from Auth or session
-        $userId = $this->getCurrentUserId();
+        $userId = 1; // Current user (guest for now)
         $otherUserId = $validated['other_user_id'];
 
         // Check if private room already exists between these two users
