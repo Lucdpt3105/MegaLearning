@@ -10,12 +10,13 @@ class ForumAnswer extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     // Only created_at exists in table; disable automatic timestamps to avoid updated_at inserts
-    public $timestamps = false;
-    const UPDATED_AT = null;
+    // public $timestamps = false;
+    // const CREATED_AT = null;
+    // const UPDATED_AT = null;
     protected $fillable = ['forum_question_id', 'user_id', 'answer_content', 'parent_id'];
-    protected $casts = [
-        'created_at' => 'datetime', // ensure Carbon instance for diffForHumans()
-    ];
+    // protected $casts = [
+    //     'created_at' => 'datetime', // ensure Carbon instance for diffForHumans()
+    // ];
 
     public function question() {
         return $this->belongsTo(ForumQuestion::class, 'forum_question_id', 'forum_question_id');

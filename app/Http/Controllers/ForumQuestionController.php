@@ -92,7 +92,8 @@ class ForumQuestionController extends Controller
             ->value('value') ?? 0);
         $question = $forumQuestion;
         // store previous URL to enable consistent back navigation
-        if (url()->previous() !== route('forum.edit', $forumQuestion->getKey())) {
+        if (url()->previous() !== route('forum.edit', $forumQuestion->getKey()) &&
+            url()->previous() !== route('forum.show', $forumQuestion->getKey())) {
             $this->storeReturnTo();
         }
         // Build tree structure for nested answers
