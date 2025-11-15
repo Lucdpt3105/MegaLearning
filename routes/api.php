@@ -31,12 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthApiController::class, 'me']);
 });
 
-// Chat API Routes - Need session support
-Route::prefix('chat')->middleware(['web'])->group(function () {
-    // User management
-    Route::post('/set-user', [ChatApiController::class, 'setCurrentUser']);
-    Route::get('/current-user', [ChatApiController::class, 'getCurrentUser']);
-    
+// Chat API Routes
+Route::prefix('chat')->group(function () {
     // Public routes
     Route::get('/rooms', [ChatApiController::class, 'getRooms']);
     Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages']);
