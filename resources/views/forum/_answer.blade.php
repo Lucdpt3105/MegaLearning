@@ -32,7 +32,7 @@
                 <div class="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                     <span>👤 {{ optional($answer->user)->name ?? 'Unknown' }}</span>
                     <span>
-                        🕓 {{ $answer->created_at ? (\Illuminate\Support\Carbon::parse($answer->created_at)->diffForHumans()) : '' }}
+                        🕓 {{ $answer->created_at->diffForHumans() }}
                     </span>
                 </div>
                 <p class="text-sm text-gray-700 whitespace-pre-line">{{ $answer->answer_content }}</p>
