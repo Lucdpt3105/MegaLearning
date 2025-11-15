@@ -205,6 +205,7 @@
 		const url = form.getAttribute('action');
 		const fd = new FormData(form);
 		try {
+			// alert(url);
 			const res = await fetch(url, { method:'POST', headers:{'X-CSRF-TOKEN':csrf,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}, body: fd });
 			if(!res.ok) throw new Error('Failed');
 			const data = await res.json();

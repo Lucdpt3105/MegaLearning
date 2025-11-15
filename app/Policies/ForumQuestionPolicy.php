@@ -17,7 +17,7 @@ class ForumQuestionPolicy
      */
     public function before(User $user, $ability)
     {
-        if ($user->role === 'admin') {
+        if ($user->hasRole('admin')) {
             // admin được phép mọi hành động
             return true;
         }
