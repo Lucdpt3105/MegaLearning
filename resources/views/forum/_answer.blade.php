@@ -2,7 +2,7 @@
     $answer = $node['model'];
     $depth = $node['depth'];
     $children = $node['children'];
-    $indent = min($depth * 4, 32); // cap indentation
+    $indent = min($depth * 6, 60); // cap indentation
     $mlClass = 'ml-['.$indent.'px]'; // arbitrary value via JIT (Tailwind needs enabled arbitrary values)
     $myVote = (int)($answer->votes()->where('user_id', auth()->id())->value('value') ?? 0);
     $votesSum = (int)$answer->votes_sum;
@@ -38,13 +38,13 @@
                 <p class="text-sm text-gray-700 whitespace-pre-line">{{ $answer->answer_content }}</p>
                 <div class="mt-3 flex items-center gap-2">
                     <button type="button" class="toggle-reply inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" data-target="#reply-form-{{$answer->getKey()}}">Reply</button>
-                    @if($answer->user_id === auth()->id() || auth()->user()->can('admin'))
+                    @can('delete', $answer)
                         <form method="POST" action="{{ route('forum.answer.destroy', [$answer->forum_question_id, $answer->getKey()]) }}" onsubmit="return confirm('Delete this answer and its replies?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">Delete</button>
                         </form>
-                    @endif
+                    @endcan
                 </div>
                 <div id="reply-form-{{$answer->getKey()}}" class="hidden mt-3">
                     <form method="POST" action="{{ route('forum.answer.store', $answer->forum_question_id) }}" class="space-y-2 js-answer-form" data-parent-id="{{$answer->getKey()}}">
