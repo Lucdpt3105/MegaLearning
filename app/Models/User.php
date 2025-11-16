@@ -28,6 +28,10 @@ class User extends Authenticatable
         'bio',
         'last_login_at',
         'is_locked',
+        'student_id',
+        'gender',
+        'date_of_birth',
+        'address',
     ];
 
     /**

@@ -93,6 +93,15 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/documents/{document}/approve', [App\Http\Controllers\Teacher\DocumentController::class, 'approve'])->name('documents.approve');
     Route::post('/documents/{document}/reject', [App\Http\Controllers\Teacher\DocumentController::class, 'reject'])->name('documents.reject');
     
+    // Phase 3: Student Management (UC-GV-050 to UC-GV-054)
+    Route::get('/students', [App\Http\Controllers\Teacher\StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/{classRoom}', [App\Http\Controllers\Teacher\StudentController::class, 'show'])->name('students.show');
+    Route::post('/students/{classRoom}/add', [App\Http\Controllers\Teacher\StudentController::class, 'addStudents'])->name('students.add');
+    Route::delete('/students/{classRoom}/remove/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeStudent'])->name('students.remove');
+    Route::put('/students/{classRoom}/notes/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateNotes'])->name('students.update-notes');
+    Route::put('/students/{classRoom}/enrollment/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateEnrollment'])->name('students.update-enrollment');
+    Route::put('/students/{classRoom}/info/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateStudentInfo'])->name('students.update-info');
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
     Route::get('/questions', [TeacherController::class, 'questions'])->name('questions');
