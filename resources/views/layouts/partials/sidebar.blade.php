@@ -71,18 +71,6 @@
                     </div>
                 </a>
 
-                <a href="/teacher/students" class="nav-item {{ request()->is('teacher/students*') ? 'active' : '' }}">
-                    <div class="nav-icon bg-gradient-to-br from-teal-500 to-teal-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
-                    </div>
-                    <div class="nav-content">
-                        <span class="nav-label">Quản lý Học sinh</span>
-                        <span class="nav-desc">Students Management</span>
-                    </div>
-                </a>
-
                 <!-- Documents Section -->
                 <div class="nav-section-header">
                     <div class="flex items-center space-x-2">
@@ -100,6 +88,26 @@
                     <div class="nav-content">
                         <span class="nav-label">Tài liệu học tập</span>
                         <span class="nav-desc">Upload & Manage Docs</span>
+                    </div>
+                </a>
+
+                <!-- Students Section -->
+                <div class="nav-section-header">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">👥</span>
+                        <span>Học sinh</span>
+                    </div>
+                </div>
+
+                <a href="{{ route('teacher.students.index') }}" class="nav-item {{ request()->is('teacher/students*') ? 'active' : '' }}">
+                    <div class="nav-icon bg-gradient-to-br from-emerald-500 to-emerald-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-label">Quản lý học sinh</span>
+                        <span class="nav-desc">Manage Students</span>
                     </div>
                 </a>
 
