@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ClassRoom;
 use App\Models\User;
 use App\Models\ClassEnrollment;
+use App\Models\ChatRoom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,61 @@ class StudentController extends Controller
             ->orderBy('users.name')
             ->get();
 
-        return view('teacher.students.show', compact('classRoom', 'availableStudents'));
+        // Get chat room của lớp học (mỗi lớp có chat riêng)
+        $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+            ->where('room_type', 'class')
+            ->with(['members', 'messages' => function($query) {
+                $query->latest()->limit(50);
+            }])
+            ->first();
+
+        // Nếu chưa có chat room, tự động tạo cho lớp này
+        if (!$chatRoom) {
+            $chatRoom = ChatRoom::create([
+                'room_name' => "Chat - {$classRoom->name}",
+                'room_type' => 'class',
+                'class_room_id' => $classRoom->id,
+                'subject_id' => $classRoom->subject_id,
+                'created_by' => Auth::id(),
+                'is_active' => true,
+            ]);
+
+            // Add teacher as admin
+            $chatRoom->members()->attach(Auth::id(), [
+                'role' => 'admin',
+                'joined_at' => now()
+            ]);
+
+            // Add all active students
+            foreach ($classRoom->students as $student) {
+                $chatRoom->members()->attach($student->id, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+            }
+
+            $chatRoom->load(['members', 'messages']);
+        }
+
+        // Get available users for chat (nếu có chat room)
+        $availableChatUsers = collect();
+        if ($chatRoom) {
+            $existingMemberIds = $chatRoom->members->pluck('id')->toArray();
+            
+            $availableChatUsers = DB::table('users')
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->whereNotIn('users.id', $existingMemberIds)
+                ->where('model_has_roles.model_type', 'App\\Models\\User')
+                ->whereIn('roles.name', ['student', 'teacher'])
+                ->select('users.id', 'users.name', 'users.email', 'roles.name as role')
+                ->orderByRaw("FIELD(roles.name, 'teacher', 'student')")
+                ->orderBy('users.name')
+                ->distinct()
+                ->get();
+        }
+
+        return view('teacher.students.show', compact('classRoom', 'availableStudents', 'chatRoom', 'availableChatUsers'));
     }
 
     /**
@@ -128,6 +183,23 @@ class StudentController extends Controller
                 $addedCount++;
             }
 
+            // Đồng bộ với chat room của lớp học (nếu có)
+            $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+                ->where('room_type', 'class')
+                ->first();
+            
+            if ($chatRoom) {
+                foreach ($request->student_ids as $studentId) {
+                    // Chỉ thêm vào chat nếu chưa là thành viên
+                    if (!$chatRoom->members()->where('user_id', $studentId)->exists()) {
+                        $chatRoom->members()->attach($studentId, [
+                            'role' => 'member',
+                            'joined_at' => now()
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
 
             return redirect()
@@ -168,6 +240,15 @@ class StudentController extends Controller
                 'status' => 'dropped',
                 'dropped_at' => now()
             ]);
+
+            // Xóa khỏi chat room của lớp này
+            $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+                ->where('room_type', 'class')
+                ->first();
+            
+            if ($chatRoom) {
+                $chatRoom->members()->detach($studentId);
+            }
 
             return redirect()
                 ->back()
@@ -336,6 +417,118 @@ class StudentController extends Controller
             return redirect()
                 ->back()
                 ->with('success', 'Đã cập nhật thông tin học sinh thành công!');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Thêm thành viên vào chat room của lớp
+     */
+    public function addChatMember(Request $request, ClassRoom $classRoom)
+    {
+        if ($classRoom->teacher_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền quản lý chat của lớp này.');
+        }
+
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        try {
+            $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+                ->where('room_type', 'class')
+                ->firstOrFail();
+
+            $addedCount = 0;
+            foreach ($request->user_ids as $userId) {
+                if (!$chatRoom->members()->where('user_id', $userId)->exists()) {
+                    $chatRoom->members()->attach($userId, [
+                        'role' => 'member',
+                        'joined_at' => now()
+                    ]);
+                    $addedCount++;
+                }
+            }
+
+            return redirect()
+                ->back()
+                ->with('success', "Đã thêm {$addedCount} thành viên vào nhóm chat!");
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Xóa thành viên khỏi chat room của lớp
+     */
+    public function removeChatMember(ClassRoom $classRoom, $userId)
+    {
+        if ($classRoom->teacher_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền quản lý chat của lớp này.');
+        }
+
+        try {
+            $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+                ->where('room_type', 'class')
+                ->firstOrFail();
+
+            $member = $chatRoom->members()->where('user_id', $userId)->first();
+            
+            if (!$member) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Thành viên không tồn tại trong nhóm chat.');
+            }
+
+            if ($member->pivot->role === 'admin') {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Không thể xóa quản trị viên khỏi nhóm chat.');
+            }
+
+            $chatRoom->members()->detach($userId);
+
+            return redirect()
+                ->back()
+                ->with('success', 'Đã xóa thành viên khỏi nhóm chat!');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Đóng/Mở chat room của lớp
+     */
+    public function toggleChatStatus(ClassRoom $classRoom)
+    {
+        if ($classRoom->teacher_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền quản lý chat của lớp này.');
+        }
+
+        try {
+            $chatRoom = ChatRoom::where('class_room_id', $classRoom->id)
+                ->where('room_type', 'class')
+                ->firstOrFail();
+
+            $chatRoom->is_active = !$chatRoom->is_active;
+            $chatRoom->save();
+
+            $status = $chatRoom->is_active ? 'mở' : 'đóng';
+
+            return redirect()
+                ->back()
+                ->with('success', "Đã {$status} phòng chat thành công!");
 
         } catch (\Exception $e) {
             return redirect()

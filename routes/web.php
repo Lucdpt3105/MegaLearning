@@ -98,6 +98,11 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::get('/students/{classRoom}', [App\Http\Controllers\Teacher\StudentController::class, 'show'])->name('students.show');
     Route::post('/students/{classRoom}/add', [App\Http\Controllers\Teacher\StudentController::class, 'addStudents'])->name('students.add');
     Route::delete('/students/{classRoom}/remove/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeStudent'])->name('students.remove');
+    
+    // Class Chat Room Management
+    Route::post('/students/{classRoom}/chat/members', [App\Http\Controllers\Teacher\StudentController::class, 'addChatMember'])->name('students.chat.add-member');
+    Route::delete('/students/{classRoom}/chat/members/{userId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeChatMember'])->name('students.chat.remove-member');
+    Route::post('/students/{classRoom}/chat/toggle', [App\Http\Controllers\Teacher\StudentController::class, 'toggleChatStatus'])->name('students.chat.toggle');
     Route::put('/students/{classRoom}/notes/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateNotes'])->name('students.update-notes');
     Route::put('/students/{classRoom}/enrollment/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateEnrollment'])->name('students.update-enrollment');
     Route::put('/students/{classRoom}/info/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateStudentInfo'])->name('students.update-info');

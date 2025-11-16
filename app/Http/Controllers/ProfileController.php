@@ -37,10 +37,21 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'student_id' => ['nullable', 'string', 'max:50'],
+            'gender' => ['nullable', 'in:male,female,other'],
+            'date_of_birth' => ['nullable', 'date', 'before:today'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'regex:/^[0-9]{10,11}$/'],
+            'address' => ['nullable', 'string', 'max:500'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // 2MB
+        ], [
+            'name.required' => 'Tên không được để trống',
+            'phone.required' => 'Số điện thoại không được để trống',
+            'phone.regex' => 'Số điện thoại phải có 10-11 chữ số',
+            'date_of_birth.before' => 'Ngày sinh phải trước ngày hôm nay',
+            'avatar.image' => 'Ảnh đại diện phải là file hình ảnh',
+            'avatar.max' => 'Ảnh đại diện không được vượt quá 2MB',
         ]);
 
         // Handle avatar upload
@@ -57,7 +68,7 @@ class ProfileController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
+        return redirect()->route('profile.edit')->with('success', 'Cập nhật thông tin thành công!');
     }
 
     /**

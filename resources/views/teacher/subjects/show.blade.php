@@ -110,7 +110,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <a href="{{ route('teacher.documents.create', ['subject_id' => $subject->id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-indigo-500">
             <div class="flex items-center space-x-4">
                 <div class="bg-indigo-100 p-3 rounded-xl">
@@ -138,44 +138,60 @@
                 </div>
             </div>
         </a>
-
-        @php
-            $hasChatRoom = \App\Models\ChatRoom::where('subject_id', $subject->id)->exists();
-        @endphp
-
-        @if($hasChatRoom)
-        <a href="{{ route('teacher.subjects.chat-room.manage', $subject) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-green-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-green-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Quản lý Chat</h3>
-                    <p class="text-sm text-gray-600">UC-GV-015</p>
-                </div>
-            </div>
-        </a>
-        @else
-        <form action="{{ route('teacher.subjects.chat-room.create', $subject) }}" method="POST">
-            @csrf
-            <button type="submit" class="w-full bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-dashed border-gray-300 hover:border-green-500">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-gray-100 p-3 rounded-xl">
-                        <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="font-semibold text-gray-900">Tạo nhóm chat</h3>
-                        <p class="text-sm text-gray-600">UC-GV-015</p>
-                    </div>
-                </div>
-            </button>
-        </form>
-        @endif
     </div>
+
+    <!-- Class Rooms List -->
+    @if($subject->classRooms->isNotEmpty())
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Danh sách lớp học</h2>
+            <a href="{{ route('teacher.students.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                Xem tất cả →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($subject->classRooms as $classRoom)
+            <a href="{{ route('teacher.students.show', $classRoom) }}" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-indigo-400">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-900 text-lg mb-1">{{ $classRoom->name }}</h3>
+                        <p class="text-sm text-gray-600">{{ $classRoom->code }}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $classRoom->status === 'active' ? 'bg-green-100 text-green-800' : '' }}
+                        {{ $classRoom->status === 'draft' ? 'bg-gray-100 text-gray-800' : '' }}
+                        {{ $classRoom->status === 'completed' ? 'bg-blue-100 text-blue-800' : '' }}
+                        {{ $classRoom->status === 'archived' ? 'bg-orange-100 text-orange-800' : '' }}">
+                        {{ $classRoom->status === 'active' ? '✅ Hoạt động' : '' }}
+                        {{ $classRoom->status === 'draft' ? '📝 Nháp' : '' }}
+                        {{ $classRoom->status === 'completed' ? '✔️ Hoàn thành' : '' }}
+                        {{ $classRoom->status === 'archived' ? '📦 Lưu trữ' : '' }}
+                    </span>
+                </div>
+
+                @if($classRoom->description)
+                <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ $classRoom->description }}</p>
+                @endif
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-700">
+                            {{ $classRoom->students_count ?? 0 }}/{{ $classRoom->max_students }} học sinh
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        {{ $classRoom->start_date?->format('d/m/Y') ?? 'Chưa bắt đầu' }}
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
 
     <!-- Documents List -->
     <div class="bg-white rounded-2xl shadow-lg p-6">

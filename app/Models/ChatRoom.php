@@ -10,8 +10,9 @@ class ChatRoom extends Model
 {
     protected $fillable = [
         'room_name',
-        'room_type', // 'group', 'private', 'subject'
+        'room_type', // 'group', 'private', 'subject', 'class'
         'subject_id', // NULL nếu không liên quan đến môn học
+        'class_room_id', // NULL nếu không liên quan đến lớp học
         'created_by',
         'is_active'
     ];
@@ -61,6 +62,14 @@ class ChatRoom extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
+    }
+
+    /**
+     * Get the class room related to this room (if any)
+     */
+    public function classRoom()
+    {
+        return $this->belongsTo(ClassRoom::class, 'class_room_id', 'id');
     }
 
     /**
