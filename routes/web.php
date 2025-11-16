@@ -76,7 +76,24 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 // Teacher Routes
 Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
-    Route::get('/subjects', [TeacherController::class, 'subjects'])->name('subjects');
+    
+    // Phase 1: Subject Management (UC-GV-010 to UC-GV-015)
+    Route::resource('subjects', App\Http\Controllers\Teacher\SubjectController::class);
+    Route::post('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'createChatRoom'])->name('subjects.chat-room.create');
+    Route::get('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'manageChatRoom'])->name('subjects.chat-room.manage');
+    Route::post('/subjects/{subject}/chat-room/members', [App\Http\Controllers\Teacher\SubjectController::class, 'addChatMember'])->name('subjects.chat-room.add-member');
+    Route::delete('/subjects/{subject}/chat-room/members/{userId}', [App\Http\Controllers\Teacher\SubjectController::class, 'removeChatMember'])->name('subjects.chat-room.remove-member');
+    Route::post('/subjects/{subject}/chat-room/toggle', [App\Http\Controllers\Teacher\SubjectController::class, 'toggleChatStatus'])->name('subjects.chat-room.toggle');
+    
+    // Phase 2: Document Management (UC-GV-070 to UC-GV-074)
+    Route::resource('documents', App\Http\Controllers\Teacher\DocumentController::class);
+    Route::post('/documents/folder', [App\Http\Controllers\Teacher\DocumentController::class, 'createFolder'])->name('documents.folder.create');
+    Route::post('/documents/{document}/move', [App\Http\Controllers\Teacher\DocumentController::class, 'moveToFolder'])->name('documents.move');
+    Route::get('/documents/{document}/download', [App\Http\Controllers\Teacher\DocumentController::class, 'download'])->name('documents.download');
+    Route::post('/documents/{document}/approve', [App\Http\Controllers\Teacher\DocumentController::class, 'approve'])->name('documents.approve');
+    Route::post('/documents/{document}/reject', [App\Http\Controllers\Teacher\DocumentController::class, 'reject'])->name('documents.reject');
+    
+    // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
     Route::get('/questions', [TeacherController::class, 'questions'])->name('questions');
     Route::get('/exams', [TeacherController::class, 'exams'])->name('exams');
