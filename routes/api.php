@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ExamController;
+use App\Http\Controllers\Api\ChatApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,27 @@ Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::get('/me', [AuthApiController::class, 'me']);
+});
+
+// Chat API Routes - Need session support
+Route::prefix('chat')->middleware(['web'])->group(function () {
+    // User management
+    Route::post('/set-user', [ChatApiController::class, 'setCurrentUser']);
+    Route::get('/current-user', [ChatApiController::class, 'getCurrentUser']);
+    
+    // Public routes
+    Route::get('/rooms', [ChatApiController::class, 'getRooms']);
+    Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages']);
+    Route::post('/rooms', [ChatApiController::class, 'createRoom']);
+    Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage']);
+    Route::post('/rooms/{roomId}/join', [ChatApiController::class, 'joinRoom']);
+    Route::post('/rooms/{roomId}/leave', [ChatApiController::class, 'leaveRoom']);
+    Route::post('/rooms/{roomId}/mark-read', [ChatApiController::class, 'markRoomAsRead']);
+    Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage']);
+    
+    // Private chat routes
+    Route::get('/users', [ChatApiController::class, 'getUsers']);
+    Route::post('/rooms/private', [ChatApiController::class, 'createPrivateRoom']);
 });
 
 // API Version 1

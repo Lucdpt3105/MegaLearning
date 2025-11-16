@@ -47,7 +47,8 @@
         <div class="pt-4">
             <p class="px-4 text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-2">System</p>
             
-            <a href="#" class="flex items-center px-4 py-3 rounded-lg transition hover:bg-white/10">
+            <a href="{{ route('admin.users.index') }}" 
+               class="flex items-center px-4 py-3 rounded-lg transition {{ request()->routeIs('admin.users.*') ? 'bg-white/20 backdrop-blur' : 'hover:bg-white/10' }}">
                 <span class="mr-3 text-xl">👥</span>
                 <span class="font-medium">Users</span>
             </a>

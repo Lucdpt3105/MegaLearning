@@ -7,25 +7,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Answer extends Model
 {
-    protected $table = 'answers';
-    protected $primaryKey = 'answer_id';
-    public $timestamps = false;
-
     protected $fillable = [
-        'answer_text',
-        'answer_question_id',
-        'is_correct'
+        'question_id',
+        'content',
+        'is_correct',
+        'order',
+        'image_url',
     ];
 
     protected $casts = [
-        'is_correct' => 'boolean'
+        'is_correct' => 'boolean',
     ];
 
-    /**
-     * Get the question that owns this answer
-     */
     public function question(): BelongsTo
     {
-        return $this->belongsTo(Question::class, 'answer_question_id', 'question_id');
+        return $this->belongsTo(Question::class);
     }
 }

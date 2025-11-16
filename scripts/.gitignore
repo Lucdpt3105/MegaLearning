@@ -1,0 +1,18 @@
+# Scripts .gitignore
+
+# Ignore test output files
+*.log
+*.txt
+output/
+
+# Ignore temporary files
+*.tmp
+*.temp
+~*
+
+# Keep the scripts themselves
+!*.bat
+!*.ps1
+!*.php
+!*.sh
+!README.md

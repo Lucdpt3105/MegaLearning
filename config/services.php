@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Google Gemini AI (FREE!)
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY', ''),
+        'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        'ai_name' => env('AI_NAME', 'Gemini AI'),
+    ],
+
 ];

@@ -13,28 +13,43 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Tạo Admin
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@megalearning.com',
-            'password' => Hash::make('password'),
-        ]);
-        $admin->assignRole('admin');
+        // Tạo Admin (idempotent)
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@megalearning.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        if (!$admin->hasRole('admin')) {
+            $admin->assignRole('admin');
+        }
 
-        // Tạo Teacher
-        $teacher = User::create([
-            'name' => 'Teacher User',
-            'email' => 'teacher@megalearning.com',
-            'password' => Hash::make('password'),
-        ]);
-        $teacher->assignRole('teacher');
+        // Tạo Teacher (idempotent)
+        $teacher = User::firstOrCreate(
+            ['email' => 'teacher@megalearning.com'],
+            [
+                'name' => 'Teacher User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        if (!$teacher->hasRole('teacher')) {
+            $teacher->assignRole('teacher');
+        }
 
-        // Tạo Student
-        $student = User::create([
-            'name' => 'Student User',
-            'email' => 'student@megalearning.com',
-            'password' => Hash::make('password'),
-        ]);
-        $student->assignRole('student');
+        // Tạo Student (idempotent)
+        $student = User::firstOrCreate(
+            ['email' => 'student@megalearning.com'],
+            [
+                'name' => 'Student User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        if (!$student->hasRole('student')) {
+            $student->assignRole('student');
+        }
     }
 }
