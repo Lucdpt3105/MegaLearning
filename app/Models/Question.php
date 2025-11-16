@@ -8,39 +8,47 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Question extends Model
 {
-    protected $table = 'questions';
-    protected $primaryKey = 'question_id';
-    public $timestamps = false;
-
     protected $fillable = [
-        'question_text',
-        'question_topic_id',
-        'question_type_id',
-        'question_difficulty'
+        'content',
+        'type',
+        'exam_id',
+        'subject_id',
+        'created_by',
+        'points',
+        'difficulty',
+        'explanation',
+        'image_url',
+        'order',
+        'in_question_bank',
     ];
 
-    /**
-     * Get the topic that owns this question
-     */
-    public function topic(): BelongsTo
+    protected $casts = [
+        'points' => 'decimal:2',
+        'in_question_bank' => 'boolean',
+    ];
+
+    public function exam(): BelongsTo
     {
-        return $this->belongsTo(Topic::class, 'question_topic_id', 'topic_id');
+        return $this->belongsTo(Exam::class);
     }
 
-    /**
-     * Get all answers for this question
-     */
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function answers(): HasMany
     {
-        return $this->hasMany(Answer::class, 'answer_question_id', 'question_id');
+        return $this->hasMany(Answer::class);
     }
 
-    /**
-     * Get the correct answer for this question
-     */
-    public function correctAnswer()
+    public function correctAnswer(): HasMany
     {
-        return $this->hasOne(Answer::class, 'answer_question_id', 'question_id')
-                    ->where('is_correct', 1);
+        return $this->hasMany(Answer::class)->where('is_correct', true);
     }
 }
