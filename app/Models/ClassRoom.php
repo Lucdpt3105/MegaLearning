@@ -64,4 +64,9 @@ class ClassRoom extends Model
     {
         return $this->hasMany(StudentRanking::class);
     }
+
+    public function chatRoom()
+    {
+        return $this->hasOne(ChatRoom::class, 'class_room_id');
+    }
 }

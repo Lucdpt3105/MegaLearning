@@ -106,7 +106,11 @@ class SubjectController extends Controller
         $this->authorize('view', $subject);
 
         $subject->load([
-            'classRooms',
+            'classRooms' => function($query) {
+                $query->withCount(['students' => function($q) {
+                    $q->where('class_enrollments.status', 'active');
+                }]);
+            },
             'documents' => function($query) {
                 $query->latest()->with(['uploader', 'approver']);
             },
