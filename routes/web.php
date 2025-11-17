@@ -107,9 +107,15 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::put('/students/{classRoom}/enrollment/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateEnrollment'])->name('students.update-enrollment');
     Route::put('/students/{classRoom}/info/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateStudentInfo'])->name('students.update-info');
     
+    // Phase 4: Question Bank Management
+    Route::get('/questions/subjects/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'bySubject'])->name('questions.by-subject');
+    Route::get('/questions/export/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'export'])->name('questions.export');
+    Route::post('/questions/import/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'import'])->name('questions.import');
+    Route::get('/questions/download-template', [App\Http\Controllers\Teacher\QuestionController::class, 'downloadTemplate'])->name('questions.download-template');
+    Route::resource('questions', App\Http\Controllers\Teacher\QuestionController::class);
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
-    Route::get('/questions', [TeacherController::class, 'questions'])->name('questions');
     Route::get('/exams', [TeacherController::class, 'exams'])->name('exams');
 });
 
