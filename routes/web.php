@@ -114,9 +114,18 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::get('/questions/download-template', [App\Http\Controllers\Teacher\QuestionController::class, 'downloadTemplate'])->name('questions.download-template');
     Route::resource('questions', App\Http\Controllers\Teacher\QuestionController::class);
     
+    // Phase 5: Exam Management (UC-GV-030 to UC-GV-037)
+    Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Teacher\ExamController::class, 'addQuestions'])->name('exams.questions.add');
+    Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Teacher\ExamController::class, 'createQuestion'])->name('exams.questions.create');
+    Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Teacher\ExamController::class, 'removeQuestion'])->name('exams.questions.remove');
+    Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Teacher\ExamController::class, 'reorderQuestions'])->name('exams.questions.reorder');
+    Route::post('/exams/{exam}/publish', [App\Http\Controllers\Teacher\ExamController::class, 'publish'])->name('exams.publish');
+    Route::post('/exams/{exam}/notify', [App\Http\Controllers\Teacher\ExamController::class, 'sendNotification'])->name('exams.notify');
+    Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');
+    Route::resource('exams', App\Http\Controllers\Teacher\ExamController::class);
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
-    Route::get('/exams', [TeacherController::class, 'exams'])->name('exams');
 });
 
 // Admin Routes
