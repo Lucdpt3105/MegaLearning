@@ -34,6 +34,20 @@ class Exam extends Model
         'allow_review',
         'status',
         'settings',
+        // Security fields
+        'access_code',
+        'require_access_code',
+        'restrict_to_class',
+        'detect_cheating',
+        'detect_tab_switch',
+        'detect_device_change',
+        'lock_on_exit',
+        'max_exit_time',
+        'require_camera',
+        'require_screen_recording',
+        // Auto-generation
+        'is_auto_generated',
+        'auto_gen_criteria',
     ];
 
     protected $casts = [
@@ -48,6 +62,18 @@ class Exam extends Model
         'show_results_immediately' => 'boolean',
         'allow_review' => 'boolean',
         'settings' => 'array',
+        // Security casts
+        'require_access_code' => 'boolean',
+        'restrict_to_class' => 'boolean',
+        'detect_cheating' => 'boolean',
+        'detect_tab_switch' => 'boolean',
+        'detect_device_change' => 'boolean',
+        'lock_on_exit' => 'boolean',
+        'require_camera' => 'boolean',
+        'require_screen_recording' => 'boolean',
+        // Auto-generation casts
+        'is_auto_generated' => 'boolean',
+        'auto_gen_criteria' => 'array',
     ];
 
     public function subject(): BelongsTo

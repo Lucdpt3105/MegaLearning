@@ -62,9 +62,68 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Quick Actions Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <a href="{{ route('teacher.documents.create', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-indigo-500">
+            <div class="flex items-center space-x-4">
+                <div class="bg-indigo-100 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Thêm tài liệu</h3>
+                    <p class="text-sm text-gray-600">UC-GV-071</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('teacher.exams.create', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-purple-500">
+            <div class="flex items-center space-x-4">
+                <div class="bg-purple-100 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Tạo đề thi</h3>
+                    <p class="text-sm text-gray-600">UC-GV-032</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('teacher.exams.index', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-green-500">
+            <div class="flex items-center space-x-4">
+                <div class="bg-green-100 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Xem đề thi</h3>
+                    <p class="text-sm text-gray-600">UC-GV-030</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('teacher.questions.by-subject', $classRoom->subject) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-orange-500">
+            <div class="flex items-center space-x-4">
+                <div class="bg-orange-100 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Ngân hàng câu hỏi</h3>
+                    <p class="text-sm text-gray-600">UC-GV-020</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Secondary Actions -->
     <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Thao tác nhanh</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Thao tác khác</h2>
         <div class="flex flex-wrap gap-3">
             <button onclick="openAddStudentModal()" class="inline-flex items-center space-x-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

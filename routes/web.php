@@ -114,6 +114,9 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::get('/questions/download-template', [App\Http\Controllers\Teacher\QuestionController::class, 'downloadTemplate'])->name('questions.download-template');
     Route::resource('questions', App\Http\Controllers\Teacher\QuestionController::class);
     
+    // Subjects API
+    Route::get('/subjects/{subject}/topics', [App\Http\Controllers\Teacher\SubjectController::class, 'getTopics'])->name('subjects.topics');
+    
     // Phase 5: Exam Management (UC-GV-030 to UC-GV-037)
     Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Teacher\ExamController::class, 'addQuestions'])->name('exams.questions.add');
     Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Teacher\ExamController::class, 'createQuestion'])->name('exams.questions.create');

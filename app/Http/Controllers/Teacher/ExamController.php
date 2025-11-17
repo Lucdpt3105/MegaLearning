@@ -77,14 +77,34 @@ class ExamController extends Controller
             'description' => 'nullable|string',
             'type' => 'required|in:quiz,midterm,final,practice',
             'duration' => 'required|integer|min:1',
+            'total_points' => 'required|numeric|min:0',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date|after:start_time',
-            'passing_score' => 'nullable|integer|min:0|max:100',
+            'passing_score' => 'nullable|numeric|min:0',
             'shuffle_questions' => 'boolean',
             'shuffle_answers' => 'boolean',
             'show_results_immediately' => 'boolean',
             'allow_review' => 'boolean',
-            'instructions' => 'nullable|string',
+            // Security fields
+            'require_access_code' => 'boolean',
+            'access_code' => 'nullable|string|max:20',
+            'restrict_to_class' => 'boolean',
+            'detect_cheating' => 'boolean',
+            'detect_tab_switch' => 'boolean',
+            'detect_device_change' => 'boolean',
+            'lock_on_exit' => 'boolean',
+            'max_exit_time' => 'nullable|integer|min:5|max:300',
+            'require_camera' => 'boolean',
+            'require_screen_recording' => 'boolean',
+            // Auto-generate fields
+            'auto_generate' => 'boolean',
+            'auto_gen_level_1' => 'nullable|integer|min:0',
+            'auto_gen_level_2' => 'nullable|integer|min:0',
+            'auto_gen_level_3' => 'nullable|integer|min:0',
+            'auto_gen_level_4' => 'nullable|integer|min:0',
+            'auto_gen_multiple_choice' => 'nullable|integer|min:0',
+            'auto_gen_essay' => 'nullable|integer|min:0',
+            'auto_gen_topics' => 'nullable|array',
         ]);
 
         // Check subject ownership
@@ -101,6 +121,7 @@ class ExamController extends Controller
             'description' => $validated['description'] ?? null,
             'type' => $validated['type'],
             'duration' => $validated['duration'],
+            'total_points' => $validated['total_points'],
             'start_time' => $validated['start_time'] ?? null,
             'end_time' => $validated['end_time'] ?? null,
             'passing_score' => $validated['passing_score'] ?? null,
@@ -109,11 +130,28 @@ class ExamController extends Controller
             'show_results_immediately' => $request->boolean('show_results_immediately', true),
             'allow_review' => $request->boolean('allow_review', true),
             'status' => 'draft',
-            'instructions' => $validated['instructions'] ?? null,
+            // Security settings
+            'require_access_code' => $request->boolean('require_access_code'),
+            'access_code' => $request->boolean('require_access_code') ? $validated['access_code'] : null,
+            'restrict_to_class' => $request->boolean('restrict_to_class', true),
+            'detect_cheating' => $request->boolean('detect_cheating'),
+            'detect_tab_switch' => $request->boolean('detect_tab_switch'),
+            'detect_device_change' => $request->boolean('detect_device_change'),
+            'lock_on_exit' => $request->boolean('lock_on_exit'),
+            'max_exit_time' => $request->boolean('lock_on_exit') ? $validated['max_exit_time'] : null,
+            'require_camera' => $request->boolean('require_camera'),
+            'require_screen_recording' => $request->boolean('require_screen_recording'),
         ]);
 
+        // Auto-generate questions if requested
+        if ($request->boolean('auto_generate')) {
+            $this->autoGenerateQuestions($exam, $request);
+        }
+
         return redirect()->route('teacher.exams.show', $exam)
-            ->with('success', 'Đề thi đã được tạo thành công! Bây giờ hãy thêm câu hỏi.');
+            ->with('success', $request->boolean('auto_generate') 
+                ? 'Đề thi đã được tạo và câu hỏi đã được tự động thêm! Hãy kiểm tra và điều chỉnh nếu cần.' 
+                : 'Đề thi đã được tạo thành công! Bây giờ hãy thêm câu hỏi.');
     }
 
     /**
@@ -388,4 +426,130 @@ class ExamController extends Controller
             ->back()
             ->with('success', 'Đang phát triển tính năng import Excel cho đề thi!');
     }
+
+    /**
+     * Auto-generate questions based on criteria
+     */
+    protected function autoGenerateQuestions(Exam $exam, Request $request)
+    {
+        $criteria = [
+            'level_1' => $request->input('auto_gen_level_1', 0),
+            'level_2' => $request->input('auto_gen_level_2', 0),
+            'level_3' => $request->input('auto_gen_level_3', 0),
+            'level_4' => $request->input('auto_gen_level_4', 0),
+            'multiple_choice' => $request->input('auto_gen_multiple_choice', 0),
+            'essay' => $request->input('auto_gen_essay', 0),
+            'topics' => $request->input('auto_gen_topics', []),
+        ];
+
+        // Save criteria for reference
+        $exam->update([
+            'is_auto_generated' => true,
+            'auto_gen_criteria' => $criteria,
+        ]);
+
+        $selectedQuestions = [];
+        $order = 1;
+
+        // Get questions by Bloom level
+        foreach (['level_1' => 1, 'level_2' => 2, 'level_3' => 3, 'level_4' => 4] as $key => $bloomLevel) {
+            $count = $criteria[$key];
+            if ($count > 0) {
+                $questions = $this->getQuestionsForCriteria(
+                    $exam->subject_id,
+                    $bloomLevel,
+                    null,
+                    $criteria['topics'],
+                    $count
+                );
+                
+                foreach ($questions as $question) {
+                    $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 1];
+                }
+            }
+        }
+
+        // Get questions by type (if not already selected by level)
+        if ($criteria['multiple_choice'] > 0) {
+            $existing = count($selectedQuestions);
+            $needed = max(0, $criteria['multiple_choice'] - $existing);
+            
+            if ($needed > 0) {
+                $questions = $this->getQuestionsForCriteria(
+                    $exam->subject_id,
+                    null,
+                    'multiple_choice',
+                    $criteria['topics'],
+                    $needed,
+                    array_keys($selectedQuestions)
+                );
+                
+                foreach ($questions as $question) {
+                    if (!isset($selectedQuestions[$question->id])) {
+                        $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 1];
+                    }
+                }
+            }
+        }
+
+        if ($criteria['essay'] > 0) {
+            $questions = $this->getQuestionsForCriteria(
+                $exam->subject_id,
+                null,
+                'essay',
+                $criteria['topics'],
+                $criteria['essay'],
+                array_keys($selectedQuestions)
+            );
+            
+            foreach ($questions as $question) {
+                if (!isset($selectedQuestions[$question->id])) {
+                    $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 2];
+                }
+            }
+        }
+
+        // Attach questions to exam
+        if (!empty($selectedQuestions)) {
+            $exam->questions()->attach($selectedQuestions);
+        }
+
+        return count($selectedQuestions);
+    }
+
+    /**
+     * Get questions matching specific criteria
+     */
+    protected function getQuestionsForCriteria($subjectId, $bloomLevel = null, $type = null, $topics = [], $limit = 10, $exclude = [])
+    {
+        $query = Question::where('subject_id', $subjectId)
+            ->where('in_question_bank', true)
+            ->where('created_by', Auth::id());
+
+        if ($bloomLevel) {
+            if ($bloomLevel == 4) {
+                // Level 4+ means bloom_level >= 4
+                $query->where('bloom_level', '>=', 4);
+            } else {
+                $query->where('bloom_level', $bloomLevel);
+            }
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if (!empty($topics)) {
+            $query->whereIn('topic_id', $topics);
+        }
+
+        if (!empty($exclude)) {
+            $query->whereNotIn('id', $exclude);
+        }
+
+        return $query->inRandomOrder()
+            ->limit($limit)
+            ->get();
+    }
 }
+
