@@ -11,20 +11,32 @@ class Question extends Model
     protected $fillable = [
         'content',
         'type',
+        'correct_answer_count',
         'exam_id',
         'subject_id',
+        'topic_id',
         'created_by',
         'points',
         'difficulty',
+        'bloom_level',
+        'tags',
         'explanation',
+        'grading_guide',
         'image_url',
+        'audio_url',
+        'video_url',
         'order',
         'in_question_bank',
+        'usage_count',
+        'last_used_at',
     ];
 
     protected $casts = [
         'points' => 'decimal:2',
         'in_question_bank' => 'boolean',
+        'tags' => 'array',
+        'usage_count' => 'integer',
+        'last_used_at' => 'datetime',
     ];
 
     public function exam(): BelongsTo
@@ -35,6 +47,11 @@ class Question extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class);
     }
 
     public function creator(): BelongsTo
