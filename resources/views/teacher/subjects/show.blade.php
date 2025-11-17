@@ -109,37 +109,6 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <a href="{{ route('teacher.documents.create', ['subject_id' => $subject->id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-indigo-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-indigo-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Thêm tài liệu</h3>
-                    <p class="text-sm text-gray-600">UC-GV-071</p>
-                </div>
-            </div>
-        </a>
-
-        <a href="#" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-purple-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-purple-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Tạo đề thi</h3>
-                    <p class="text-sm text-gray-600">UC-GV-032</p>
-                </div>
-            </div>
-        </a>
-    </div>
-
     <!-- Class Rooms List -->
     @if($subject->classRooms->isNotEmpty())
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
