@@ -136,6 +136,13 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/video-calls/{videoCall}/save-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'saveRecording'])->name('video-calls.save-recording');
     Route::resource('video-calls', App\Http\Controllers\Teacher\VideoCallController::class);
     
+    // Phase 7: Grading (UC-GV-080 to UC-GV-084)
+    Route::get('/grading', [App\Http\Controllers\Teacher\GradingController::class, 'index'])->name('grading.index');
+    Route::get('/grading/{submission}', [App\Http\Controllers\Teacher\GradingController::class, 'show'])->name('grading.show');
+    Route::post('/grading/{submission}/auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'autoGrade'])->name('grading.auto-grade');
+    Route::post('/grading/{submission}/grade', [App\Http\Controllers\Teacher\GradingController::class, 'grade'])->name('grading.grade');
+    Route::post('/grading/bulk-auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'bulkAutoGrade'])->name('grading.bulk-auto-grade');
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
 });
