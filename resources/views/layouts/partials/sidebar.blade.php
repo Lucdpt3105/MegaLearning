@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <a href="/teacher/classes" class="nav-item {{ request()->is('teacher/classes*') ? 'active' : '' }}">
+                <a href="/teacher/classes" class="nav-item {{ request()->is('teacher/classes*') || request()->is('teacher/video-calls*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-green-500 to-green-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -70,6 +70,17 @@
                         <span class="nav-desc">Video call & Classes</span>
                     </div>
                 </a>
+
+                <!-- Sub-menu for Video Calls -->
+                <div class="ml-12 space-y-1 mt-1" x-data="{ open: {{ request()->is('teacher/video-calls*') ? 'true' : 'false' }} }">
+                    <a href="{{ route('teacher.video-calls.index') }}" 
+                       class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors {{ request()->is('teacher/video-calls*') ? 'bg-red-50 text-red-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Buổi học Online
+                    </a>
+                </div>
 
                 <!-- Documents Section -->
                 <div class="nav-section-header">

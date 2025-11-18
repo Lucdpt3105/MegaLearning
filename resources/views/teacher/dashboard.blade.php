@@ -98,11 +98,18 @@
                 <span class="text-sm font-medium text-gray-700">Ngân hàng Câu hỏi</span>
             </a>
 
-            <a href="{{ route('teacher.exams') }}" class="flex flex-col items-center p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition">
+            <a href="{{ route('teacher.exams.index') }}" class="flex flex-col items-center p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition">
                 <svg class="w-8 h-8 text-orange-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                <span class="text-sm font-medium text-gray-700">Manage Exams</span>
+                <span class="text-sm font-medium text-gray-700">Quản lý Đề thi</span>
+            </a>
+
+            <a href="{{ route('teacher.video-calls.index') }}" class="flex flex-col items-center p-4 bg-red-50 rounded-xl hover:bg-red-100 transition">
+                <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-sm font-medium text-gray-700">Buổi học Online 🎥</span>
             </a>
         </div>
     </div>
