@@ -127,6 +127,15 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');
     Route::resource('exams', App\Http\Controllers\Teacher\ExamController::class);
     
+    // Phase 6: Video Call Management (UC-GV-001 to UC-GV-004)
+    Route::post('/video-calls/{videoCall}/start', [App\Http\Controllers\Teacher\VideoCallController::class, 'start'])->name('video-calls.start');
+    Route::post('/video-calls/{videoCall}/end', [App\Http\Controllers\Teacher\VideoCallController::class, 'end'])->name('video-calls.end');
+    Route::get('/video-calls/{videoCall}/join', [App\Http\Controllers\Teacher\VideoCallController::class, 'join'])->name('video-calls.join');
+    Route::post('/video-calls/{videoCall}/invite', [App\Http\Controllers\Teacher\VideoCallController::class, 'invite'])->name('video-calls.invite');
+    Route::post('/video-calls/{videoCall}/toggle-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'toggleRecording'])->name('video-calls.toggle-recording');
+    Route::post('/video-calls/{videoCall}/save-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'saveRecording'])->name('video-calls.save-recording');
+    Route::resource('video-calls', App\Http\Controllers\Teacher\VideoCallController::class);
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
 });
