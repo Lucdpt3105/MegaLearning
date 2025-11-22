@@ -59,7 +59,7 @@
 			</form>
 		</div>
 	<section class="space-y-4">
-		<h2 class="text-lg font-semibold text-gray-800">Answers ({{ $answers_count }})</h2>
+		<h2 class="text-lg font-semibold text-gray-800">Answers (<span id="answers-count">{{ $answers_count }}</span>)</h2>
 		@if(empty($answersTree))
 			<p class="text-sm text-gray-500">No answers yet.</p>
 		@else
@@ -197,7 +197,8 @@
 <script>
 // AJAX create & delete answers (no reload)
 (function(){
-	const wrapper = document.getElementById('answers-wrapper');
+		const wrapper = document.getElementById('answers-wrapper');
+		const answersCountEl = document.getElementById('answers-count');
 	if(!wrapper) return;
 	const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('[data-csrf]')?.getAttribute('data-csrf');
 
@@ -210,6 +211,7 @@
 			if(!res.ok) throw new Error('Failed');
 			const data = await res.json();
 			if(data.html){ insertAnswerHtml(data); }
+			if(typeof data.answers_count !== 'undefined' && answersCountEl){ answersCountEl.textContent = data.answers_count; }
 			form.reset();
 			if(form.dataset.parentId){ const replyWrap = form.closest('#reply-form-'+form.dataset.parentId); replyWrap && replyWrap.classList.add('hidden'); }
 		} catch(e){ console.error(e); alert('Post failed'); }
@@ -259,6 +261,7 @@
 					if(data.deleted){
 						const el = wrapper.querySelector('[data-answer-id="'+data.answer_id+'"]');
 						if(el){ el.remove(); }
+						if(typeof data.answers_count !== 'undefined' && answersCountEl){ answersCountEl.textContent = data.answers_count; }
 					}
 				})
 				.catch(err=>console.error(err));

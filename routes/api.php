@@ -90,4 +90,21 @@ Route::prefix('v1')->group(function () {
     
     // Exams API
     Route::apiResource('exams', ExamController::class);
+
+    // Forum Q&A (public index/show, rest require auth)
+    Route::prefix('forum')->group(function () {
+        Route::get('questions', [ForumQuestionController::class, 'index']);
+        Route::get('questions/{id}', [ForumQuestionController::class, 'show']);
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::post('questions', [ForumQuestionController::class, 'store']);
+            Route::put('questions/{id}', [ForumQuestionController::class, 'update']);
+            Route::delete('questions/{id}', [ForumQuestionController::class, 'destroy']);
+            Route::post('questions/{id}/answers', [ForumQuestionController::class, 'storeAnswer']);
+            Route::post('questions/{id}/vote/up', [ForumQuestionController::class, 'voteUp']);
+            Route::post('questions/{id}/vote/down', [ForumQuestionController::class, 'voteDown']);
+            Route::post('questions/{questionId}/answers/{answerId}/vote/up', [ForumQuestionController::class, 'voteAnswerUp']);
+            Route::post('questions/{questionId}/answers/{answerId}/vote/down', [ForumQuestionController::class, 'voteAnswerDown']);
+            Route::delete('questions/{questionId}/answers/{answerId}', [ForumQuestionController::class, 'destroyAnswer']);
+        });
+    });
 });
