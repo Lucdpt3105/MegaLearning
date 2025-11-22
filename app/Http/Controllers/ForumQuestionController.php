@@ -6,9 +6,11 @@ use App\Models\ForumQuestion;
 use App\Models\Vote;
 use App\Models\ForumAnswer;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Concerns\ForumQuestionData;
 
 class ForumQuestionController extends Controller
 {
+    use ForumQuestionData;
     public function __construct()
     {
         $this->middleware('auth');
@@ -17,34 +19,7 @@ class ForumQuestionController extends Controller
     }
     public function index(Request $request)
     {
-        $sort = $request->query('sort', 'latest');
-
-        $query = ForumQuestion::query()
-            ->with('user:id,name')
-            ->withSum(['votes as votes_sum' => function ($q) {
-                $q->whereNull('forum_answer_id');
-            }], 'value')
-            // Count ALL answers (including nested), not just top-level
-            ->withCount('answers as answers_count');
-
-        switch ($sort) {
-            case 'votes':
-                $query->orderByDesc('votes_sum')
-                    ->orderByDesc('created_at');
-                break;
-
-            case 'answers':
-                $query->orderByDesc('answers_count')
-                    ->orderByDesc('created_at');
-                break;
-            case 'my_post':
-                $query->where('user_id', auth()->id())
-                    ->orderByDesc('created_at');
-                break;
-            default: // latest
-                $query->orderByDesc('created_at');
-        }
-
+        [$query, $sort] = $this->questionBaseQuery($request);
         $questions = $query->paginate(10)->appends(['sort' => $sort]);
 
         if ($request->ajax() || $request->boolean('partial')) {
@@ -77,31 +52,17 @@ class ForumQuestionController extends Controller
 
     public function show(ForumQuestion $forumQuestion)
     {
-        $forumQuestion->load(['user:id,name']);
-        // Eager load answers (flat) with user and votes sum
-        $answers = ForumAnswer::where('forum_question_id', $forumQuestion->getKey())
-            ->with('user:id,name')
-            ->withSum('votes as votes_sum', 'value')
-            ->orderBy('forum_answer_id')
-            ->get();
-        $answers_count = $answers->count();
-        $votes_sum = $forumQuestion->votes()->whereNull('forum_answer_id')->sum('value');
-        $my_vote = (int) ($forumQuestion->votes()
-            ->whereNull('forum_answer_id')
-            ->where('user_id', auth()->id())
-            ->value('value') ?? 0);
-        $question = $forumQuestion;
+        $data = $this->assembleShowData($forumQuestion);
+        $question = $data['question'];
+        $answers_count = $data['answers_count'];
+        $votes_sum = $data['votes_sum'];
+        $my_vote = $data['my_vote'];
+        $nestedAnswers = $data['answersTree'];
         // store previous URL to enable consistent back navigation
         if (url()->previous() !== route('forum.edit', $forumQuestion->getKey()) &&
             url()->previous() !== route('forum.show', $forumQuestion->getKey())) {
             $this->storeReturnTo();
         }
-        // Build tree structure for nested answers
-        $byParent = [];
-        foreach ($answers as $a) {
-            $byParent[$a->parent_id ?? 0][] = $a;
-        }
-        $nestedAnswers = $this->buildAnswerTree($byParent, 0, 0);
         return view('forum.show', [
             'question' => $question,
             'answersTree' => $nestedAnswers,
@@ -135,6 +96,7 @@ class ForumQuestionController extends Controller
         ]);
         if ($request->ajax()) {
             $depth = $this->computeAnswerDepth($answer);
+            $answersCount = ForumAnswer::where('forum_question_id', $forumQuestion->getKey())->count();
             $html = view('forum._answer', [
                 'node' => [
                     'model' => $answer->load('user:id,name')->loadSum('votes as votes_sum', 'value'),
@@ -148,6 +110,7 @@ class ForumQuestionController extends Controller
                 'parent_id' => $parentId,
                 'depth' => $depth,
                 'html' => $html,
+                'answers_count' => $answersCount,
             ], 201);
         }
         return redirect()->route('forum.show', $forumQuestion->getKey())
@@ -156,7 +119,7 @@ class ForumQuestionController extends Controller
 
     public function voteUp(ForumQuestion $forumQuestion)
     {
-        $current = $this->toggleVote($forumQuestion, 1);
+        $current = $this->toggleQuestionVote($forumQuestion, 1);
         if (request()->ajax() || request()->wantsJson()) {
             $sum = (int) $forumQuestion->votes()->whereNull('forum_answer_id')->sum('value');
             return response()->json(['votes_sum' => $sum, 'my_vote' => $current]);
@@ -166,7 +129,7 @@ class ForumQuestionController extends Controller
 
     public function voteDown(ForumQuestion $forumQuestion)
     {
-        $current = $this->toggleVote($forumQuestion, -1);
+        $current = $this->toggleQuestionVote($forumQuestion, -1);
         if (request()->ajax() || request()->wantsJson()) {
             $sum = (int) $forumQuestion->votes()->whereNull('forum_answer_id')->sum('value');
             return response()->json(['votes_sum' => $sum, 'my_vote' => $current]);
@@ -174,31 +137,10 @@ class ForumQuestionController extends Controller
         return back();
     }
 
-    protected function toggleVote(ForumQuestion $forumQuestion, int $value): int
-    {
-        $vote = $forumQuestion->votes()
-            ->where('user_id', auth()->id())
-            ->whereNull('forum_answer_id')
-            ->first();
-        if ($vote) {
-            if ((int)$vote->value === $value) {
-                // same click toggles off
-                $vote->delete();
-                return 0;
-            }
-            $vote->update(['value' => $value]);
-            return $value;
-        }
-        $forumQuestion->votes()->create([
-            'user_id' => auth()->id(),
-            'value' => $value,
-        ]);
-        return $value;
-    }
 
     public function voteAnswerUp(ForumQuestion $forumQuestion, ForumAnswer $forumAnswer)
     {
-        $current = $this->toggleAnswerVote($forumQuestion, $forumAnswer, 1);
+        $current = $this->toggleAnswerVote($forumAnswer, $forumQuestion, 1);
         if (request()->ajax() || request()->wantsJson()) {
             $sum = (int) $forumAnswer->votes()->sum('value');
             return response()->json(['answer_id' => $forumAnswer->getKey(), 'votes_sum' => $sum, 'my_vote' => $current]);
@@ -208,7 +150,7 @@ class ForumQuestionController extends Controller
 
     public function voteAnswerDown(ForumQuestion $forumQuestion, ForumAnswer $forumAnswer)
     {
-        $current = $this->toggleAnswerVote($forumQuestion, $forumAnswer, -1);
+        $current = $this->toggleAnswerVote($forumAnswer, $forumQuestion, -1);
         if (request()->ajax() || request()->wantsJson()) {
             $sum = (int) $forumAnswer->votes()->sum('value');
             return response()->json(['answer_id' => $forumAnswer->getKey(), 'votes_sum' => $sum, 'my_vote' => $current]);
@@ -216,43 +158,7 @@ class ForumQuestionController extends Controller
         return back();
     }
 
-    protected function toggleAnswerVote(ForumQuestion $forumQuestion, ForumAnswer $forumAnswer, int $value): int
-    {
-        // ensure answer belongs to question
-        if ($forumAnswer->forum_question_id !== $forumQuestion->getKey()) {
-            abort(404);
-        }
-        $vote = $forumAnswer->votes()->where('user_id', auth()->id())->first();
-        if ($vote) {
-            if ((int)$vote->value === $value) {
-                $vote->delete();
-                return 0;
-            }
-            $vote->update(['value' => $value]);
-            return $value;
-        }
-        // IMPORTANT: Do NOT set forum_question_id here to avoid violating
-        // unique(user_id, forum_question_id) when the user already voted on the question.
-        // The relation will set forum_answer_id automatically.
-        $forumAnswer->votes()->create([
-            'user_id' => auth()->id(),
-            'value' => $value,
-        ]);
-        return $value;
-    }
 
-    protected function buildAnswerTree(array $byParent, int $parentId, int $depth): array
-    {
-        $result = [];
-        foreach ($byParent[$parentId] ?? [] as $answer) {
-            $result[] = [
-                'model' => $answer,
-                'depth' => $depth,
-                'children' => $this->buildAnswerTree($byParent, $answer->getKey(), $depth + 1)
-            ];
-        }
-        return $result;
-    }
 
     public function edit(ForumQuestion $forumQuestion)
     {
@@ -307,8 +213,14 @@ class ForumQuestionController extends Controller
         // authorization via policy (admin: all, others: owner only)
         $this->authorize('delete', $forumAnswer);
         $this->deleteAnswerRecursive($forumAnswer);
+        $answersCount = ForumAnswer::where('forum_question_id', $forumQuestion->getKey())->count();
         if (request()->ajax()) {
-            return response()->json(['ok' => true, 'deleted' => true, 'answer_id' => $forumAnswer->getKey()]);
+            return response()->json([
+                'ok' => true,
+                'deleted' => true,
+                'answer_id' => $forumAnswer->getKey(),
+                'answers_count' => $answersCount,
+            ]);
         }
         return redirect()->route('forum.show', $forumQuestion->getKey())
             ->with('success-answer', 'Answer deleted');
@@ -324,15 +236,4 @@ class ForumQuestionController extends Controller
         $answer->delete();
     }
 
-    protected function computeAnswerDepth(ForumAnswer $answer): int
-    {
-        $depth = 0;
-        $current = $answer;
-        while ($current->parent_id) {
-            $depth++;
-            $current = ForumAnswer::find($current->parent_id);
-            if (!$current) break;
-        }
-        return $depth;
-    }
 }
