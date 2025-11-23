@@ -4,13 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-<<<<<<< .merge_file_2tsHox
-use App\Http\Controllers\ForumQuestionController;
-=======
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
->>>>>>> .merge_file_XixHoc
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
