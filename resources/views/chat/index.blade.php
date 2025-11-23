@@ -973,7 +973,7 @@
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
-                const response = await fetch(`${API_URL}/current-user`);
+                const response = await fetch(`${API_URL}/user/current`);
                 const data = await response.json();
                 
                 console.log('🔍 Checking current user:', data);
@@ -1140,7 +1140,7 @@
                 
                 console.log('👤 Selecting user:', { userId, userName, userEmail });
                 
-                const response = await fetch(`${API_URL}/set-user`, {
+                const response = await fetch(`${API_URL}/user/set`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

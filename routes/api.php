@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\ForumQuestionController;
+use App\Http\Controllers\Api\ChatApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('exams', ExamController::class);
 
     // Forum Q&A (public index/show, rest require auth)
+    // TEMPORARILY COMMENTED OUT - Fix ForumQuestionController issue
+    /*
     Route::prefix('forum')->group(function () {
         Route::get('questions', [ForumQuestionController::class, 'index']);
         Route::get('questions/{id}', [ForumQuestionController::class, 'show']);
@@ -107,4 +110,29 @@ Route::prefix('v1')->group(function () {
             Route::delete('questions/{questionId}/answers/{answerId}', [ForumQuestionController::class, 'destroyAnswer']);
         });
     });
+    */
+});
+
+// Chat API Routes (Public - no authentication required for demo)
+Route::prefix('chat')->name('chat.api.')->group(function () {
+    // User management
+    Route::post('/user/set', [ChatApiController::class, 'setCurrentUser'])->name('user.set');
+    Route::get('/user/current', [ChatApiController::class, 'getCurrentUser'])->name('user.current');
+    
+    // Get all users for private chat
+    Route::get('/users', [ChatApiController::class, 'getUsers'])->name('users');
+    
+    // Room management
+    Route::get('/rooms', [ChatApiController::class, 'getRooms'])->name('rooms');
+    Route::post('/rooms', [ChatApiController::class, 'createRoom'])->name('rooms.create');
+    Route::post('/rooms/private', [ChatApiController::class, 'createPrivateRoom'])->name('rooms.private');
+    Route::get('/rooms/{roomId}', [ChatApiController::class, 'getRoom'])->name('rooms.show');
+    Route::delete('/rooms/{roomId}', [ChatApiController::class, 'deleteRoom'])->name('rooms.delete');
+    
+    // Message management
+    Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages'])->name('messages');
+    Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage'])->name('messages.send');
+    Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage'])->name('messages.delete');
+    Route::put('/messages/{messageId}', [ChatApiController::class, 'updateMessage'])->name('messages.update');
+    Route::post('/rooms/{roomId}/read', [ChatApiController::class, 'markRoomAsRead'])->name('rooms.read');
 });
