@@ -114,7 +114,8 @@ Route::prefix('v1')->group(function () {
 });
 
 // Chat API Routes (Public - no authentication required for demo)
-Route::prefix('chat')->name('chat.api.')->group(function () {
+// Using web middleware to share session with authenticated users
+Route::middleware(['web'])->prefix('chat')->name('chat.api.')->group(function () {
     // User management
     Route::post('/user/set', [ChatApiController::class, 'setCurrentUser'])->name('user.set');
     Route::get('/user/current', [ChatApiController::class, 'getCurrentUser'])->name('user.current');
