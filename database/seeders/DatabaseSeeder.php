@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         // Chạy seeder theo thứ tự: Roles -> Users -> Subjects -> Private Chat
         $this->call([
-            RolePermissionSeeder::class,
+            // RolePermissionSeeder::class,
             UserSeeder::class,
             SubjectSeeder::class,
             PrivateChatSeeder::class,
