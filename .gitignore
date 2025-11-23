@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Test files with API keys
+test-gemini.php
+list-gemini-models.php

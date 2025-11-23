@@ -16,19 +16,19 @@ class RoleSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create roles
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'teacher']);
-        Role::create(['name' => 'student']);
+    // Create roles (idempotent)
+    Role::firstOrCreate(['name' => 'admin']);
+    Role::firstOrCreate(['name' => 'teacher']);
+    Role::firstOrCreate(['name' => 'student']);
 
-        // Create permissions (optional)
-        Permission::create(['name' => 'manage-users']);
-        Permission::create(['name' => 'manage-subjects']);
-        Permission::create(['name' => 'manage-topics']);
-        Permission::create(['name' => 'manage-questions']);
-        Permission::create(['name' => 'manage-exams']);
-        Permission::create(['name' => 'take-exams']);
-        Permission::create(['name' => 'view-results']);
+    // Create permissions (idempotent)
+    Permission::firstOrCreate(['name' => 'manage-users']);
+    Permission::firstOrCreate(['name' => 'manage-subjects']);
+    Permission::firstOrCreate(['name' => 'manage-topics']);
+    Permission::firstOrCreate(['name' => 'manage-questions']);
+    Permission::firstOrCreate(['name' => 'manage-exams']);
+    Permission::firstOrCreate(['name' => 'take-exams']);
+    Permission::firstOrCreate(['name' => 'view-results']);
 
         // Assign permissions to roles
         $adminRole = Role::findByName('admin');

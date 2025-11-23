@@ -15,11 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Chạy seeder theo thứ tự: Roles -> Users
+        // Chạy seeder theo thứ tự: Roles -> Users -> Subjects -> Private Chat
         $this->call([
+<<<<<<< .merge_file_uChAAo
             // RoleSeeder::class,
             // UserSeeder::class,
            // ForumSeeder::class,
+=======
+            RolePermissionSeeder::class,
+            UserSeeder::class,
+            SubjectSeeder::class,
+            PrivateChatSeeder::class,
+>>>>>>> .merge_file_zikVx1
         ]);
     }
 }
