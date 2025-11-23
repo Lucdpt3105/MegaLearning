@@ -8,7 +8,8 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-        "laravel/sanctum": "^4.0",
+        "laravel/sanctum": "^4.2",
+        "laravel/telescope": "^5.15",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "3.1.67",
         "pusher/pusher-php-server": "^7.2",

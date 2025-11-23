@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ExamController;
-use App\Http\Controllers\Api\ChatApiController;
+use App\Http\Controllers\Api\ForumQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,32 +24,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::get('/forum/questions', [ForumQuestionController::class, 'index']);
+//     Route::get('/forum/questions/{id}', [ForumQuestionController::class, 'show']);
+//     Route::post('/forum/questions', [ForumQuestionController::class, 'store']);
+//     Route::put('/forum/questions/{id}', [ForumQuestionController::class, 'update']);
+//     Route::delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
+// });
+// Route::middleware(['auth:sanctum', 'role:admin'])->delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
+
+
+
 // Authentication Routes (Public)
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::get('/me', [AuthApiController::class, 'me']);
-});
-
-// Chat API Routes - Need session support
-Route::prefix('chat')->middleware(['web'])->group(function () {
-    // User management
-    Route::post('/set-user', [ChatApiController::class, 'setCurrentUser']);
-    Route::get('/current-user', [ChatApiController::class, 'getCurrentUser']);
-    
-    // Public routes
-    Route::get('/rooms', [ChatApiController::class, 'getRooms']);
-    Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages']);
-    Route::post('/rooms', [ChatApiController::class, 'createRoom']);
-    Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage']);
-    Route::post('/rooms/{roomId}/join', [ChatApiController::class, 'joinRoom']);
-    Route::post('/rooms/{roomId}/leave', [ChatApiController::class, 'leaveRoom']);
-    Route::post('/rooms/{roomId}/mark-read', [ChatApiController::class, 'markRoomAsRead']);
-    Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage']);
-    
-    // Private chat routes
-    Route::get('/users', [ChatApiController::class, 'getUsers']);
-    Route::post('/rooms/private', [ChatApiController::class, 'createPrivateRoom']);
 });
 
 // API Version 1
@@ -99,4 +90,21 @@ Route::prefix('v1')->group(function () {
     
     // Exams API
     Route::apiResource('exams', ExamController::class);
+
+    // Forum Q&A (public index/show, rest require auth)
+    Route::prefix('forum')->group(function () {
+        Route::get('questions', [ForumQuestionController::class, 'index']);
+        Route::get('questions/{id}', [ForumQuestionController::class, 'show']);
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::post('questions', [ForumQuestionController::class, 'store']);
+            Route::put('questions/{id}', [ForumQuestionController::class, 'update']);
+            Route::delete('questions/{id}', [ForumQuestionController::class, 'destroy']);
+            Route::post('questions/{id}/answers', [ForumQuestionController::class, 'storeAnswer']);
+            Route::post('questions/{id}/vote/up', [ForumQuestionController::class, 'voteUp']);
+            Route::post('questions/{id}/vote/down', [ForumQuestionController::class, 'voteDown']);
+            Route::post('questions/{questionId}/answers/{answerId}/vote/up', [ForumQuestionController::class, 'voteAnswerUp']);
+            Route::post('questions/{questionId}/answers/{answerId}/vote/down', [ForumQuestionController::class, 'voteAnswerDown']);
+            Route::delete('questions/{questionId}/answers/{answerId}', [ForumQuestionController::class, 'destroyAnswer']);
+        });
+    });
 });
