@@ -416,5 +416,31 @@ class SubjectController extends Controller
                 ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get topics for a subject (API endpoint for auto-generate)
+     */
+    public function getTopics(Subject $subject)
+    {
+        // Check ownership
+        if ($subject->teacher_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $topics = $subject->topics()
+            ->withCount(['questions' => function($query) {
+                $query->where('in_question_bank', true);
+            }])
+            ->get()
+            ->map(function($topic) {
+                return [
+                    'id' => $topic->id,
+                    'name' => $topic->name,
+                    'questions_count' => $topic->questions_count,
+                ];
+            });
+
+        return response()->json($topics);
+    }
 }
 

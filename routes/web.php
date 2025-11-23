@@ -111,10 +111,44 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::put('/students/{classRoom}/enrollment/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateEnrollment'])->name('students.update-enrollment');
     Route::put('/students/{classRoom}/info/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateStudentInfo'])->name('students.update-info');
     
+    // Phase 4: Question Bank Management
+    Route::get('/questions/subjects/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'bySubject'])->name('questions.by-subject');
+    Route::get('/questions/export/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'export'])->name('questions.export');
+    Route::post('/questions/import/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'import'])->name('questions.import');
+    Route::get('/questions/download-template', [App\Http\Controllers\Teacher\QuestionController::class, 'downloadTemplate'])->name('questions.download-template');
+    Route::resource('questions', App\Http\Controllers\Teacher\QuestionController::class);
+    
+    // Subjects API
+    Route::get('/subjects/{subject}/topics', [App\Http\Controllers\Teacher\SubjectController::class, 'getTopics'])->name('subjects.topics');
+    
+    // Phase 5: Exam Management (UC-GV-030 to UC-GV-037)
+    Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Teacher\ExamController::class, 'addQuestions'])->name('exams.questions.add');
+    Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Teacher\ExamController::class, 'createQuestion'])->name('exams.questions.create');
+    Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Teacher\ExamController::class, 'removeQuestion'])->name('exams.questions.remove');
+    Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Teacher\ExamController::class, 'reorderQuestions'])->name('exams.questions.reorder');
+    Route::post('/exams/{exam}/publish', [App\Http\Controllers\Teacher\ExamController::class, 'publish'])->name('exams.publish');
+    Route::post('/exams/{exam}/notify', [App\Http\Controllers\Teacher\ExamController::class, 'sendNotification'])->name('exams.notify');
+    Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');
+    Route::resource('exams', App\Http\Controllers\Teacher\ExamController::class);
+    
+    // Phase 6: Video Call Management (UC-GV-001 to UC-GV-004)
+    Route::post('/video-calls/{videoCall}/start', [App\Http\Controllers\Teacher\VideoCallController::class, 'start'])->name('video-calls.start');
+    Route::post('/video-calls/{videoCall}/end', [App\Http\Controllers\Teacher\VideoCallController::class, 'end'])->name('video-calls.end');
+    Route::get('/video-calls/{videoCall}/join', [App\Http\Controllers\Teacher\VideoCallController::class, 'join'])->name('video-calls.join');
+    Route::post('/video-calls/{videoCall}/invite', [App\Http\Controllers\Teacher\VideoCallController::class, 'invite'])->name('video-calls.invite');
+    Route::post('/video-calls/{videoCall}/toggle-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'toggleRecording'])->name('video-calls.toggle-recording');
+    Route::post('/video-calls/{videoCall}/save-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'saveRecording'])->name('video-calls.save-recording');
+    Route::resource('video-calls', App\Http\Controllers\Teacher\VideoCallController::class);
+    
+    // Phase 7: Grading (UC-GV-080 to UC-GV-084)
+    Route::get('/grading', [App\Http\Controllers\Teacher\GradingController::class, 'index'])->name('grading.index');
+    Route::get('/grading/{submission}', [App\Http\Controllers\Teacher\GradingController::class, 'show'])->name('grading.show');
+    Route::post('/grading/{submission}/auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'autoGrade'])->name('grading.auto-grade');
+    Route::post('/grading/{submission}/grade', [App\Http\Controllers\Teacher\GradingController::class, 'grade'])->name('grading.grade');
+    Route::post('/grading/bulk-auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'bulkAutoGrade'])->name('grading.bulk-auto-grade');
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
-    Route::get('/questions', [TeacherController::class, 'questions'])->name('questions');
-    Route::get('/exams', [TeacherController::class, 'exams'])->name('exams');
 });
 
 // Admin Routes
