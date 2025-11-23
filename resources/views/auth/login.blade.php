@@ -203,7 +203,7 @@
                         <input type="checkbox" name="remember" class="w-4 h-4 rounded border-white/20 bg-white/5 text-[#D84A5C] focus:ring-[#D84A5C] focus:ring-offset-0 cursor-pointer">
                         <span class="ml-2 text-gray-400 group-hover:text-gray-300 transition">Ghi nhớ đăng nhập</span>
                     </label>
-                    <a href="#" class="text-[#E08976] hover:text-[#D84A5C] font-medium transition">Quên mật khẩu?</a>
+                    <a href="{{ route('password.request') }}" class="text-[#E08976] hover:text-[#D84A5C] font-medium transition">Quên mật khẩu?</a>
                 </div>
 
                 <!-- Submit Button -->
