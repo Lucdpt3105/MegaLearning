@@ -195,7 +195,8 @@ DB_PASSWORD=your_password_here
 ### Bước 3: Chạy Migration và Seed Data
 
 ```bash
-php artisan migrate:fresh --seed
+php artisan db:seed
+
 ```
 
 Lệnh này sẽ:
