@@ -60,7 +60,7 @@ CREATE TABLE `ai_proctoring_sessions` (
   `ended_at` datetime DEFAULT NULL,
   `flags` json DEFAULT NULL,
   `notes` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -332,7 +332,7 @@ CREATE TABLE `attachments` (
   `file_url` varchar(512) DEFAULT NULL,
   `file_type` varchar(100) DEFAULT NULL,
   `uploaded_at` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -393,7 +393,7 @@ CREATE TABLE `chat_messages` (
   `user_id` int DEFAULT NULL,
   `message_text` text,
   `sent_at` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -405,7 +405,7 @@ CREATE TABLE `chat_rooms` (
   `room_id` int NOT NULL,
   `room_name` varchar(200) DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `chat_rooms`
@@ -532,7 +532,8 @@ CREATE TABLE `forumanswers` (
   `forum_question_id` int DEFAULT NULL,
   `user_id` int DEFAULT NULL,
   `answer_content` text COLLATE utf8mb4_unicode_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `parent_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -848,7 +849,7 @@ CREATE TABLE `roles` (
   `role_id` int NOT NULL,
   `role_name` varchar(50) NOT NULL,
   `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `roles`

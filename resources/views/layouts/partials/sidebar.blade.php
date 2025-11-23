@@ -297,12 +297,25 @@
             @endif
         @endauth
 
+<<<<<<< .merge_file_6cAVT0
+        <a href="/forum" class="sidebar-link {{ request()->is('forum*') ? 'active' : '' }}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <span>Forum</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="pt-4 pb-2">
+            <p class="px-4 text-xs font-semibold text-purple-200 uppercase tracking-wider">Settings</p>
+=======
         <!-- Settings Section -->
         <div class="nav-section-header mt-6">
             <div class="flex items-center space-x-2">
                 <span class="text-2xl">⚙️</span>
                 <span>Cài đặt</span>
             </div>
+>>>>>>> .merge_file_OVC1M8
         </div>
 
         <a href="{{ route('profile.edit') }}" class="nav-item {{ request()->is('profile*') ? 'active' : '' }}">
