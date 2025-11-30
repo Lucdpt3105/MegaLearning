@@ -117,49 +117,77 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Recent Exams -->
+        <!-- Upcoming Events -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
                     <h2 class="text-xl font-bold text-white flex items-center">
                         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Bài Kiểm Tra Sắp Tới
+                        Sự Kiện Sắp Tới
                     </h2>
                 </div>
                 <div class="p-6">
-                    @if($availableExams->isEmpty())
+                    @if($upcomingEvents->isEmpty())
                         <div class="text-center py-8 text-gray-500">
                             <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <p class="font-medium">Chưa có bài kiểm tra</p>
-                            <p class="text-sm">Hãy đăng ký thêm khóa học để tham gia kiểm tra</p>
+                            <p class="font-medium">Chưa có sự kiện nào</p>
+                            <p class="text-sm">Hãy đăng ký thêm khóa học để tham gia kiểm tra và lịch học</p>
                         </div>
                     @else
                         <div class="space-y-4">
-                            @foreach($availableExams as $exam)
-                                <div class="border-l-4 border-blue-500 bg-gray-50 p-4 rounded-r-lg hover:bg-gray-100 transition-colors">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <h3 class="font-semibold text-gray-900 mb-1">{{ $exam->title }}</h3>
-                                            <p class="text-sm text-gray-600">{{ $exam->subject->name }} - {{ $exam->classRoom->name }}</p>
-                                            <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                                                <span>⏱️ {{ $exam->duration }} phút</span>
-                                                <span>📊 {{ $exam->total_points }} điểm</span>
+                            @foreach($upcomingEvents as $event)
+                                @if($event['type'] == 'exam')
+                                    <!-- Exam Event -->
+                                    <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg hover:bg-blue-100 transition-colors">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded">BÀI THI</span>
+                                                    <h3 class="font-semibold text-gray-900">{{ $event['title'] }}</h3>
+                                                </div>
+                                                <p class="text-sm text-gray-600">{{ $event['subject'] }} - {{ $event['class'] }}</p>
+                                                <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                                    <span>📅 {{ $event['datetime']->format('d/m/Y H:i') }}</span>
+                                                    <span>⏱️ {{ $event['duration'] }} phút</span>
+                                                    <span>📊 {{ $event['points'] }} điểm</span>
+                                                </div>
                                             </div>
+                                            <a href="{{ $event['url'] }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                                Xem
+                                            </a>
                                         </div>
-                                        <a href="{{ route('student.exams.show', $exam->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                                            Xem
-                                        </a>
                                     </div>
-                                </div>
+                                @else
+                                    <!-- Video Call Event -->
+                                    <div class="border-l-4 border-green-500 bg-green-50 p-4 rounded-r-lg hover:bg-green-100 transition-colors">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded">📹 ZOOM</span>
+                                                    <h3 class="font-semibold text-gray-900">{{ $event['title'] }}</h3>
+                                                </div>
+                                                <p class="text-sm text-gray-600">{{ $event['subject'] }} - {{ $event['class'] }}</p>
+                                                <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                                    <span>📅 {{ $event['datetime']->format('d/m/Y H:i') }}</span>
+                                                    <span>⏱️ {{ $event['duration'] }} phút</span>
+                                                    <span>👨‍🏫 {{ $event['host'] }}</span>
+                                                </div>
+                                            </div>
+                                            <a href="{{ $event['url'] }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                                                Tham gia
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                         <div class="mt-4 text-center">
-                            <a href="{{ route('student.exams.index') }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                                Xem tất cả →
+                            <a href="{{ route('student.exams.index') }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm mr-4">
+                                Xem tất cả bài thi →
                             </a>
                         </div>
                     @endif

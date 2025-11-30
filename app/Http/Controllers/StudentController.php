@@ -6,9 +6,11 @@ use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\ExamSubmission;
 use App\Models\ClassEnrollment;
+use App\Models\VideoCall;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class StudentController extends Controller
 {
@@ -48,8 +50,50 @@ class StudentController extends Controller
             ->filter(function($exam) use ($student) {
                 $submissionCount = $exam->submissions()->where('student_id', $student->id)->count();
                 return $exam->allow_retake || $submissionCount == 0;
-            })
-            ->take(5);
+            });
+        
+        // Get upcoming video calls (scheduled for future)
+        $upcomingVideoCalls = VideoCall::whereIn('class_room_id', $enrolledClassIds)
+            ->where('status', 'scheduled')
+            ->where('scheduled_at', '>', Carbon::now())
+            ->with(['classRoom', 'host'])
+            ->get();
+        
+        // Combine exams and video calls into events
+        $upcomingEvents = collect();
+        
+        // Add exams as events
+        foreach ($availableExams as $exam) {
+            $upcomingEvents->push([
+                'type' => 'exam',
+                'id' => $exam->id,
+                'title' => $exam->title,
+                'subject' => $exam->subject->name ?? 'N/A',
+                'class' => $exam->classRoom->name ?? 'N/A',
+                'datetime' => $exam->start_time ?? Carbon::now(),
+                'duration' => $exam->duration,
+                'points' => $exam->total_points,
+                'url' => route('student.exams.show', $exam->id),
+            ]);
+        }
+        
+        // Add video calls as events
+        foreach ($upcomingVideoCalls as $videoCall) {
+            $upcomingEvents->push([
+                'type' => 'video_call',
+                'id' => $videoCall->id,
+                'title' => $videoCall->title,
+                'subject' => $videoCall->classRoom->subject->name ?? 'N/A',
+                'class' => $videoCall->classRoom->name ?? 'N/A',
+                'datetime' => $videoCall->scheduled_at,
+                'duration' => $videoCall->duration,
+                'host' => $videoCall->host->name ?? 'N/A',
+                'url' => route('student.video-calls.show', $videoCall->id),
+            ]);
+        }
+        
+        // Sort by datetime and take top 5
+        $upcomingEvents = $upcomingEvents->sortBy('datetime')->take(5);
         
         // Get recent submissions
         $recentSubmissions = ExamSubmission::where('student_id', $student->id)
@@ -72,7 +116,7 @@ class StudentController extends Controller
         return view('student.dashboard', compact(
             'stats',
             'enrolledClasses',
-            'availableExams',
+            'upcomingEvents',
             'recentSubmissions',
             'performanceBySubject'
         ));

@@ -174,7 +174,7 @@
                     </div>
                 </div>
 
-                <a href="/teacher/forum" class="nav-item {{ request()->is('teacher/forum*') ? 'active' : '' }}">
+                <a href="/forum" class="nav-item {{ request()->is('teacher/forum*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
@@ -297,25 +297,13 @@
             @endif
         @endauth
 
-<<<<<<< .merge_file_6cAVT0
-        <a href="/forum" class="sidebar-link {{ request()->is('forum*') ? 'active' : '' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <span>Forum</span>
-        </a>
 
-        <!-- Divider -->
-        <div class="pt-4 pb-2">
-            <p class="px-4 text-xs font-semibold text-purple-200 uppercase tracking-wider">Settings</p>
-=======
         <!-- Settings Section -->
         <div class="nav-section-header mt-6">
             <div class="flex items-center space-x-2">
                 <span class="text-2xl">⚙️</span>
                 <span>Cài đặt</span>
             </div>
->>>>>>> .merge_file_OVC1M8
         </div>
 
         <a href="{{ route('profile.edit') }}" class="nav-item {{ request()->is('profile*') ? 'active' : '' }}">

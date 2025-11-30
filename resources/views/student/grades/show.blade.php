@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.exam')
 
 @section('title', 'Chi Tiết Bài Làm - MegaLearning')
 
