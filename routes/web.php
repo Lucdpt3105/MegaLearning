@@ -70,8 +70,16 @@ Route::middleware(['auth'])->group(function () {
 
 // Student Dashboard (authenticated students)
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
-    Route::get('/dashboard', [StudentController::class, 'welcome'])->name('dashboard');
-    Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
+    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
+    Route::get('/welcome', [StudentController::class, 'dashboard'])->name('welcome'); // Keep for backward compatibility
+    
+    // Courses Management (UC-STUDENT-001 to UC-STUDENT-006)
+    Route::get('/courses', [App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/browse', [App\Http\Controllers\Student\CourseController::class, 'browse'])->name('courses.browse');
+    Route::get('/courses/{id}', [App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/materials', [App\Http\Controllers\Student\CourseController::class, 'materials'])->name('courses.materials');
+    Route::get('/courses/{id}/schedule', [App\Http\Controllers\Student\CourseController::class, 'schedule'])->name('courses.schedule');
+    Route::post('/courses/{id}/enroll', [App\Http\Controllers\Student\CourseController::class, 'enroll'])->name('courses.enroll');
 });
 
 // Teacher Routes
