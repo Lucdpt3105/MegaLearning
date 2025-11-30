@@ -25,4 +25,11 @@ class StudentController extends Controller
 
         return view('welcome', compact('stats', 'recentExams', 'subjects'));
     }
+        /**
+     * Alias for dashboard (backward compatibility)
+     */
+    public function welcome()
+    {
+        return $this->dashboard();
+    }
 }
