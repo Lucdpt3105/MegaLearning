@@ -3,9 +3,9 @@
 @section('title', 'Làm Bài: ' . $exam->title)
 
 @section('content')
-<div class="container mx-auto px-4 py-8 max-w-5xl">
-    <!-- Timer and Header -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6 sticky top-0 z-10">
+<!-- Timer and Header - Fixed to top -->
+<div class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 max-w-5xl">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ $exam->title }}</h1>
@@ -17,7 +17,9 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="container mx-auto px-4 py-8 max-w-5xl">
     <form id="examForm" action="{{ route('student.exams.submit', $exam->id) }}" method="POST">
         @csrf
         
