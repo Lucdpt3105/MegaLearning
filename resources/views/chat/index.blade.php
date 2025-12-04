@@ -253,7 +253,7 @@
 
     <script>
         // Configuration
-        const API_URL = '{{ url("/api/chat") }}';
+        const API_URL = '{{ url("/api/v1/chat") }}';
         const PUSHER_KEY = '{{ env("PUSHER_APP_KEY") }}';
         const PUSHER_CLUSTER = '{{ env("PUSHER_APP_CLUSTER", "ap1") }}';
         
@@ -320,8 +320,8 @@
                 
                 const roomsList = document.getElementById('roomsList');
                 
-                if (data.success && data.data.length > 0) {
-                    roomsList.innerHTML = data.data.map(room => {
+                if (data.success && data.rooms && data.rooms.length > 0) {
+                    roomsList.innerHTML = data.rooms.map(room => {
                         // For private rooms, show the other user's name
                         let displayName = room.room_name;
                         if (room.room_type === 'private' && room.members && room.members.length > 0) {
@@ -357,7 +357,7 @@
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                                             </svg>
-                                            ${room.members_count || 0} thành viên
+                                            ${room.members ? room.members.length : 0} thành viên
                                         </span>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${room.room_type === 'group' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
                                             ${room.room_type === 'group' ? 'Nhóm' : 'Riêng tư'}
@@ -407,7 +407,7 @@
                 const roomsData = await roomResponse.json();
                 const messagesData = await messagesResponse.json();
 
-                currentRoom = roomsData.data.find(r => r.id === roomId);
+                currentRoom = roomsData.rooms ? roomsData.rooms.find(r => r.id === roomId) : null;
                 
                 if (!currentRoom) {
                     showNotification('Không tìm thấy phòng', 'error');
@@ -433,7 +433,7 @@
                 document.getElementById('messageInput').placeholder = 'Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)';
 
                 // Display messages
-                displayMessages(messagesData.data.data || []);
+                displayMessages(messagesData.messages || []);
 
                 // Subscribe to realtime updates
                 subscribeToRoom(roomId);
@@ -483,8 +483,8 @@
             fetch(`${API_URL}/rooms`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.data.length > 0) {
-                        data.data.forEach(room => {
+                    if (data.success && data.rooms && data.rooms.length > 0) {
+                        data.rooms.forEach(room => {
                             echoInstance.channel(`room-updates.${room.id}`)
                                 .listen('.room.updated', (e) => {
                                     console.log('🔔 Room updated:', e);
@@ -505,11 +505,11 @@
             try {
                 const response = await fetch(`${API_URL}/rooms/${roomId}/messages`);
                 const data = await response.json();
-                if (data.success) {
+                if (data.success && data.messages) {
                     const currentMessageIds = Array.from(document.querySelectorAll('[data-message-id]'))
                         .map(el => el.dataset.messageId);
                     
-                    data.data.data.forEach(msg => {
+                    data.messages.forEach(msg => {
                         // Use 'id' instead of 'message_id'
                         const msgId = msg.id || msg.message_id;
                         if (!currentMessageIds.includes(String(msgId))) {
@@ -648,8 +648,8 @@
                     input.style.height = 'auto';
                     
                     // In polling mode, add message immediately
-                    if (!echoInstance) {
-                        appendMessage(data.data);
+                    if (!echoInstance && data.message) {
+                        appendMessage(data.message);
                         
                         // Show AI typing indicator if room has AI
                         if (currentRoom.has_ai) {
@@ -735,12 +735,12 @@
 
                 const data = await response.json();
 
-                if (data.success) {
+                if (data.success && data.room) {
                     showNotification(`Đã tạo phòng "${roomName}" thành công!`, 'success');
                     hideCreateRoomModal();
                     nameInput.value = '';
                     await loadRooms();
-                    selectRoom(data.data.id);
+                    selectRoom(data.room.id);
                 } else {
                     console.error('Create room failed:', data);
                     showNotification(data.message || 'Không thể tạo phòng', 'error');
@@ -787,8 +787,8 @@
                 
                 const usersList = document.getElementById('usersList');
                 
-                if (data.success && data.data.length > 0) {
-                    usersList.innerHTML = data.data.map(user => {
+                if (data.success && data.users && data.users.length > 0) {
+                    usersList.innerHTML = data.users.map(user => {
                         const roleColors = {
                             'admin': 'bg-red-100 text-red-800',
                             'teacher': 'bg-blue-100 text-blue-800',
@@ -863,8 +863,8 @@
 
                 const data = await response.json();
 
-                if (data.success && data.data && data.data.id) {
-                    console.log('Private room created/found:', data.data);
+                if (data.success && data.room) {
+                    console.log('Private room created/found:', data.room);
                     
                     // Switch back to rooms tab
                     switchTab('rooms');
@@ -874,7 +874,7 @@
                     
                     // Wait a bit for rooms to load, then select the room
                     setTimeout(() => {
-                        selectRoom(data.data.id);
+                        selectRoom(data.room.id);
                         showNotification(data.message || `Đã mở phòng chat với ${userName}`, 'success');
                     }, 400);
                 } else {
@@ -989,26 +989,15 @@
                     console.log('📌 User source:', data.data.source);
                     
                     updateUserInfo(); // Update UI with user info
+                    hideSelectUserModal(); // Always hide modal
                     
-                    if (isAuthenticatedUser) {
-                        // User logged in via Laravel Auth - hide modal and change user button
-                        hideSelectUserModal();
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'none';
-                    } else {
-                        // Manual selection mode - show change user button
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'flex';
-                        
-                        // If no user selected yet, show modal
-                        if (!currentUser || currentUser.id === 1) {
-                            await showSelectUserModal();
-                            return; // Don't initialize chat yet
-                        } else {
-                            hideSelectUserModal();
-                        }
+                    // Hide change user button if authenticated via Laravel
+                    const changeUserBtn = document.getElementById('changeUserBtn');
+                    if (changeUserBtn) {
+                        changeUserBtn.style.display = isAuthenticatedUser ? 'none' : 'flex';
                     }
                     
+                    // Initialize chat immediately
                     await initializeChat();
                 } else {
                     // No user found - show selection modal
@@ -1051,76 +1040,42 @@
             modal.classList.remove('hidden');
             
             try {
-                // Load all users (including current user if not set)
-                const response = await fetch('{{ url("/api/chat/users") }}');
+                // Load all users
+                const response = await fetch('{{ url("/api/v1/chat/users") }}');
                 const data = await response.json();
                 
-                if (data.success) {
-                    // Add all users including those that might be excluded
-                    const allUsersResponse = await fetch('{{ url("/api") }}/users');
-                    let allUsers = [];
-                    
-                    // Fallback: use test users
-                    allUsers = [
-                        { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                        { id: 2, name: 'Admin User', email: 'admin@megalearning.local', role: 'admin' },
-                        { id: 3, name: 'Teacher Nguyen', email: 'teacher@megalearning.local', role: 'teacher' },
-                        { id: 4, name: 'Student A', email: 'student1@megalearning.local', role: 'student' },
-                        { id: 5, name: 'Student B', email: 'student2@megalearning.local', role: 'student' }
-                    ];
-                    
-                    // Try to get real users from database
-                    try {
-                        const usersResp = await fetch('{{ url("/api/chat/users") }}');
-                        const usersData = await usersResp.json();
-                        if (usersData.success && usersData.data.length > 0) {
-                            // Add guest user to the list
-                            allUsers = [
-                                { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                                ...usersData.data
-                            ];
-                        }
-                    } catch (e) {
-                        console.warn('Could not fetch users, using fallback list');
-                    }
-                    
-                    list.innerHTML = allUsers.map(user => {
-                        const roleColors = {
-                            admin: 'bg-red-100 text-red-800',
-                            teacher: 'bg-blue-100 text-blue-800',
-                            student: 'bg-green-100 text-green-800',
-                            guest: 'bg-gray-100 text-gray-800',
-                            ai: 'bg-purple-100 text-purple-800'
-                        };
-                        const roleIcons = {
-                            admin: '👑',
-                            teacher: '👨‍🏫',
-                            student: '👨‍🎓',
-                            guest: '👤',
-                            ai: '🤖'
-                        };
-                        
-                        return `
-                            <button 
-                                onclick="selectUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')"
-                                class="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-indigo-300 flex items-center space-x-4 group"
-                            >
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    ${roleIcons[user.role] || user.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div class="flex-1 text-left">
-                                    <h4 class="font-semibold text-gray-800 group-hover:text-indigo-600">${escapeHtml(user.name)}</h4>
-                                    <p class="text-sm text-gray-500">${escapeHtml(user.email)}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-medium ${roleColors[user.role] || 'bg-gray-100 text-gray-800'}">
-                                    ${user.role || 'user'}
-                                </span>
-                            </button>
-                        `;
-                    }).join('');
+                let allUsers = [];
+                
+                if (data.success && data.users && data.users.length > 0) {
+                    // Use real users from database
+                    allUsers = data.users;
                 } else {
-                    throw new Error('Could not load users');
+                    // Fallback: use test users if no data
+                    allUsers = [
+                        { id: 1, name: 'Guest User', email: 'guest@megalearning.local' },
+                        { id: 2, name: 'Admin User', email: 'admin@megalearning.local' },
+                        { id: 3, name: 'Teacher Nguyen', email: 'teacher@megalearning.local' },
+                        { id: 4, name: 'Student A', email: 'student1@megalearning.local' },
+                        { id: 5, name: 'Student B', email: 'student2@megalearning.local' }
+                    ];
                 }
+                
+                list.innerHTML = allUsers.map(user => {
+                    return `
+                        <button 
+                            onclick="selectUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')"
+                            class="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-indigo-300 flex items-center space-x-4 group"
+                        >
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="flex-1 text-left">
+                                <h4 class="font-semibold text-gray-800 group-hover:text-indigo-600">${escapeHtml(user.name)}</h4>
+                                <p class="text-sm text-gray-500">${escapeHtml(user.email)}</p>
+                            </div>
+                        </button>
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('Error loading users:', error);
                 list.innerHTML = `

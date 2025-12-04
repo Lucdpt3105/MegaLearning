@@ -129,6 +129,18 @@ class ChatController extends Controller
             }
         }
 
+        // Load relationships
+        $room->load('members');
+
+        // Return JSON for API or redirect for web
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'room' => $room,
+                'message' => 'Chat room created successfully'
+            ]);
+        }
+
         return redirect()->route('chat.show', $room->id)
             ->with('success', 'Chat room created successfully');
     }
@@ -268,5 +280,322 @@ class ChatController extends Controller
 
         return redirect()->route('chat.index')
             ->with('success', 'Left room successfully');
+    }
+    
+    /**
+     * Get all chat rooms (API)
+     */
+    public function getRooms(Request $request)
+    {
+        $userId = Auth::check() ? Auth::id() : null;
+        
+        if ($userId) {
+            // Get all rooms user is member of
+            $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->with(['latestMessage.user', 'members'])
+            ->where('is_active', true)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+            // Add unread count for each room
+            $rooms->each(function($room) use ($userId) {
+                $room->unread_count = $this->getUnreadCount($room->id, $userId);
+            });
+        } else {
+            // Get all public rooms (group type)
+            $rooms = ChatRoom::where('is_active', true)
+                ->where('room_type', 'group')
+                ->with(['latestMessage.user', 'members'])
+                ->orderBy('updated_at', 'desc')
+                ->get();
+                
+            $rooms->each(function($room) {
+                $room->unread_count = 0;
+            });
+        }
+        
+        return response()->json([
+            'success' => true,
+            'rooms' => $rooms
+        ]);
+    }
+    
+    /**
+     * Get unread message count for a room
+     */
+    private function getUnreadCount($roomId, $userId)
+    {
+        // Count messages in room that user hasn't read
+        return ChatMessage::where('room_id', $roomId)
+            ->where('user_id', '!=', $userId) // Don't count own messages
+            ->whereNotExists(function($query) use ($userId) {
+                $query->select(\DB::raw(1))
+                    ->from('chat_message_reads')
+                    ->whereColumn('chat_message_reads.message_id', 'chat_messages.id')
+                    ->where('chat_message_reads.user_id', $userId);
+            })
+            ->count();
+    }
+    
+    /**
+     * Get total unread count across all rooms
+     */
+    public function getTotalUnreadCount(Request $request)
+    {
+        $userId = Auth::check() ? Auth::id() : null;
+        
+        if (!$userId) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => 0
+            ]);
+        }
+        
+        // Get all room IDs user is member of
+        $roomIds = ChatRoom::whereHas('members', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->pluck('id');
+        
+        // Count unread messages across all rooms
+        $totalUnread = ChatMessage::whereIn('room_id', $roomIds)
+            ->where('user_id', '!=', $userId)
+            ->whereNotExists(function($query) use ($userId) {
+                $query->select(\DB::raw(1))
+                    ->from('chat_message_reads')
+                    ->whereColumn('chat_message_reads.message_id', 'chat_messages.id')
+                    ->where('chat_message_reads.user_id', $userId);
+            })
+            ->count();
+        
+        return response()->json([
+            'success' => true,
+            'unread_count' => $totalUnread
+        ]);
+    }
+    
+    /**
+     * Get messages for a room (API)
+     */
+    public function getMessages($roomId)
+    {
+        $messages = ChatMessage::where('room_id', $roomId)
+            ->with('user')
+            ->active()
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        // Mark messages as read for authenticated user
+        $userId = Auth::check() ? Auth::id() : session('chat_user_id');
+        if ($userId) {
+            $this->markMessagesAsRead($roomId, $userId);
+        }
+            
+        return response()->json([
+            'success' => true,
+            'messages' => $messages
+        ]);
+    }
+    
+    /**
+     * Mark all messages in a room as read for user
+     */
+    private function markMessagesAsRead($roomId, $userId)
+    {
+        $messageIds = ChatMessage::where('room_id', $roomId)
+            ->where('user_id', '!=', $userId)
+            ->pluck('id');
+            
+        foreach ($messageIds as $messageId) {
+            \DB::table('chat_message_reads')->insertOrIgnore([
+                'message_id' => $messageId,
+                'user_id' => $userId,
+                'read_at' => now()
+            ]);
+        }
+    }
+    
+    /**
+     * Mark messages as read (API endpoint)
+     */
+    public function markAsRead(Request $request, $roomId)
+    {
+        $userId = Auth::check() ? Auth::id() : session('chat_user_id');
+        
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
+        
+        $this->markMessagesAsRead($roomId, $userId);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Messages marked as read'
+        ]);
+    }
+    
+    /**
+     * Get all users for chat (API)
+     */
+    public function getUsers(Request $request)
+    {
+        $users = \App\Models\User::select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+            
+        return response()->json([
+            'success' => true,
+            'users' => $users
+        ]);
+    }
+    
+    /**
+     * Get current user from session (API)
+     */
+    public function getCurrentUser(Request $request)
+    {
+        // Check if user is authenticated via Laravel Auth
+        if (Auth::check()) {
+            $user = Auth::user();
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'is_authenticated' => true,
+                    'source' => 'laravel_auth'
+                ]
+            ]);
+        }
+        
+        // Check session for manual user selection
+        $userId = session('chat_user_id');
+        if ($userId) {
+            $user = \App\Models\User::find($userId);
+            if ($user) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'is_authenticated' => false,
+                        'source' => 'session'
+                    ]
+                ]);
+            }
+        }
+        
+        // No user found
+        return response()->json([
+            'success' => false,
+            'message' => 'No user selected'
+        ]);
+    }
+    
+    /**
+     * Set current user in session (API)
+     */
+    public function setUser(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:users,id'
+        ]);
+        
+        session(['chat_user_id' => $validated['user_id']]);
+        
+        $user = \App\Models\User::find($validated['user_id']);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_authenticated' => false,
+                'source' => 'session'
+            ]
+        ]);
+    }
+    
+    /**
+     * Add member to room (API)
+     */
+    public function addMember(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+        
+        $room = ChatRoom::findOrFail($roomId);
+        
+        // Check if already member
+        if ($room->members->contains('id', $validated['user_id'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is already a member'
+            ], 400);
+        }
+        
+        $room->members()->attach($validated['user_id'], [
+            'role' => 'member',
+            'joined_at' => now()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Member added successfully'
+        ]);
+    }
+    
+    /**
+     * Remove member from room (API)
+     */
+    public function removeMember($roomId, $userId)
+    {
+        $room = ChatRoom::findOrFail($roomId);
+        $room->members()->detach($userId);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Member removed successfully'
+        ]);
+    }
+    
+    /**
+     * Update room (API)
+     */
+    public function update(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'room_name' => 'required|string|max:255',
+        ]);
+        
+        $room = ChatRoom::findOrFail($roomId);
+        $room->update($validated);
+        
+        return response()->json([
+            'success' => true,
+            'room' => $room
+        ]);
+    }
+    
+    /**
+     * Delete room (API)
+     */
+    public function destroy($roomId)
+    {
+        $room = ChatRoom::findOrFail($roomId);
+        $room->update(['is_active' => false]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Room deleted successfully'
+        ]);
     }
 }

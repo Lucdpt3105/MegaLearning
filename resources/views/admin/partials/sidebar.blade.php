@@ -53,6 +53,13 @@
                 <span class="font-medium">Users</span>
             </a>
 
+            <!-- UC-ADM-050: Statistics Dashboard -->
+            <a href="{{ route('admin.statistics.index') }}" 
+               class="flex items-center px-4 py-3 rounded-lg transition {{ request()->routeIs('admin.statistics.*') ? 'bg-white/20 backdrop-blur' : 'hover:bg-white/10' }}">
+                <span class="mr-3 text-xl">📈</span>
+                <span class="font-medium">Thống kê</span>
+            </a>
+
             <a href="#" class="flex items-center px-4 py-3 rounded-lg transition hover:bg-white/10">
                 <span class="mr-3 text-xl">⚙️</span>
                 <span class="font-medium">Settings</span>
