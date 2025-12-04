@@ -1,6 +1,18 @@
 <aside class="w-72 bg-gradient-to-b from-white via-blue-50/30 to-purple-50/30 border-r border-gray-200 flex-shrink-0 overflow-y-auto shadow-xl">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
+    @php
+        $dashboardUrl = '/';
+        if (Auth::check()) {
+            if (Auth::user()->hasRole('admin')) {
+                $dashboardUrl = '/admin';
+            } elseif (Auth::user()->hasRole('teacher')) {
+                $dashboardUrl = '/teacher/dashboard';
+            } elseif (Auth::user()->hasRole('student')) {
+                $dashboardUrl = '/student/dashboard';
+            }
+        }
+    @endphp
+    <a href="{{ $dashboardUrl }}" class="block p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
         <div class="flex items-center space-x-3">
             <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300">
                 <span class="text-3xl">🎓</span>
@@ -10,7 +22,7 @@
                 <p class="text-xs text-blue-100 font-medium">E-Learning Platform</p>
             </div>
         </div>
-    </div>
+    </a>
 
     <!-- Navigation -->
     <nav class="p-4 space-y-2">
@@ -163,7 +175,7 @@
                     </div>
                 </div>
 
-                <a href="/teacher/forum" class="nav-item {{ request()->is('teacher/forum*') ? 'active' : '' }}">
+                <a href="/forum" class="nav-item {{ request()->is('forum*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
@@ -306,13 +318,6 @@
                 </a>
             @endif
         @endauth
-
-        <a href="/forum" class="sidebar-link {{ request()->is('forum*') ? 'active' : '' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <span>Forum</span>
-        </a>
 
         <!-- Settings Section -->
         <div class="nav-section-header mt-6">
