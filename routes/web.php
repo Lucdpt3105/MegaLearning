@@ -4,13 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-<<<<<<< .merge_file_2tsHox
 use App\Http\Controllers\ForumQuestionController;
-=======
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
->>>>>>> .merge_file_XixHoc
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -147,6 +144,15 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/grading/{submission}/grade', [App\Http\Controllers\Teacher\GradingController::class, 'grade'])->name('grading.grade');
     Route::post('/grading/bulk-auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'bulkAutoGrade'])->name('grading.bulk-auto-grade');
     
+    // Phase 8: Reports & Analytics (UC-GV-060 to UC-GV-062)
+    Route::get('/reports', [App\Http\Controllers\Teacher\ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/subject/{subject}', [App\Http\Controllers\Teacher\ReportsController::class, 'subjectOverview'])->name('reports.subject-overview');
+    Route::get('/reports/class/{classRoom}', [App\Http\Controllers\Teacher\ReportsController::class, 'classPerformance'])->name('reports.class-performance');
+    Route::get('/reports/student/{classRoom}/{student}', [App\Http\Controllers\Teacher\ReportsController::class, 'studentPerformance'])->name('reports.student-performance');
+    Route::get('/reports/exam/{exam}', [App\Http\Controllers\Teacher\ReportsController::class, 'examAnalysis'])->name('reports.exam-analysis');
+    Route::get('/reports/export-gradebook/{classRoom}', [App\Http\Controllers\Teacher\ReportsController::class, 'exportGradebook'])->name('reports.export-gradebook');
+    Route::get('/reports/print-gradebook/{classRoom}', [App\Http\Controllers\Teacher\ReportsController::class, 'printGradebook'])->name('reports.print-gradebook');
+    
     // Legacy routes (to be refactored)
     Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
 });
@@ -157,6 +163,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/', function () {
         return view('admin.dashboard');
     })->name('dashboard');
+
+    // UC-ADM-050: Statistics Dashboard
+    Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
+    Route::get('/statistics/activity-logs', [App\Http\Controllers\Admin\StatisticsController::class, 'activityLogs'])->name('statistics.activity-logs');
+    Route::get('/statistics/usage-duration', [App\Http\Controllers\Admin\StatisticsController::class, 'usageDuration'])->name('statistics.usage-duration');
+    Route::get('/statistics/participation', [App\Http\Controllers\Admin\StatisticsController::class, 'participation'])->name('statistics.participation');
+    Route::get('/statistics/rankings', [App\Http\Controllers\Admin\StatisticsController::class, 'rankings'])->name('statistics.rankings');
+    Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
 
     // User Management (UC-ADM-010 to UC-ADM-015)
     Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
