@@ -35,20 +35,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Public chat route (for demo/testing without auth)
-Route::get('/chat', function () {
-    return view('chat.index');
-})->name('chat');
+// Chat route - Requires authentication
+Route::middleware(['auth'])->get('/chat', [ChatController::class, 'index'])->name('chat');
 
-// Chat demo (alternative route)
+// Chat demo (public - for testing without auth)
 Route::get('/chat-demo', function () {
     return view('chat.index');
 })->name('chat.demo');
-
-// Chat Routes (accessible by authenticated users) - if you need authenticated version
-Route::middleware(['auth'])->prefix('chat-auth')->name('chat.auth.')->group(function () {
-    Route::get('/chat', [ChatController::class, 'index'])->name('index');
-});
 
 // Universal Dashboard Route (redirects based on role)
 Route::middleware(['auth'])->group(function () {
