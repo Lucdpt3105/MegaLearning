@@ -35,8 +35,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Chat route - Requires authentication
-Route::middleware(['auth'])->get('/chat', [ChatController::class, 'index'])->name('chat');
+// Chat route - No auth middleware to avoid session conflicts
+Route::get('/chat', [ChatController::class, 'index'])->name('chat');
 
 // Chat demo (public - for testing without auth)
 Route::get('/chat-demo', function () {
