@@ -22,7 +22,7 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink
 Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
 
-// Profile Routes (UC-GLOBAL-004: Manage Profile)
+// Profile Routes (Manage Profile)
 Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
     Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
     Route::put('/update', [ProfileController::class, 'update'])->name('update');
@@ -79,6 +79,9 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::delete('/subjects/{subject}/chat-room/members/{userId}', [App\Http\Controllers\Teacher\SubjectController::class, 'removeChatMember'])->name('subjects.chat-room.remove-member');
     Route::post('/subjects/{subject}/chat-room/toggle', [App\Http\Controllers\Teacher\SubjectController::class, 'toggleChatStatus'])->name('subjects.chat-room.toggle');
     
+    // Topic Management
+    Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
+    
     // Phase 2: Document Management (UC-GV-070 to UC-GV-074)
     Route::resource('documents', App\Http\Controllers\Teacher\DocumentController::class);
     Route::post('/documents/folder', [App\Http\Controllers\Teacher\DocumentController::class, 'createFolder'])->name('documents.folder.create');
@@ -88,7 +91,7 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/documents/{document}/reject', [App\Http\Controllers\Teacher\DocumentController::class, 'reject'])->name('documents.reject');
     
     // Phase 3: Student Management (UC-GV-050 to UC-GV-054)
-    Route::get('/students', [App\Http\Controllers\Teacher\StudentController::class, 'index'])->name('students.index');
+    Route::get('/students', [App\Http\Controllers\Teacher\StudentController::class, 'index'])->name('students');
     Route::get('/students/{classRoom}', [App\Http\Controllers\Teacher\StudentController::class, 'show'])->name('students.show');
     Route::post('/students/{classRoom}/add', [App\Http\Controllers\Teacher\StudentController::class, 'addStudents'])->name('students.add');
     Route::delete('/students/{classRoom}/remove/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeStudent'])->name('students.remove');
@@ -145,9 +148,6 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::get('/reports/exam/{exam}', [App\Http\Controllers\Teacher\ReportsController::class, 'examAnalysis'])->name('reports.exam-analysis');
     Route::get('/reports/export-gradebook/{classRoom}', [App\Http\Controllers\Teacher\ReportsController::class, 'exportGradebook'])->name('reports.export-gradebook');
     Route::get('/reports/print-gradebook/{classRoom}', [App\Http\Controllers\Teacher\ReportsController::class, 'printGradebook'])->name('reports.print-gradebook');
-    
-    // Legacy routes (to be refactored)
-    Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
 });
 
 // Admin Routes
@@ -157,7 +157,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return view('admin.dashboard');
     })->name('dashboard');
 
-    // UC-ADM-050: Statistics Dashboard
+    // Statistics Dashboard
     Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
     Route::get('/statistics/activity-logs', [App\Http\Controllers\Admin\StatisticsController::class, 'activityLogs'])->name('statistics.activity-logs');
     Route::get('/statistics/usage-duration', [App\Http\Controllers\Admin\StatisticsController::class, 'usageDuration'])->name('statistics.usage-duration');

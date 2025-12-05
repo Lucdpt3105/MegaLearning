@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'UC-GV-061: Kết quả Lớp học')
+@section('title', 'Kết quả Lớp học')
 
 @push('styles')
 <style>
@@ -54,7 +54,7 @@
                         ← Quay lại Báo cáo
                     </a>
                     <h1 class="text-3xl font-bold text-gray-800">{{ $classRoom->name }}</h1>
-                    <p class="text-gray-600">{{ $classRoom->subject->name }} • UC-GV-061: Kết quả tổng hợp</p>
+                    <p class="text-gray-600">{{ $classRoom->subject->name }} • Kết quả tổng hợp</p>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('teacher.reports.print-gradebook', $classRoom->id) }}" 

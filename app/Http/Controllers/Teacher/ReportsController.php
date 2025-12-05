@@ -18,7 +18,7 @@ use Carbon\Carbon;
 
 /**
  * Teacher Reports & Analytics Controller
- * UC-GV-060: Quản lý thống kê kết quả (Gradebook)
+ * Quản lý thống kê kết quả (Gradebook)
  */
 class ReportsController extends Controller
 {
@@ -61,7 +61,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * UC-GV-061: Xem kết quả tổng hợp của lớp
+     * Xem kết quả tổng hợp của lớp
      * Class performance overview
      */
     public function classPerformance(Request $request, $classRoomId)
@@ -123,7 +123,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * UC-GV-062: Xem kết quả của từng học sinh
+     * Xem kết quả của từng học sinh
      * Individual student performance
      */
     public function studentPerformance($classRoomId, $studentId)

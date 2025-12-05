@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('title', 'Thống kê Thời lượng')
-@section('page-title', 'UC-ADM-054: Thống kê Thời lượng Sử dụng')
+@section('page-title', 'Thống kê Thời lượng Sử dụng')
 @section('page-description', 'Phân tích mức độ tương tác và thời gian sử dụng hệ thống')
 
 @push('styles')

@@ -7,14 +7,14 @@
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center space-x-4 mb-4">
-            <a href="{{ route('teacher.students.index') }}" class="text-gray-600 hover:text-gray-900">
+            <a href="{{ route('teacher.students') }}" class="text-gray-600 hover:text-gray-900">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">{{ $classRoom->name }}</h1>
-                <p class="text-gray-600 mt-1">UC-GV-054: Xem và quản lý danh sách học sinh</p>
+                <p class="text-gray-600 mt-1">Xem và quản lý danh sách học sinh</p>
             </div>
         </div>
     </div>

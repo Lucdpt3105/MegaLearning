@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('title', 'Thống kê Người tham gia')
-@section('page-title', 'UC-ADM-055: Thống kê Số người tham gia')
+@section('page-title', 'Thống kê Số người tham gia')
 @section('page-description', 'Phân tích số lượng người tham gia theo môn học và hoạt động')
 
 @section('content')

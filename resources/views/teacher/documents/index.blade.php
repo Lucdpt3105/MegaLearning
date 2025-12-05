@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Quản lý Tài liệu</h1>
-                <p class="text-gray-600 mt-1">UC-GV-070: Upload, cập nhật, sắp xếp và xóa tài liệu học tập</p>
+                <p class="text-gray-600 mt-1">Upload, cập nhật, sắp xếp và xóa tài liệu học tập</p>
             </div>
             <a href="{{ route('teacher.documents.create') }}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

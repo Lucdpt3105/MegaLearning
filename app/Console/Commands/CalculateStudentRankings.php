@@ -11,14 +11,14 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\DB;
 
 /**
- * UC-SYS-004: Thống kê điểm số và xếp hạng
+ * Thống kê điểm số và xếp hạng
  * Batch job tự động tính toán GPA và xếp hạng
  */
 class CalculateStudentRankings extends Command
 {
     protected $signature = 'rankings:calculate {--class_room_id=} {--student_id=}';
     
-    protected $description = 'UC-SYS-004: Tính toán GPA và xếp hạng học sinh tự động';
+    protected $description = 'Tính toán GPA và xếp hạng học sinh tự động';
 
     public function handle()
     {

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('title', 'Xếp hạng Học sinh')
-@section('page-title', 'UC-SYS-004: Xếp hạng Học sinh')
+@section('page-title', 'Xếp hạng Học sinh')
 @section('page-description', 'Bảng xếp hạng được tính toán tự động bởi hệ thống')
 
 @section('content')
@@ -157,7 +157,7 @@
         <div class="flex items-start gap-3">
             <span class="text-2xl">ℹ️</span>
             <div>
-                <h4 class="font-semibold text-blue-800 mb-2">Về UC-SYS-004: Thống kê điểm số và xếp hạng</h4>
+                <h4 class="font-semibold text-blue-800 mb-2">Về Thống kê điểm số và xếp hạng</h4>
                 <p class="text-sm text-blue-700">
                     Bảng xếp hạng này được tính toán tự động bởi một tác vụ nền (batch job) chạy định kỳ. 
                     Hệ thống tự động tính toán GPA, điểm trung bình, và xếp hạng dựa trên kết quả các bài thi.
