@@ -17,18 +17,18 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 /**
- * UC-ADM-050: Theo dõi thống kê
+ * Theo dõi thống kê
  * Statistics Dashboard Controller
  */
 class StatisticsController extends Controller
 {
     /**
-     * UC-ADM-050: Dashboard Thống kê chính
+     * Dashboard Thống kê chính
      * Display the main statistics dashboard
      */
     public function index()
     {
-        // UC-ADM-052: Log đăng nhập (luôn hiển thị - <<include>>)
+        // Log đăng nhập (luôn hiển thị - <<include>>)
         $loginStats = $this->getLoginStats();
 
         // Thống kê tổng quan
@@ -38,7 +38,7 @@ class StatisticsController extends Controller
     }
 
     /**
-     * UC-ADM-052: Log đăng nhập
+     * Log đăng nhập
      * Get login statistics (24 hours)
      */
     public function getLoginStats()
@@ -85,7 +85,7 @@ class StatisticsController extends Controller
     }
 
     /**
-     * UC-ADM-053: Log hoạt động (<<extend>>)
+     * Log hoạt động (<<extend>>)
      * Detailed activity logs
      */
     public function activityLogs(Request $request)
@@ -132,7 +132,7 @@ class StatisticsController extends Controller
     }
 
     /**
-     * UC-ADM-054: Thống kê thời lượng (<<extend>>)
+     * Thống kê thời lượng (<<extend>>)
      * Average usage duration statistics
      */
     public function usageDuration(Request $request)
@@ -194,7 +194,7 @@ class StatisticsController extends Controller
     }
 
     /**
-     * UC-ADM-055: Thống kê số người tham gia (<<extend>>)
+     * Thống kê số người tham gia (<<extend>>)
      * Participation statistics by subject
      */
     public function participation(Request $request)
@@ -286,7 +286,7 @@ class StatisticsController extends Controller
 
     /**
      * Get student rankings
-     * Related to UC-SYS-004: Thống kê điểm số và xếp hạng
+     * Related to Thống kê điểm số và xếp hạng
      */
     public function rankings(Request $request)
     {

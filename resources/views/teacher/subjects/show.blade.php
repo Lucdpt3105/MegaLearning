@@ -114,7 +114,7 @@
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-900">Danh sách lớp học</h2>
-            <a href="{{ route('teacher.students.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+            <a href="{{ route('teacher.students') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
                 Xem tất cả →
             </a>
         </div>

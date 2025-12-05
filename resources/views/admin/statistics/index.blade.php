@@ -2,7 +2,7 @@
 
 @section('title', 'Thống kê Hệ thống')
 @section('page-title', 'Dashboard Thống kê')
-@section('page-description', 'UC-ADM-050: Theo dõi thống kê và phân tích hoạt động hệ thống')
+@section('page-description', 'Theo dõi thống kê và phân tích hoạt động hệ thống')
 
 @push('styles')
 <style>
@@ -42,7 +42,7 @@
 @endpush
 
 @section('content')
-    <!-- UC-ADM-050: Dashboard chính -->
+    <!-- Dashboard chính -->
     
     <!-- Overview Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -111,11 +111,11 @@
         </div>
     </div>
 
-    <!-- UC-ADM-052: Log đăng nhập (<<include>> - luôn hiển thị) -->
+    <!-- Log đăng nhập (<<include>> - luôn hiển thị) -->
     <div class="widget-container">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-gray-800">
-                📊 UC-ADM-052: Log Đăng nhập (24 giờ qua)
+                📊 Log Đăng nhập (24 giờ qua)
             </h3>
             <span class="text-sm text-gray-500">Tỷ lệ thành công: <strong class="text-green-600">{{ $loginStats['success_rate'] }}%</strong></span>
         </div>
@@ -186,7 +186,7 @@
 
     <!-- UC-ADM-053, 054, 055: Extended widgets -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <!-- UC-ADM-053: Activity Logs Link -->
+        <!-- Activity Logs Link -->
         <a href="{{ route('admin.statistics.activity-logs') }}" 
            class="widget-container hover:shadow-lg transition cursor-pointer group">
             <div class="flex items-center gap-4">
@@ -195,12 +195,12 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-gray-800 group-hover:text-indigo-600 transition">Log Hoạt động</h4>
-                    <p class="text-sm text-gray-500">UC-ADM-053: Xem chi tiết hoạt động</p>
+                    <p class="text-sm text-gray-500">Xem chi tiết hoạt động</p>
                 </div>
             </div>
         </a>
 
-        <!-- UC-ADM-054: Usage Duration Link -->
+        <!-- Usage Duration Link -->
         <a href="{{ route('admin.statistics.usage-duration') }}" 
            class="widget-container hover:shadow-lg transition cursor-pointer group">
             <div class="flex items-center gap-4">
@@ -209,12 +209,12 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-gray-800 group-hover:text-pink-600 transition">Thống kê Thời lượng</h4>
-                    <p class="text-sm text-gray-500">UC-ADM-054: Thời gian sử dụng trung bình</p>
+                    <p class="text-sm text-gray-500">Thời gian sử dụng trung bình</p>
                 </div>
             </div>
         </a>
 
-        <!-- UC-ADM-055: Participation Link -->
+        <!-- Participation Link -->
         <a href="{{ route('admin.statistics.participation') }}" 
            class="widget-container hover:shadow-lg transition cursor-pointer group">
             <div class="flex items-center gap-4">
@@ -223,7 +223,7 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-gray-800 group-hover:text-teal-600 transition">Số người tham gia</h4>
-                    <p class="text-sm text-gray-500">UC-ADM-055: Thống kê theo môn học</p>
+                    <p class="text-sm text-gray-500">Thống kê theo môn học</p>
                 </div>
             </div>
         </a>
@@ -233,7 +233,7 @@
     <div class="widget-container">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-gray-800">
-                🏆 UC-SYS-004: Xếp hạng Học sinh
+                🏆 Xếp hạng Học sinh
             </h3>
             <a href="{{ route('admin.statistics.rankings') }}" 
                class="text-sm text-blue-600 hover:text-blue-700 font-medium">

@@ -8,7 +8,7 @@
     <div class="mb-8 flex items-center justify-between">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Quản lý Môn học</h1>
-            <p class="text-gray-600 mt-2">UC-GV-014: Xem danh sách môn học của bạn</p>
+            <p class="text-gray-600 mt-2">Xem danh sách môn học của bạn</p>
         </div>
         <a href="{{ route('teacher.subjects.create') }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

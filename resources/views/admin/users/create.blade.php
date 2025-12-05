@@ -2,7 +2,7 @@
 
 @section('title', 'Thêm Người dùng')
 @section('page-title', 'Thêm Người dùng Mới')
-@section('page-description', 'UC-ADM-011: Thêm tài khoản quản trị')
+@section('page-description', 'Thêm tài khoản quản trị')
 
 @section('content')
     <div class="flex justify-between items-center mb-6">

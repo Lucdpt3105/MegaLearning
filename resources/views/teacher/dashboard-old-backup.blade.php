@@ -3,8 +3,15 @@
 @section('title', 'Teacher Dashboard - MegaLearning')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-8 relative overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="floating-circle bg-gradient-to-br from-blue-400/20 to-purple-400/20" style="top: 10%; left: 5%; width: 300px; height: 300px; animation-delay: 0s;"></div>
+        <div class="floating-circle bg-gradient-to-br from-pink-400/20 to-orange-400/20" style="top: 60%; right: 10%; width: 250px; height: 250px; animation-delay: 2s;"></div>
+        <div class="floating-circle bg-gradient-to-br from-cyan-400/20 to-blue-400/20" style="bottom: 10%; left: 50%; width: 200px; height: 200px; animation-delay: 4s;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
         
         <!-- 🎓 Welcome Header -->
         <div class="flex items-center justify-between">
@@ -101,15 +108,15 @@
                     <div>
                         <p class="text-green-100 text-sm font-medium mb-1">Questions</p>
                         <h3 class="text-5xl font-bold mb-2">{{ $stats['questions_count'] }}</h3>
-                        <div class="flex items-center text-sm text-green-100">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span>In question bank</span>
-                        </div>
+                    <div class="flex items-center text-sm text-green-100">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span>In question bank</span>
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Exams Card -->
             <div class="card-gradient-orange group cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
@@ -134,6 +141,10 @@
                             </svg>
                             <span>Total assessments</span>
                         </div>
+                    </div>
+                </div>
+                        </svg>
+                        <span>Total assessments</span>
                     </div>
                 </div>
             </div>
@@ -221,7 +232,7 @@
                 </a>
 
                 <!-- Students -->
-                <a href="{{ route('teacher.students') }}" class="quick-action">
+                <a href="{{ route('teacher.students.index') }}" class="quick-action">
                     <div class="quick-action-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>

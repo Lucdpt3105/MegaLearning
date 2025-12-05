@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('title', 'Log Hoạt động')
-@section('page-title', 'UC-ADM-053: Log Hoạt động Chi tiết')
+@section('page-title', 'Log Hoạt động Chi tiết')
 @section('page-description', 'Xem chi tiết các hoạt động của người dùng trong hệ thống')
 
 @section('content')
