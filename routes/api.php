@@ -109,11 +109,10 @@ Route::prefix('v1')->group(function () {
         });
     });
     
-    // Chat API Routes - use web middleware for session support
-    Route::middleware(['web'])->prefix('chat')->group(function () {
-        // Public routes for chat (demo/testing) - with session/auth support
+    // Chat API Routes - stateful API with session support (no web middleware needed)
+    Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
+        // All chat routes require authentication
         Route::get('current-user', [ChatController::class, 'getCurrentUser']);
-        Route::post('set-user', [ChatController::class, 'setUser']);
         Route::get('rooms', [ChatController::class, 'getRooms']);
         Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
         Route::post('rooms', [ChatController::class, 'store']);
@@ -121,13 +120,10 @@ Route::prefix('v1')->group(function () {
         Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
         Route::get('users', [ChatController::class, 'getUsers']);
         Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
-        
-        // Authenticated routes
-        Route::middleware(['auth'])->group(function () {
-            Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
-            Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
-            Route::put('rooms/{roomId}', [ChatController::class, 'update']);
-            Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
-        });
+        Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
+        Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
+        Route::put('rooms/{roomId}', [ChatController::class, 'update']);
+        Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
+        Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
     });
 });
