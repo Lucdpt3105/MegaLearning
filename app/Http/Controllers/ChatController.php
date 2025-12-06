@@ -80,69 +80,96 @@ class ChatController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'room_name' => 'required|string|max:255',
-            'room_type' => 'required|in:group,private,subject',
-            'subject_id' => 'nullable|exists:subjects,subject_id',
-            'members' => 'array',
-            'members.*' => 'exists:users,id',
-            'include_ai' => 'boolean'
-        ]);
+        try {
+            \Log::info('Creating chat room', [
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
 
-        // Use authenticated user ID or default to 1 (guest)
-        $creatorId = Auth::check() ? Auth::id() : 1;
+            $validated = $request->validate([
+                'room_name' => 'required|string|max:255',
+                'room_type' => 'required|in:group,private,subject',
+                'subject_id' => 'nullable|exists:subjects,subject_id',
+                'members' => 'nullable|array',
+                'members.*' => 'exists:users,id',
+                'include_ai' => 'nullable|boolean'
+            ]);
 
-        $room = ChatRoom::create([
-            'room_name' => $validated['room_name'],
-            'room_type' => $validated['room_type'],
-            'subject_id' => $validated['subject_id'] ?? null,
-            'created_by' => $creatorId,
-            'is_active' => true
-        ]);
+            // Use authenticated user ID - must be logged in
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You must be logged in to create a room'
+                ], 401);
+            }
 
-        // Add creator as admin if logged in
-        if (Auth::check()) {
+            $creatorId = Auth::id();
+
+            $room = ChatRoom::create([
+                'room_name' => $validated['room_name'],
+                'room_type' => $validated['room_type'],
+                'subject_id' => $validated['subject_id'] ?? null,
+                'created_by' => $creatorId,
+                'is_active' => true
+            ]);
+
+            // Add creator as admin
             $room->members()->attach($creatorId, [
                 'role' => 'admin',
                 'joined_at' => now()
             ]);
-        }
 
-        // Add other members
-        if (isset($validated['members'])) {
-            foreach ($validated['members'] as $memberId) {
-                $room->members()->attach($memberId, [
-                    'role' => 'member',
-                    'joined_at' => now()
-                ]);
+            // Add other members
+            if (isset($validated['members']) && is_array($validated['members'])) {
+                foreach ($validated['members'] as $memberId) {
+                    if ($memberId != $creatorId) {
+                        $room->members()->attach($memberId, [
+                            'role' => 'member',
+                            'joined_at' => now()
+                        ]);
+                    }
+                }
             }
-        }
 
-        // Add AI bot if requested and configured
-        if (($validated['include_ai'] ?? false) && $this->aiService->isConfigured()) {
-            $aiUser = $this->aiService->getAIUser();
-            if ($aiUser && !$room->members->contains($aiUser->id)) {
-                $room->members()->attach($aiUser->id, [
-                    'role' => 'bot',
-                    'joined_at' => now()
-                ]);
+            // Add AI bot if requested and configured
+            if (($validated['include_ai'] ?? false) && $this->aiService->isConfigured()) {
+                $aiUser = $this->aiService->getAIUser();
+                if ($aiUser && !$room->members->contains($aiUser->id)) {
+                    $room->members()->attach($aiUser->id, [
+                        'role' => 'bot',
+                        'joined_at' => now()
+                    ]);
+                }
             }
-        }
 
-        // Load relationships
-        $room->load('members');
+            // Load relationships
+            $room->load('members', 'latestMessage');
 
-        // Return JSON for API or redirect for web
-        if ($request->expectsJson() || $request->is('api/*')) {
+            \Log::info('Chat room created successfully', ['room_id' => $room->id]);
+
+            // Return JSON for API
             return response()->json([
                 'success' => true,
                 'room' => $room,
                 'message' => 'Chat room created successfully'
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error creating room', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error creating chat room', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating room: ' . $e->getMessage()
+            ], 500);
         }
-
-        return redirect()->route('chat.show', $room->id)
-            ->with('success', 'Chat room created successfully');
     }
 
     /**
@@ -150,55 +177,88 @@ class ChatController extends Controller
      */
     public function sendMessage(Request $request, $roomId)
     {
-        $validated = $request->validate([
-            'message_text' => 'required|string|max:5000',
-            'message_type' => 'in:text,image,file',
-            'file_url' => 'nullable|string|max:500'
-        ]);
+        try {
+            \Log::info('Sending message', [
+                'room_id' => $roomId,
+                'user_id' => Auth::check() ? Auth::id() : 'guest',
+                'message' => $request->message_text
+            ]);
 
-        $room = ChatRoom::findOrFail($roomId);
+            $validated = $request->validate([
+                'message_text' => 'required|string|max:5000',
+                'message_type' => 'nullable|in:text,image,file',
+                'file_url' => 'nullable|string|max:500'
+            ]);
 
-        // Use authenticated user ID or default to 1 (guest)
-        $userId = Auth::check() ? Auth::id() : 1;
+            $room = ChatRoom::findOrFail($roomId);
 
-        // Check if user is member (only for private/subject rooms)
-        if ($room->room_type !== 'group' && Auth::check()) {
-            if (!$room->members->contains('id', $userId)) {
-                abort(403, 'You are not a member of this room');
+            // Use authenticated user ID or default to 1 (guest)
+            $userId = Auth::check() ? Auth::id() : 1;
+
+            // Check if user is member (only for private/subject rooms)
+            if ($room->room_type !== 'group' && Auth::check()) {
+                if (!$room->members->contains('id', $userId)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Bạn không phải thành viên của phòng chat này'
+                    ], 403);
+                }
             }
-        }
 
-        $message = ChatMessage::create([
-            'room_id' => $roomId,
-            'user_id' => $userId,
-            'message_text' => $validated['message_text'],
-            'message_type' => $validated['message_type'] ?? 'text',
-            'file_url' => $validated['file_url'] ?? null,
-        ]);
+            $message = ChatMessage::create([
+                'room_id' => $roomId,
+                'user_id' => $userId,
+                'message_text' => $validated['message_text'],
+                'message_type' => $validated['message_type'] ?? 'text',
+                'file_url' => $validated['file_url'] ?? null,
+            ]);
 
-        // Load relationships
-        $message->load('user');
+            // Load relationships
+            $message->load('user');
 
-        // Update room's updated_at
-        $room->touch();
+            // Update room's updated_at
+            $room->touch();
 
-        // Broadcast event
-        broadcast(new MessageSent($message))->toOthers();
-
-        // Trigger AI response if configured and AI is a member
-        if ($this->aiService->isConfigured()) {
-            $aiUser = $this->aiService->getAIUser();
-            if ($aiUser && $room->members->contains($aiUser->id)) {
-                dispatch(function () use ($room, $message) {
-                    $this->handleAIResponse($room, $message);
-                })->afterResponse();
+            // Broadcast event
+            try {
+                broadcast(new MessageSent($message))->toOthers();
+            } catch (\Exception $e) {
+                \Log::warning('Broadcast failed (Pusher not configured)', ['error' => $e->getMessage()]);
             }
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => $message
-        ]);
+            // Trigger AI response if configured and AI is a member
+            if ($this->aiService->isConfigured()) {
+                $aiUser = $this->aiService->getAIUser();
+                if ($aiUser && $room->members->contains($aiUser->id)) {
+                    dispatch(function () use ($room, $message) {
+                        $this->handleAIResponse($room, $message);
+                    })->afterResponse();
+                }
+            }
+
+            \Log::info('Message sent successfully', ['message_id' => $message->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error sending message', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -461,41 +521,35 @@ class ChatController extends Controller
         // Check if user is authenticated via Laravel Auth
         if (Auth::check()) {
             $user = Auth::user();
+            
+            // Determine user role
+            $role = 'student'; // default
+            if ($user->hasRole('admin')) {
+                $role = 'admin';
+            } elseif ($user->hasRole('teacher')) {
+                $role = 'teacher';
+            } elseif ($user->hasRole('student')) {
+                $role = 'student';
+            }
+            
             return response()->json([
                 'success' => true,
                 'data' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'role' => $role,
                     'is_authenticated' => true,
                     'source' => 'laravel_auth'
                 ]
             ]);
         }
         
-        // Check session for manual user selection
-        $userId = session('chat_user_id');
-        if ($userId) {
-            $user = \App\Models\User::find($userId);
-            if ($user) {
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'is_authenticated' => false,
-                        'source' => 'session'
-                    ]
-                ]);
-            }
-        }
-        
-        // No user found
+        // No user found - must login
         return response()->json([
             'success' => false,
-            'message' => 'No user selected'
-        ]);
+            'message' => 'Not authenticated. Please login first.'
+        ], 401);
     }
     
     /**

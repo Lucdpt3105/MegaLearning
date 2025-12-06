@@ -37,26 +37,38 @@
         <div class="bg-white rounded-t-2xl shadow-lg p-6 border-b-2 border-indigo-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div id="userAvatar" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
-                        ?
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
-                        <p id="userInfo" class="text-sm text-gray-500">Đang tải...</p>
-                    </div>
+                    @auth
+                        @php
+                            $userInitial = strtoupper(substr(Auth::user()->name, 0, 1));
+                            $roleColors = [
+                                'admin' => 'from-red-500 to-pink-500',
+                                'teacher' => 'from-blue-500 to-indigo-500',
+                                'student' => 'from-green-500 to-emerald-500'
+                            ];
+                            $userRole = 'student';
+                            if (Auth::user()->hasRole('admin')) $userRole = 'admin';
+                            elseif (Auth::user()->hasRole('teacher')) $userRole = 'teacher';
+                            $gradientClass = $roleColors[$userRole] ?? 'from-indigo-600 to-purple-600';
+                        @endphp
+                        <div class="bg-gradient-to-r {{ $gradientClass }} text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
+                            {{ $userInitial }}
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
+                            <p class="text-sm text-gray-500">Đăng nhập với: <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span></p>
+                        </div>
+                    @else
+                        <div id="userAvatar" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
+                            ?
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
+                            <p id="userInfo" class="text-sm text-gray-500">Đang tải...</p>
+                        </div>
+                    @endauth
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Change User Button - Only show if not authenticated via Laravel -->
-                    <button 
-                        id="changeUserBtn"
-                        onclick="showSelectUserModal()"
-                        class="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl shadow-sm transition-all duration-200"
-                        style="display: none;">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                        </svg>
-                        <span class="font-medium">Đổi User</span>
-                    </button>
+                    <!-- Change User Button removed for security -->
                     
                     <!-- Home Button -->
                     @auth
@@ -72,7 +84,7 @@
                         @endphp
                         <a href="{{ $homeUrl }}"
                     @else
-                        <a href="/"
+                        <a href="/login"
                     @endauth
                        class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,6 +283,46 @@
         const PUSHER_KEY = '{{ env("PUSHER_APP_KEY") }}';
         const PUSHER_CLUSTER = '{{ env("PUSHER_APP_CLUSTER", "ap1") }}';
         
+        // Helper function for API calls with CSRF and credentials
+        async function apiCall(url, options = {}, retryCount = 0) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!token) {
+                console.error('❌ CSRF token not found in meta tag');
+            }
+            
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest', // Important for Laravel to recognize AJAX requests
+                    ...(options.headers || {})
+                },
+                credentials: 'same-origin' // Include cookies for session
+            };
+            
+            const finalOptions = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...(options.headers || {}) } };
+            
+            console.log('🔍 API Call:', url, finalOptions);
+            
+            const response = await fetch(url, finalOptions);
+            
+            // If CSRF token mismatch (419) and we haven't retried yet, refresh token and retry
+            if (response.status === 419 && retryCount === 0) {
+                console.warn('⚠️ CSRF token mismatch (419), refreshing token and retrying...');
+                await initializeCsrf(); // Refresh CSRF cookie
+                
+                // Also update the meta tag if Laravel provides a new token
+                const newTokenResponse = await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+                
+                // Retry the request once
+                return apiCall(url, options, 1);
+            }
+            
+            return response;
+        }
+        
         // State
         let currentRoom = null;
         let currentUser = { id: 1, name: 'Guest User' };
@@ -327,7 +379,7 @@
             try {
                 console.log('📋 Loading rooms for user:', currentUser);
                 
-                const response = await fetch(`${API_URL}/rooms`);
+                const response = await apiCall(`${API_URL}/rooms`);
                 const data = await response.json();
                 
                 console.log('📋 Rooms response:', data);
@@ -517,7 +569,7 @@
             if (currentRoom?.id !== roomId) return;
             
             try {
-                const response = await fetch(`${API_URL}/rooms/${roomId}/messages`);
+                const response = await apiCall(`${API_URL}/rooms/${roomId}/messages`);
                 const data = await response.json();
                 if (data.success && data.messages) {
                     const currentMessageIds = Array.from(document.querySelectorAll('[data-message-id]'))
@@ -643,19 +695,39 @@
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
 
-            if (!text || !currentRoom) return;
+            if (!text || !currentRoom) {
+                console.log('Cannot send: missing text or room');
+                return;
+            }
 
             try {
-                const response = await fetch(`${API_URL}/rooms/${currentRoom.id}/messages`, {
+                console.log('Sending message to room:', currentRoom.id);
+                
+                const response = await apiCall(`${API_URL}/rooms/${currentRoom.id}/messages`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ message_text: text })
+                    body: JSON.stringify({ 
+                        message_text: text,
+                        message_type: 'text'
+                    })
                 });
 
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error response:', errorText);
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        showNotification(errorData.message || 'Lỗi khi gửi tin nhắn', 'error');
+                    } catch (e) {
+                        showNotification(`Lỗi ${response.status}: ${response.statusText}`, 'error');
+                    }
+                    return;
+                }
+
                 const data = await response.json();
+                console.log('Message sent successfully:', data);
 
                 if (data.success) {
                     input.value = '';
@@ -671,11 +743,11 @@
                         }
                     }
                 } else {
-                    showNotification('Không thể gửi tin nhắn', 'error');
+                    showNotification(data.message || 'Không thể gửi tin nhắn', 'error');
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
-                showNotification('Lỗi khi gửi tin nhắn', 'error');
+                showNotification('Lỗi khi gửi tin nhắn: ' + error.message, 'error');
             }
         }
 
@@ -730,12 +802,10 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/rooms`, {
+                console.log('Creating room:', { roomName, includeAI });
+                
+                const response = await apiCall(`${API_URL}/rooms`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({
                         room_name: roomName,
                         room_type: 'group',
@@ -743,11 +813,26 @@
                     })
                 });
 
+                console.log('Create room response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        showNotification(errorData.message || 'Không thể tạo phòng', 'error');
+                        if (errorData.errors) {
+                            console.error('Validation errors:', errorData.errors);
+                        }
+                    } catch (e) {
+                        showNotification(`Lỗi ${response.status}: ${response.statusText}`, 'error');
+                    }
+                    return;
                 }
 
                 const data = await response.json();
+                console.log('Room created:', data);
 
                 if (data.success && data.room) {
                     showNotification(`Đã tạo phòng "${roomName}" thành công!`, 'success');
@@ -796,7 +881,7 @@
         // Load users for private chat
         async function loadUsers() {
             try {
-                const response = await fetch(`${API_URL}/users`);
+                const response = await apiCall(`${API_URL}/users`);
                 const data = await response.json();
                 
                 const usersList = document.getElementById('usersList');
@@ -860,12 +945,8 @@
                 // Don't show notification immediately, show loading state instead
                 console.log(`Starting private chat with user ${userId} (${userName})`);
                 
-                const response = await fetch(`${API_URL}/rooms/private`, {
+                const response = await apiCall(`${API_URL}/rooms/private`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({
                         other_user_id: userId
                     })
@@ -980,14 +1061,29 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize CSRF cookie for Sanctum
+            await initializeCsrf();
             // Check if user is already selected
             await checkCurrentUser();
         });
 
+        // Initialize CSRF cookie for Sanctum stateful API
+        async function initializeCsrf() {
+            try {
+                console.log('🔐 Initializing CSRF cookie...');
+                await fetch('/sanctum/csrf-cookie', {
+                    credentials: 'same-origin'
+                });
+                console.log('✅ CSRF cookie initialized');
+            } catch (error) {
+                console.error('❌ Failed to initialize CSRF cookie:', error);
+            }
+        }
+
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
-                const response = await fetch(`${API_URL}/current-user`);
+                const response = await apiCall(`${API_URL}/current-user`);
                 const data = await response.json();
                 
                 console.log('🔍 Checking current user:', data);
@@ -1008,23 +1104,31 @@
                     // Hide change user button if authenticated via Laravel
                     const changeUserBtn = document.getElementById('changeUserBtn');
                     if (changeUserBtn) {
-                        changeUserBtn.style.display = isAuthenticatedUser ? 'none' : 'flex';
+                        changeUserBtn.style.display = 'none'; // Always hide for security
                     }
                     
                     // Initialize chat immediately
                     await initializeChat();
                 } else {
-                    // No user found - show selection modal
-                    await showSelectUserModal();
+                    // No user found - redirect to login
+                    console.error('❌ Not logged in - redirecting to login page');
+                    showNotification('Vui lòng đăng nhập để sử dụng chat', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Error checking current user:', error);
-                await showSelectUserModal();
+                showNotification('Không thể kết nối đến server', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
             }
         }
 
-        // Update user info in header
+        // Update user info in header (only for non-auth users)
         function updateUserInfo() {
+            @guest
             if (currentUser) {
                 const avatarEl = document.getElementById('userAvatar');
                 const infoEl = document.getElementById('userInfo');
@@ -1039,6 +1143,7 @@
                 
                 console.log('📝 Updated user info in header:', currentUser.name);
             }
+            @endguest
         }
 
         // Show user selection modal
@@ -1055,7 +1160,7 @@
             
             try {
                 // Load all users
-                const response = await fetch('{{ url("/api/v1/chat/users") }}');
+                const response = await apiCall('{{ url("/api/v1/chat/users") }}');
                 const data = await response.json();
                 
                 let allUsers = [];
@@ -1109,12 +1214,8 @@
                 
                 console.log('👤 Selecting user:', { userId, userName, userEmail });
                 
-                const response = await fetch(`${API_URL}/set-user`, {
+                const response = await apiCall(`${API_URL}/set-user`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({ user_id: userId })
                 });
 
