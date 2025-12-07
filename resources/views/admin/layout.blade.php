@@ -24,6 +24,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
 </head>
 <body class="min-h-screen bg-slate-50 font-['Poppins',system-ui,sans-serif] text-slate-800 antialiased">
 
@@ -65,27 +67,34 @@
                            data-sidebar-chevron="users"></i>
                     </button>
 
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="users">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.students.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Học sinh</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.teachers.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Giáo viên</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.admins.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Quản trị viên</span>
-                        </a>
-                    </div>
+                   <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+     data-sidebar-body="users">
+
+    {{-- Học sinh --}}
+    <a href="{{ route('admin.students.index') }}"
+       class="flex items-center gap-2 py-1.5 rounded-lg
+              {{ request()->routeIs('admin.students.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+        <span>Học sinh</span>
+    </a>
+
+    {{-- Giáo viên --}}
+    <a href="{{ route('admin.teachers.index') }}"
+       class="flex items-center gap-2 py-1.5 rounded-lg
+              {{ request()->routeIs('admin.teachers.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+        <span>Giáo viên</span>
+    </a>
+
+    {{-- Quản trị viên --}}
+    <a href="{{ route('admin.admins.index') }}"
+       class="flex items-center gap-2 py-1.5 rounded-lg
+              {{ request()->routeIs('admin.admins.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+        <span>Quản trị viên</span>
+    </a>
+    
+</div>
                 </div>
 
                 {{-- Khóa học --}}
@@ -431,15 +440,65 @@
                 </button>
 
                 {{-- Avatar --}}
-                <div class="flex items-center gap-2">
-                    <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
-                        A
-                    </div>
-                    <div class="hidden md:flex flex-col leading-tight">
-                        <span class="text-xs font-medium text-slate-800">Admin</span>
-                        <span class="text-[11px] text-slate-400">Quản trị viên</span>
-                    </div>
-                </div>
+{{-- PROFILE DROPDOWN --}}
+<div class="relative" x-data="{ open: false }">
+
+    {{-- BUTTON: Avatar + Name --}}
+    <button @click="open = !open"
+            class="flex items-center gap-2 focus:outline-none select-none">
+
+        {{-- Avatar --}}
+        <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center 
+                    text-xs font-semibold text-slate-700">
+            {{ strtoupper(Auth::user()->name[0] ?? 'A') }}
+        </div>
+
+        {{-- Name --}}
+        <div class="hidden md:flex flex-col leading-tight text-left">
+            <span class="text-xs font-medium text-slate-800">{{ Auth::user()->name }}</span>
+            <span class="text-[11px] text-slate-400 capitalize">
+                {{ Auth::user()->roles->first()->name ?? 'Admin' }}
+            </span>
+        </div>
+
+        <i data-feather="chevron-down" class="w-4 h-4 text-slate-500"></i>
+    </button>
+
+    {{-- DROPDOWN MENU --}}
+    <div x-show="open"
+         x-transition
+         @click.outside="open = false"
+         class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-50">
+
+        {{-- Hồ sơ cá nhân --}}
+        <a href="{{ route('admin.profile') }}"
+           class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 
+                  hover:bg-slate-100 rounded-lg transition">
+            <i data-feather="user" class="w-4 h-4"></i>
+            Hồ sơ cá nhân
+        </a>
+
+        {{-- Cài đặt --}}
+        <a href="{{ route('admin.settings') }}"
+           class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 
+                  hover:bg-slate-100 rounded-lg transition">
+            <i data-feather="settings" class="w-4 h-4"></i>
+            Cài đặt
+        </a>
+
+        {{-- Logout --}}
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button
+                class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600
+                       hover:bg-red-50 rounded-lg transition">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Đăng xuất
+            </button>
+        </form>
+
+    </div>
+</div>
             </div>
             </header>
 
