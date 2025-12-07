@@ -15,7 +15,7 @@ class DocumentController extends Controller
     use AuthorizesRequests;
 
     /**
-     * UC-GV-070: Display a listing of documents
+     * Display a listing of documents
      */
     public function index(Request $request)
     {
@@ -70,7 +70,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-071: Show the form for creating a new document
+     * Show the form for creating a new document
      */
     public function create()
     {
@@ -83,7 +83,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-071: Store a newly created document (Upload)
+     * Store a newly created document (Upload)
      * Post-condition: Send to UC-ADM-021 for approval
      */
     public function store(Request $request)
@@ -175,7 +175,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-072: Show the form for editing (updating) document
+     * Show the form for editing (updating) document
      */
     public function edit(Document $document)
     {
@@ -190,7 +190,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-072: Update document (Upload new version)
+     * Update document (Upload new version)
      * Post-condition: Send to UC-ADM-021 for approval
      */
     public function update(Request $request, Document $document)
@@ -273,7 +273,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-074: Remove the specified document (Delete)
+     * Remove the specified document (Delete)
      */
     public function destroy(Document $document)
     {
@@ -307,7 +307,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-073: Organize documents (Create folder)
+     * Organize documents (Create folder)
      */
     public function createFolder(Request $request)
     {
@@ -324,7 +324,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * UC-GV-073: Move document to folder
+     * Move document to folder
      */
     public function moveToFolder(Request $request, Document $document)
     {

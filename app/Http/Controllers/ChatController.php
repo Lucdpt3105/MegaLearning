@@ -80,57 +80,96 @@ class ChatController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'room_name' => 'required|string|max:255',
-            'room_type' => 'required|in:group,private,subject',
-            'subject_id' => 'nullable|exists:subjects,subject_id',
-            'members' => 'array',
-            'members.*' => 'exists:users,id',
-            'include_ai' => 'boolean'
-        ]);
+        try {
+            \Log::info('Creating chat room', [
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
 
-        // Use authenticated user ID or default to 1 (guest)
-        $creatorId = Auth::check() ? Auth::id() : 1;
+            $validated = $request->validate([
+                'room_name' => 'required|string|max:255',
+                'room_type' => 'required|in:group,private,subject',
+                'subject_id' => 'nullable|exists:subjects,subject_id',
+                'members' => 'nullable|array',
+                'members.*' => 'exists:users,id',
+                'include_ai' => 'nullable|boolean'
+            ]);
 
-        $room = ChatRoom::create([
-            'room_name' => $validated['room_name'],
-            'room_type' => $validated['room_type'],
-            'subject_id' => $validated['subject_id'] ?? null,
-            'created_by' => $creatorId,
-            'is_active' => true
-        ]);
+            // Use authenticated user ID - must be logged in
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You must be logged in to create a room'
+                ], 401);
+            }
 
-        // Add creator as admin if logged in
-        if (Auth::check()) {
+            $creatorId = Auth::id();
+
+            $room = ChatRoom::create([
+                'room_name' => $validated['room_name'],
+                'room_type' => $validated['room_type'],
+                'subject_id' => $validated['subject_id'] ?? null,
+                'created_by' => $creatorId,
+                'is_active' => true
+            ]);
+
+            // Add creator as admin
             $room->members()->attach($creatorId, [
                 'role' => 'admin',
                 'joined_at' => now()
             ]);
-        }
 
-        // Add other members
-        if (isset($validated['members'])) {
-            foreach ($validated['members'] as $memberId) {
-                $room->members()->attach($memberId, [
-                    'role' => 'member',
-                    'joined_at' => now()
-                ]);
+            // Add other members
+            if (isset($validated['members']) && is_array($validated['members'])) {
+                foreach ($validated['members'] as $memberId) {
+                    if ($memberId != $creatorId) {
+                        $room->members()->attach($memberId, [
+                            'role' => 'member',
+                            'joined_at' => now()
+                        ]);
+                    }
+                }
             }
-        }
 
-        // Add AI bot if requested and configured
-        if (($validated['include_ai'] ?? false) && $this->aiService->isConfigured()) {
-            $aiUser = $this->aiService->getAIUser();
-            if ($aiUser && !$room->members->contains($aiUser->id)) {
-                $room->members()->attach($aiUser->id, [
-                    'role' => 'bot',
-                    'joined_at' => now()
-                ]);
+            // Add AI bot if requested and configured
+            if (($validated['include_ai'] ?? false) && $this->aiService->isConfigured()) {
+                $aiUser = $this->aiService->getAIUser();
+                if ($aiUser && !$room->members->contains($aiUser->id)) {
+                    $room->members()->attach($aiUser->id, [
+                        'role' => 'bot',
+                        'joined_at' => now()
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('chat.show', $room->id)
-            ->with('success', 'Chat room created successfully');
+            // Load relationships
+            $room->load('members', 'latestMessage');
+
+            \Log::info('Chat room created successfully', ['room_id' => $room->id]);
+
+            // Return JSON for API
+            return response()->json([
+                'success' => true,
+                'room' => $room,
+                'message' => 'Chat room created successfully'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error creating room', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error creating chat room', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating room: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -138,55 +177,88 @@ class ChatController extends Controller
      */
     public function sendMessage(Request $request, $roomId)
     {
-        $validated = $request->validate([
-            'message_text' => 'required|string|max:5000',
-            'message_type' => 'in:text,image,file',
-            'file_url' => 'nullable|string|max:500'
-        ]);
+        try {
+            \Log::info('Sending message', [
+                'room_id' => $roomId,
+                'user_id' => Auth::check() ? Auth::id() : 'guest',
+                'message' => $request->message_text
+            ]);
 
-        $room = ChatRoom::findOrFail($roomId);
+            $validated = $request->validate([
+                'message_text' => 'required|string|max:5000',
+                'message_type' => 'nullable|in:text,image,file',
+                'file_url' => 'nullable|string|max:500'
+            ]);
 
-        // Use authenticated user ID or default to 1 (guest)
-        $userId = Auth::check() ? Auth::id() : 1;
+            $room = ChatRoom::findOrFail($roomId);
 
-        // Check if user is member (only for private/subject rooms)
-        if ($room->room_type !== 'group' && Auth::check()) {
-            if (!$room->members->contains('id', $userId)) {
-                abort(403, 'You are not a member of this room');
+            // Use authenticated user ID or default to 1 (guest)
+            $userId = Auth::check() ? Auth::id() : 1;
+
+            // Check if user is member (only for private/subject rooms)
+            if ($room->room_type !== 'group' && Auth::check()) {
+                if (!$room->members->contains('id', $userId)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Bạn không phải thành viên của phòng chat này'
+                    ], 403);
+                }
             }
-        }
 
-        $message = ChatMessage::create([
-            'room_id' => $roomId,
-            'user_id' => $userId,
-            'message_text' => $validated['message_text'],
-            'message_type' => $validated['message_type'] ?? 'text',
-            'file_url' => $validated['file_url'] ?? null,
-        ]);
+            $message = ChatMessage::create([
+                'room_id' => $roomId,
+                'user_id' => $userId,
+                'message_text' => $validated['message_text'],
+                'message_type' => $validated['message_type'] ?? 'text',
+                'file_url' => $validated['file_url'] ?? null,
+            ]);
 
-        // Load relationships
-        $message->load('user');
+            // Load relationships
+            $message->load('user');
 
-        // Update room's updated_at
-        $room->touch();
+            // Update room's updated_at
+            $room->touch();
 
-        // Broadcast event
-        broadcast(new MessageSent($message))->toOthers();
-
-        // Trigger AI response if configured and AI is a member
-        if ($this->aiService->isConfigured()) {
-            $aiUser = $this->aiService->getAIUser();
-            if ($aiUser && $room->members->contains($aiUser->id)) {
-                dispatch(function () use ($room, $message) {
-                    $this->handleAIResponse($room, $message);
-                })->afterResponse();
+            // Broadcast event
+            try {
+                broadcast(new MessageSent($message))->toOthers();
+            } catch (\Exception $e) {
+                \Log::warning('Broadcast failed (Pusher not configured)', ['error' => $e->getMessage()]);
             }
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => $message
-        ]);
+            // Trigger AI response if configured and AI is a member
+            if ($this->aiService->isConfigured()) {
+                $aiUser = $this->aiService->getAIUser();
+                if ($aiUser && $room->members->contains($aiUser->id)) {
+                    dispatch(function () use ($room, $message) {
+                        $this->handleAIResponse($room, $message);
+                    })->afterResponse();
+                }
+            }
+
+            \Log::info('Message sent successfully', ['message_id' => $message->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error', ['errors' => $e->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error sending message', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -268,5 +340,316 @@ class ChatController extends Controller
 
         return redirect()->route('chat.index')
             ->with('success', 'Left room successfully');
+    }
+    
+    /**
+     * Get all chat rooms (API)
+     */
+    public function getRooms(Request $request)
+    {
+        $userId = Auth::check() ? Auth::id() : null;
+        
+        if ($userId) {
+            // Get all rooms user is member of
+            $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->with(['latestMessage.user', 'members'])
+            ->where('is_active', true)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+            // Add unread count for each room
+            $rooms->each(function($room) use ($userId) {
+                $room->unread_count = $this->getUnreadCount($room->id, $userId);
+            });
+        } else {
+            // Get all public rooms (group type)
+            $rooms = ChatRoom::where('is_active', true)
+                ->where('room_type', 'group')
+                ->with(['latestMessage.user', 'members'])
+                ->orderBy('updated_at', 'desc')
+                ->get();
+                
+            $rooms->each(function($room) {
+                $room->unread_count = 0;
+            });
+        }
+        
+        return response()->json([
+            'success' => true,
+            'rooms' => $rooms
+        ]);
+    }
+    
+    /**
+     * Get unread message count for a room
+     */
+    private function getUnreadCount($roomId, $userId)
+    {
+        // Count messages in room that user hasn't read
+        return ChatMessage::where('room_id', $roomId)
+            ->where('user_id', '!=', $userId) // Don't count own messages
+            ->whereNotExists(function($query) use ($userId) {
+                $query->select(\DB::raw(1))
+                    ->from('chat_message_reads')
+                    ->whereColumn('chat_message_reads.message_id', 'chat_messages.id')
+                    ->where('chat_message_reads.user_id', $userId);
+            })
+            ->count();
+    }
+    
+    /**
+     * Get total unread count across all rooms
+     */
+    public function getTotalUnreadCount(Request $request)
+    {
+        $userId = Auth::check() ? Auth::id() : null;
+        
+        if (!$userId) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => 0
+            ]);
+        }
+        
+        // Get all room IDs user is member of
+        $roomIds = ChatRoom::whereHas('members', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->pluck('id');
+        
+        // Count unread messages across all rooms
+        $totalUnread = ChatMessage::whereIn('room_id', $roomIds)
+            ->where('user_id', '!=', $userId)
+            ->whereNotExists(function($query) use ($userId) {
+                $query->select(\DB::raw(1))
+                    ->from('chat_message_reads')
+                    ->whereColumn('chat_message_reads.message_id', 'chat_messages.id')
+                    ->where('chat_message_reads.user_id', $userId);
+            })
+            ->count();
+        
+        return response()->json([
+            'success' => true,
+            'unread_count' => $totalUnread
+        ]);
+    }
+    
+    /**
+     * Get messages for a room (API)
+     */
+    public function getMessages($roomId)
+    {
+        $messages = ChatMessage::where('room_id', $roomId)
+            ->with('user')
+            ->active()
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        // Mark messages as read for authenticated user
+        $userId = Auth::check() ? Auth::id() : session('chat_user_id');
+        if ($userId) {
+            $this->markMessagesAsRead($roomId, $userId);
+        }
+            
+        return response()->json([
+            'success' => true,
+            'messages' => $messages
+        ]);
+    }
+    
+    /**
+     * Mark all messages in a room as read for user
+     */
+    private function markMessagesAsRead($roomId, $userId)
+    {
+        $messageIds = ChatMessage::where('room_id', $roomId)
+            ->where('user_id', '!=', $userId)
+            ->pluck('id');
+            
+        foreach ($messageIds as $messageId) {
+            \DB::table('chat_message_reads')->insertOrIgnore([
+                'message_id' => $messageId,
+                'user_id' => $userId,
+                'read_at' => now()
+            ]);
+        }
+    }
+    
+    /**
+     * Mark messages as read (API endpoint)
+     */
+    public function markAsRead(Request $request, $roomId)
+    {
+        $userId = Auth::check() ? Auth::id() : session('chat_user_id');
+        
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
+        
+        $this->markMessagesAsRead($roomId, $userId);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Messages marked as read'
+        ]);
+    }
+    
+    /**
+     * Get all users for chat (API)
+     */
+    public function getUsers(Request $request)
+    {
+        $users = \App\Models\User::select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+            
+        return response()->json([
+            'success' => true,
+            'users' => $users
+        ]);
+    }
+    
+    /**
+     * Get current user from session (API)
+     */
+    public function getCurrentUser(Request $request)
+    {
+        // Check if user is authenticated via Laravel Auth
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Determine user role
+            $role = 'student'; // default
+            if ($user->hasRole('admin')) {
+                $role = 'admin';
+            } elseif ($user->hasRole('teacher')) {
+                $role = 'teacher';
+            } elseif ($user->hasRole('student')) {
+                $role = 'student';
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $role,
+                    'is_authenticated' => true,
+                    'source' => 'laravel_auth'
+                ]
+            ]);
+        }
+        
+        // No user found - must login
+        return response()->json([
+            'success' => false,
+            'message' => 'Not authenticated. Please login first.'
+        ], 401);
+    }
+    
+    /**
+     * Set current user in session (API)
+     */
+    public function setUser(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:users,id'
+        ]);
+        
+        session(['chat_user_id' => $validated['user_id']]);
+        
+        $user = \App\Models\User::find($validated['user_id']);
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_authenticated' => false,
+                'source' => 'session'
+            ]
+        ]);
+    }
+    
+    /**
+     * Add member to room (API)
+     */
+    public function addMember(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+        
+        $room = ChatRoom::findOrFail($roomId);
+        
+        // Check if already member
+        if ($room->members->contains('id', $validated['user_id'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is already a member'
+            ], 400);
+        }
+        
+        $room->members()->attach($validated['user_id'], [
+            'role' => 'member',
+            'joined_at' => now()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Member added successfully'
+        ]);
+    }
+    
+    /**
+     * Remove member from room (API)
+     */
+    public function removeMember($roomId, $userId)
+    {
+        $room = ChatRoom::findOrFail($roomId);
+        $room->members()->detach($userId);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Member removed successfully'
+        ]);
+    }
+    
+    /**
+     * Update room (API)
+     */
+    public function update(Request $request, $roomId)
+    {
+        $validated = $request->validate([
+            'room_name' => 'required|string|max:255',
+        ]);
+        
+        $room = ChatRoom::findOrFail($roomId);
+        $room->update($validated);
+        
+        return response()->json([
+            'success' => true,
+            'room' => $room
+        ]);
+    }
+    
+    /**
+     * Delete room (API)
+     */
+    public function destroy($roomId)
+    {
+        $room = ChatRoom::findOrFail($roomId);
+        $room->update(['is_active' => false]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Room deleted successfully'
+        ]);
     }
 }

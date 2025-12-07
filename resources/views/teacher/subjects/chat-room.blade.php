@@ -27,7 +27,7 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Quản lý Nhóm Chat</h1>
-                <p class="text-gray-600 mt-1">UC-GV-015: {{ $subject->name }} ({{ $subject->code }})</p>
+                <p class="text-gray-600 mt-1">{{ $subject->name }} ({{ $subject->code }})</p>
             </div>
         </div>
     </div>

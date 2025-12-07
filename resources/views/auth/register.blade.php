@@ -13,7 +13,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background: linear-gradient(135deg, #0F1729 0%, #1a2332 100%);
+            background: linear-gradient(135deg, #4C3575 0%, #5849A6 50%, #6B9FD9 100%);
             position: fixed;
         }
         
@@ -26,7 +26,7 @@
             scrollbar-width: none;
         }
         
-        /* 🎨 Diagonal Stripes Background */
+        /* 🎨 Animated Gradient Overlay */
         html::before {
             content: '';
             position: fixed;
@@ -34,40 +34,42 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(
+            background: linear-gradient(
                 45deg,
-                rgba(216, 74, 92, 0.03),
-                rgba(216, 74, 92, 0.03) 20px,
-                rgba(224, 137, 118, 0.02) 20px,
-                rgba(224, 137, 118, 0.02) 40px
+                rgba(76, 53, 117, 0.4),
+                rgba(88, 73, 166, 0.3),
+                rgba(107, 159, 217, 0.4),
+                rgba(89, 196, 224, 0.3)
             );
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             z-index: 0;
             pointer-events: none;
         }
         
-        /* 🌊 Subtle Floating Orbs */
+        /* 🌊 Floating Orbs with New Colors */
         body::before {
             content: '';
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(216, 74, 92, 0.08) 0%, transparent 70%);
-            top: -200px;
-            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(89, 196, 224, 0.15) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
             border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
+            animation: float 8s ease-in-out infinite;
             z-index: 0;
         }
         body::after {
             content: '';
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(139, 53, 88, 0.06) 0%, transparent 70%);
-            bottom: -150px;
-            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(88, 73, 166, 0.12) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
             border-radius: 50%;
-            animation: float 8s ease-in-out infinite reverse;
+            animation: float 10s ease-in-out infinite reverse;
             z-index: 0;
         }
         
@@ -78,32 +80,47 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/images/background.avif');
+            background-image: url('/images/background.svg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.15;
+            opacity: 0.08;
             z-index: 1;
             pointer-events: none;
         }
         
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
         @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            50% { transform: translateY(-40px) scale(1.08) rotate(5deg); }
         }
         
         .glass-card {
-            background: rgba(26, 35, 50, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(76, 53, 117, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
+        
         .input-glow:focus {
-            box-shadow: 0 0 0 3px rgba(216, 74, 92, 0.3);
+            box-shadow: 0 0 0 3px rgba(88, 73, 166, 0.25);
+            border-color: #5849A6;
         }
+        
         select option {
-            background: #1a2332;
-            color: white;
+            background: white;
+            color: #1f2937;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #4C3575, #5849A6, #6B9FD9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
@@ -115,22 +132,22 @@
         <div class="glass-card rounded-3xl p-8 mb-6">
             <!-- Logo + Title in one line -->
             <div class="flex items-center gap-4 mb-6">
-                <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning" class="w-16 h-16 drop-shadow-2xl flex-shrink-0">
+                <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning" class="w-16 h-16 drop-shadow-lg shrink-0">
                 <div>
-                    <h2 class="text-2xl font-bold text-white">Đăng ký</h2>
-                    <p class="text-gray-400 text-sm mt-1">Bắt đầu hành trình học tập của bạn.</p>
+                    <h2 class="text-3xl font-bold gradient-text">Đăng ký</h2>
+                    <p class="text-gray-600 text-sm mt-1">Bắt đầu hành trình học tập của bạn.</p>
                 </div>
             </div>
 
             @if ($errors->any())
-                <div class="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-red-500 mt-0.5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                         </svg>
                         <div class="flex-1">
-                            <p class="text-red-300 text-sm font-medium mb-1">Vui lòng kiểm tra lại thông tin:</p>
-                            <ul class="text-red-400 text-sm space-y-1 list-disc list-inside">
+                            <p class="text-red-600 text-sm font-medium mb-1">Vui lòng kiểm tra lại thông tin:</p>
+                            <ul class="text-red-500 text-sm space-y-1 list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -144,52 +161,52 @@
                 @csrf
 
                 <div>
-                    <label for="name" class="block text-sm font-semibold text-gray-300 mb-2">Họ và tên</label>
+                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Họ và tên</label>
                     <input 
                         type="text" 
                         name="name" 
                         id="name" 
                         value="{{ old('name') }}"
                         required
-                        class="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-xl focus:outline-none focus:border-[#D84A5C] input-glow transition duration-200 @error('name') border-red-500 @enderror"
+                        class="w-full px-4 py-3.5 bg-white border border-gray-200 text-gray-800 placeholder-gray-400 rounded-xl focus:outline-none input-glow transition duration-200 shadow-sm @error('name') border-red-500! @enderror"
                         placeholder="Nguyễn Văn A"
                     >
                     @error('name')
-                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-semibold text-gray-300 mb-2">Email</label>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
                     <input 
                         type="email" 
                         name="email" 
                         id="email" 
                         value="{{ old('email') }}"
                         required
-                        class="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-xl focus:outline-none focus:border-[#D84A5C] input-glow transition duration-200 @error('email') border-red-500 @enderror"
+                        class="w-full px-4 py-3.5 bg-white border border-gray-200 text-gray-800 placeholder-gray-400 rounded-xl focus:outline-none input-glow transition duration-200 shadow-sm @error('email') border-red-500! @enderror"
                         placeholder="student@example.com"
                     >
                     @error('email')
-                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-300 mb-2">Mật khẩu</label>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Mật khẩu</label>
                     <div class="relative">
                         <input 
                             type="password" 
                             name="password" 
                             id="password" 
                             required
-                            class="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-xl focus:outline-none focus:border-[#D84A5C] input-glow transition duration-200 @error('password') border-red-500 @enderror"
+                            class="w-full px-4 py-3.5 bg-white border border-gray-200 text-gray-800 placeholder-gray-400 rounded-xl focus:outline-none input-glow transition duration-200 shadow-sm @error('password') border-red-500! @enderror"
                             placeholder="••••••••"
                         >
                         <button 
                             type="button" 
                             onclick="togglePassword('password')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D84A5C] transition"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#5849A6] transition"
                         >
                             <svg id="eye-open-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -201,26 +218,26 @@
                         </button>
                     </div>
                     @error('password')
-                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">Ít nhất 8 ký tự</p>
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-semibold text-gray-300 mb-2">Xác nhận mật khẩu</label>
+                    <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">Xác nhận mật khẩu</label>
                     <div class="relative">
                         <input 
                             type="password" 
                             name="password_confirmation" 
                             id="password_confirmation" 
                             required
-                            class="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white placeholder-gray-500 rounded-xl focus:outline-none focus:border-[#D84A5C] input-glow transition duration-200"
+                            class="w-full px-4 py-3.5 bg-white border border-gray-200 text-gray-800 placeholder-gray-400 rounded-xl focus:outline-none input-glow transition duration-200 shadow-sm"
                             placeholder="••••••••"
                         >
                         <button 
                             type="button" 
                             onclick="togglePassword('password_confirmation')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D84A5C] transition"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#5849A6] transition"
                         >
                             <svg id="eye-open-password_confirmation" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -235,7 +252,7 @@
 
                 <button 
                     type="submit"
-                    class="w-full bg-gradient-to-r from-[#D84A5C] to-[#E08976] text-white font-bold py-4 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D84A5C]/50 focus:outline-none focus:ring-2 focus:ring-[#D84A5C] focus:ring-offset-2 focus:ring-offset-[#0F1729] transform transition hover:scale-[1.02] active:scale-[0.98]"
+                    class="w-full bg-linear-to-r from-[#4C3575] via-[#5849A6] to-[#6B9FD9] text-white font-bold py-4 px-6 rounded-xl hover:shadow-xl hover:shadow-[#5849A6]/40 focus:outline-none focus:ring-2 focus:ring-[#5849A6] focus:ring-offset-2 transform transition hover:scale-[1.02] active:scale-[0.98]"
                 >
                     Đăng ký
                 </button>
@@ -243,20 +260,20 @@
 
             <div class="relative my-6">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-white/10"></div>
+                    <div class="w-full border-t border-gray-200"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-4 bg-[#1a2332] text-gray-500">hoặc</span>
+                    <span class="px-4 bg-white text-gray-500">hoặc</span>
                 </div>
             </div>
 
-            <p class="text-center text-sm text-gray-400">
+            <p class="text-center text-sm text-gray-600">
                 Đã có tài khoản? 
-                <a href="{{ route('login') }}" class="text-[#E08976] hover:text-[#D84A5C] font-semibold transition">Đăng nhập ngay</a>
+                <a href="{{ route('login') }}" class="text-[#5849A6] hover:text-[#4C3575] font-semibold transition">Đăng nhập ngay</a>
             </p>
         </div>
 
-        <p class="text-center text-xs text-gray-600 mt-8">
+        <p class="text-center text-xs text-white/80 mt-8">
             © 2025 MegaLearning. All rights reserved.
         </p>
     </div>

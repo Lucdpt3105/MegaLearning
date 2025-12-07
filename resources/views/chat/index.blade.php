@@ -37,29 +37,55 @@
         <div class="bg-white rounded-t-2xl shadow-lg p-6 border-b-2 border-indigo-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div id="userAvatar" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
-                        ?
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
-                        <p id="userInfo" class="text-sm text-gray-500">Đang tải...</p>
-                    </div>
+                    @auth
+                        @php
+                            $userInitial = strtoupper(substr(Auth::user()->name, 0, 1));
+                            $roleColors = [
+                                'admin' => 'from-red-500 to-pink-500',
+                                'teacher' => 'from-blue-500 to-indigo-500',
+                                'student' => 'from-green-500 to-emerald-500'
+                            ];
+                            $userRole = 'student';
+                            if (Auth::user()->hasRole('admin')) $userRole = 'admin';
+                            elseif (Auth::user()->hasRole('teacher')) $userRole = 'teacher';
+                            $gradientClass = $roleColors[$userRole] ?? 'from-indigo-600 to-purple-600';
+                        @endphp
+                        <div class="bg-gradient-to-r {{ $gradientClass }} text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
+                            {{ $userInitial }}
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
+                            <p class="text-sm text-gray-500">Đăng nhập với: <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span></p>
+                        </div>
+                    @else
+                        <div id="userAvatar" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold shadow-lg">
+                            ?
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">MegaLearning Chat</h1>
+                            <p id="userInfo" class="text-sm text-gray-500">Đang tải...</p>
+                        </div>
+                    @endauth
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!-- Change User Button - Only show if not authenticated via Laravel -->
-                    <button 
-                        id="changeUserBtn"
-                        onclick="showSelectUserModal()"
-                        class="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl shadow-sm transition-all duration-200"
-                        style="display: {{ auth()->check() ? 'none' : 'none' }};">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                        </svg>
-                        <span class="font-medium">Đổi User</span>
-                    </button>
+                    <!-- Change User Button removed for security -->
                     
                     <!-- Home Button -->
-                    <a href="/" 
+                    @auth
+                        @php
+                            $homeUrl = '/';
+                            if (Auth::user()->hasRole('admin')) {
+                                $homeUrl = '/admin';
+                            } elseif (Auth::user()->hasRole('teacher')) {
+                                $homeUrl = '/teacher/dashboard';
+                            } elseif (Auth::user()->hasRole('student')) {
+                                $homeUrl = '/student/dashboard';
+                            }
+                        @endphp
+                        <a href="{{ $homeUrl }}"
+                    @else
+                        <a href="/login"
+                    @endauth
                        class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md transition-all duration-200 transform hover:scale-105">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -253,9 +279,49 @@
 
     <script>
         // Configuration
-        const API_URL = '{{ url("/api/chat") }}';
+        const API_URL = '{{ url("/api/v1/chat") }}';
         const PUSHER_KEY = '{{ env("PUSHER_APP_KEY") }}';
         const PUSHER_CLUSTER = '{{ env("PUSHER_APP_CLUSTER", "ap1") }}';
+        
+        // Helper function for API calls with CSRF and credentials
+        async function apiCall(url, options = {}, retryCount = 0) {
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            
+            if (!token) {
+                console.error('❌ CSRF token not found in meta tag');
+            }
+            
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest', // Important for Laravel to recognize AJAX requests
+                    ...(options.headers || {})
+                },
+                credentials: 'same-origin' // Include cookies for session
+            };
+            
+            const finalOptions = { ...defaultOptions, ...options, headers: { ...defaultOptions.headers, ...(options.headers || {}) } };
+            
+            console.log('🔍 API Call:', url, finalOptions);
+            
+            const response = await fetch(url, finalOptions);
+            
+            // If CSRF token mismatch (419) and we haven't retried yet, refresh token and retry
+            if (response.status === 419 && retryCount === 0) {
+                console.warn('⚠️ CSRF token mismatch (419), refreshing token and retrying...');
+                await initializeCsrf(); // Refresh CSRF cookie
+                
+                // Also update the meta tag if Laravel provides a new token
+                const newTokenResponse = await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+                
+                // Retry the request once
+                return apiCall(url, options, 1);
+            }
+            
+            return response;
+        }
         
         // State
         let currentRoom = null;
@@ -313,15 +379,15 @@
             try {
                 console.log('📋 Loading rooms for user:', currentUser);
                 
-                const response = await fetch(`${API_URL}/rooms`);
+                const response = await apiCall(`${API_URL}/rooms`);
                 const data = await response.json();
                 
                 console.log('📋 Rooms response:', data);
                 
                 const roomsList = document.getElementById('roomsList');
                 
-                if (data.success && data.data.length > 0) {
-                    roomsList.innerHTML = data.data.map(room => {
+                if (data.success && data.rooms && data.rooms.length > 0) {
+                    roomsList.innerHTML = data.rooms.map(room => {
                         // For private rooms, show the other user's name
                         let displayName = room.room_name;
                         if (room.room_type === 'private' && room.members && room.members.length > 0) {
@@ -357,7 +423,7 @@
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                                             </svg>
-                                            ${room.members_count || 0} thành viên
+                                            ${room.members ? room.members.length : 0} thành viên
                                         </span>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${room.room_type === 'group' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
                                             ${room.room_type === 'group' ? 'Nhóm' : 'Riêng tư'}
@@ -407,7 +473,7 @@
                 const roomsData = await roomResponse.json();
                 const messagesData = await messagesResponse.json();
 
-                currentRoom = roomsData.data.find(r => r.id === roomId);
+                currentRoom = roomsData.rooms ? roomsData.rooms.find(r => r.id === roomId) : null;
                 
                 if (!currentRoom) {
                     showNotification('Không tìm thấy phòng', 'error');
@@ -433,7 +499,7 @@
                 document.getElementById('messageInput').placeholder = 'Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)';
 
                 // Display messages
-                displayMessages(messagesData.data.data || []);
+                displayMessages(messagesData.messages || []);
 
                 // Subscribe to realtime updates
                 subscribeToRoom(roomId);
@@ -483,8 +549,8 @@
             fetch(`${API_URL}/rooms`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.data.length > 0) {
-                        data.data.forEach(room => {
+                    if (data.success && data.rooms && data.rooms.length > 0) {
+                        data.rooms.forEach(room => {
                             echoInstance.channel(`room-updates.${room.id}`)
                                 .listen('.room.updated', (e) => {
                                     console.log('🔔 Room updated:', e);
@@ -503,13 +569,13 @@
             if (currentRoom?.id !== roomId) return;
             
             try {
-                const response = await fetch(`${API_URL}/rooms/${roomId}/messages`);
+                const response = await apiCall(`${API_URL}/rooms/${roomId}/messages`);
                 const data = await response.json();
-                if (data.success) {
+                if (data.success && data.messages) {
                     const currentMessageIds = Array.from(document.querySelectorAll('[data-message-id]'))
                         .map(el => el.dataset.messageId);
                     
-                    data.data.data.forEach(msg => {
+                    data.messages.forEach(msg => {
                         // Use 'id' instead of 'message_id'
                         const msgId = msg.id || msg.message_id;
                         if (!currentMessageIds.includes(String(msgId))) {
@@ -629,27 +695,47 @@
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
 
-            if (!text || !currentRoom) return;
+            if (!text || !currentRoom) {
+                console.log('Cannot send: missing text or room');
+                return;
+            }
 
             try {
-                const response = await fetch(`${API_URL}/rooms/${currentRoom.id}/messages`, {
+                console.log('Sending message to room:', currentRoom.id);
+                
+                const response = await apiCall(`${API_URL}/rooms/${currentRoom.id}/messages`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ message_text: text })
+                    body: JSON.stringify({ 
+                        message_text: text,
+                        message_type: 'text'
+                    })
                 });
 
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error response:', errorText);
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        showNotification(errorData.message || 'Lỗi khi gửi tin nhắn', 'error');
+                    } catch (e) {
+                        showNotification(`Lỗi ${response.status}: ${response.statusText}`, 'error');
+                    }
+                    return;
+                }
+
                 const data = await response.json();
+                console.log('Message sent successfully:', data);
 
                 if (data.success) {
                     input.value = '';
                     input.style.height = 'auto';
                     
                     // In polling mode, add message immediately
-                    if (!echoInstance) {
-                        appendMessage(data.data);
+                    if (!echoInstance && data.message) {
+                        appendMessage(data.message);
                         
                         // Show AI typing indicator if room has AI
                         if (currentRoom.has_ai) {
@@ -657,11 +743,11 @@
                         }
                     }
                 } else {
-                    showNotification('Không thể gửi tin nhắn', 'error');
+                    showNotification(data.message || 'Không thể gửi tin nhắn', 'error');
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
-                showNotification('Lỗi khi gửi tin nhắn', 'error');
+                showNotification('Lỗi khi gửi tin nhắn: ' + error.message, 'error');
             }
         }
 
@@ -716,12 +802,10 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/rooms`, {
+                console.log('Creating room:', { roomName, includeAI });
+                
+                const response = await apiCall(`${API_URL}/rooms`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({
                         room_name: roomName,
                         room_type: 'group',
@@ -729,18 +813,33 @@
                     })
                 });
 
+                console.log('Create room response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        showNotification(errorData.message || 'Không thể tạo phòng', 'error');
+                        if (errorData.errors) {
+                            console.error('Validation errors:', errorData.errors);
+                        }
+                    } catch (e) {
+                        showNotification(`Lỗi ${response.status}: ${response.statusText}`, 'error');
+                    }
+                    return;
                 }
 
                 const data = await response.json();
+                console.log('Room created:', data);
 
-                if (data.success) {
+                if (data.success && data.room) {
                     showNotification(`Đã tạo phòng "${roomName}" thành công!`, 'success');
                     hideCreateRoomModal();
                     nameInput.value = '';
                     await loadRooms();
-                    selectRoom(data.data.id);
+                    selectRoom(data.room.id);
                 } else {
                     console.error('Create room failed:', data);
                     showNotification(data.message || 'Không thể tạo phòng', 'error');
@@ -782,13 +881,13 @@
         // Load users for private chat
         async function loadUsers() {
             try {
-                const response = await fetch(`${API_URL}/users`);
+                const response = await apiCall(`${API_URL}/users`);
                 const data = await response.json();
                 
                 const usersList = document.getElementById('usersList');
                 
-                if (data.success && data.data.length > 0) {
-                    usersList.innerHTML = data.data.map(user => {
+                if (data.success && data.users && data.users.length > 0) {
+                    usersList.innerHTML = data.users.map(user => {
                         const roleColors = {
                             'admin': 'bg-red-100 text-red-800',
                             'teacher': 'bg-blue-100 text-blue-800',
@@ -846,12 +945,8 @@
                 // Don't show notification immediately, show loading state instead
                 console.log(`Starting private chat with user ${userId} (${userName})`);
                 
-                const response = await fetch(`${API_URL}/rooms/private`, {
+                const response = await apiCall(`${API_URL}/rooms/private`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({
                         other_user_id: userId
                     })
@@ -863,8 +958,8 @@
 
                 const data = await response.json();
 
-                if (data.success && data.data && data.data.id) {
-                    console.log('Private room created/found:', data.data);
+                if (data.success && data.room) {
+                    console.log('Private room created/found:', data.room);
                     
                     // Switch back to rooms tab
                     switchTab('rooms');
@@ -874,7 +969,7 @@
                     
                     // Wait a bit for rooms to load, then select the room
                     setTimeout(() => {
-                        selectRoom(data.data.id);
+                        selectRoom(data.room.id);
                         showNotification(data.message || `Đã mở phòng chat với ${userName}`, 'success');
                     }, 400);
                 } else {
@@ -966,14 +1061,30 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize CSRF cookie for Sanctum
+            await initializeCsrf();
             // Check if user is already selected
             await checkCurrentUser();
         });
 
+        // Initialize CSRF cookie for Sanctum stateful API
+        async function initializeCsrf() {
+            try {
+                console.log('🔐 Initializing CSRF cookie...');
+                await fetch('/sanctum/csrf-cookie', {
+                    credentials: 'same-origin'
+                });
+                console.log('✅ CSRF cookie initialized');
+            } catch (error) {
+                console.error('❌ Failed to initialize CSRF cookie:', error);
+            }
+        }
+
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
-                const response = await fetch(`${API_URL}/user/current`);
+                // Try authenticated endpoint first, fallback to session-based
+                const response = await apiCall(`${API_URL}/current-user`);
                 const data = await response.json();
                 
                 console.log('🔍 Checking current user:', data);
@@ -989,39 +1100,36 @@
                     console.log('📌 User source:', data.data.source);
                     
                     updateUserInfo(); // Update UI with user info
+                    hideSelectUserModal(); // Always hide modal
                     
-                    if (isAuthenticatedUser) {
-                        // User logged in via Laravel Auth - hide modal and change user button
-                        hideSelectUserModal();
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'none';
-                    } else {
-                        // Manual selection mode - show change user button
-                        const changeUserBtn = document.getElementById('changeUserBtn');
-                        if (changeUserBtn) changeUserBtn.style.display = 'flex';
-                        
-                        // If no user selected yet, show modal
-                        if (!currentUser || currentUser.id === 1) {
-                            await showSelectUserModal();
-                            return; // Don't initialize chat yet
-                        } else {
-                            hideSelectUserModal();
-                        }
+                    // Hide change user button if authenticated via Laravel
+                    const changeUserBtn = document.getElementById('changeUserBtn');
+                    if (changeUserBtn) {
+                        changeUserBtn.style.display = 'none'; // Always hide for security
                     }
                     
+                    // Initialize chat immediately
                     await initializeChat();
                 } else {
-                    // No user found - show selection modal
-                    await showSelectUserModal();
+                    // No user found - redirect to login
+                    console.error('❌ Not logged in - redirecting to login page');
+                    showNotification('Vui lòng đăng nhập để sử dụng chat', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Error checking current user:', error);
-                await showSelectUserModal();
+                showNotification('Không thể kết nối đến server', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
             }
         }
 
-        // Update user info in header
+        // Update user info in header (only for non-auth users)
         function updateUserInfo() {
+            @guest
             if (currentUser) {
                 const avatarEl = document.getElementById('userAvatar');
                 const infoEl = document.getElementById('userInfo');
@@ -1036,6 +1144,7 @@
                 
                 console.log('📝 Updated user info in header:', currentUser.name);
             }
+            @endguest
         }
 
         // Show user selection modal
@@ -1051,76 +1160,42 @@
             modal.classList.remove('hidden');
             
             try {
-                // Load all users (including current user if not set)
-                const response = await fetch('{{ url("/api/chat/users") }}');
+                // Load all users
+                const response = await apiCall('{{ url("/api/v1/chat/users") }}');
                 const data = await response.json();
                 
-                if (data.success) {
-                    // Add all users including those that might be excluded
-                    const allUsersResponse = await fetch('{{ url("/api") }}/users');
-                    let allUsers = [];
-                    
-                    // Fallback: use test users
-                    allUsers = [
-                        { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                        { id: 2, name: 'Admin User', email: 'admin@megalearning.local', role: 'admin' },
-                        { id: 3, name: 'Teacher Nguyen', email: 'teacher@megalearning.local', role: 'teacher' },
-                        { id: 4, name: 'Student A', email: 'student1@megalearning.local', role: 'student' },
-                        { id: 5, name: 'Student B', email: 'student2@megalearning.local', role: 'student' }
-                    ];
-                    
-                    // Try to get real users from database
-                    try {
-                        const usersResp = await fetch('{{ url("/api/chat/users") }}');
-                        const usersData = await usersResp.json();
-                        if (usersData.success && usersData.data.length > 0) {
-                            // Add guest user to the list
-                            allUsers = [
-                                { id: 1, name: 'Guest User', email: 'guest@megalearning.local', role: 'guest' },
-                                ...usersData.data
-                            ];
-                        }
-                    } catch (e) {
-                        console.warn('Could not fetch users, using fallback list');
-                    }
-                    
-                    list.innerHTML = allUsers.map(user => {
-                        const roleColors = {
-                            admin: 'bg-red-100 text-red-800',
-                            teacher: 'bg-blue-100 text-blue-800',
-                            student: 'bg-green-100 text-green-800',
-                            guest: 'bg-gray-100 text-gray-800',
-                            ai: 'bg-purple-100 text-purple-800'
-                        };
-                        const roleIcons = {
-                            admin: '👑',
-                            teacher: '👨‍🏫',
-                            student: '👨‍🎓',
-                            guest: '👤',
-                            ai: '🤖'
-                        };
-                        
-                        return `
-                            <button 
-                                onclick="selectUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')"
-                                class="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-indigo-300 flex items-center space-x-4 group"
-                            >
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                    ${roleIcons[user.role] || user.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div class="flex-1 text-left">
-                                    <h4 class="font-semibold text-gray-800 group-hover:text-indigo-600">${escapeHtml(user.name)}</h4>
-                                    <p class="text-sm text-gray-500">${escapeHtml(user.email)}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-medium ${roleColors[user.role] || 'bg-gray-100 text-gray-800'}">
-                                    ${user.role || 'user'}
-                                </span>
-                            </button>
-                        `;
-                    }).join('');
+                let allUsers = [];
+                
+                if (data.success && data.users && data.users.length > 0) {
+                    // Use real users from database
+                    allUsers = data.users;
                 } else {
-                    throw new Error('Could not load users');
+                    // Fallback: use test users if no data
+                    allUsers = [
+                        { id: 1, name: 'Guest User', email: 'guest@megalearning.local' },
+                        { id: 2, name: 'Admin User', email: 'admin@megalearning.local' },
+                        { id: 3, name: 'Teacher Nguyen', email: 'teacher@megalearning.local' },
+                        { id: 4, name: 'Student A', email: 'student1@megalearning.local' },
+                        { id: 5, name: 'Student B', email: 'student2@megalearning.local' }
+                    ];
                 }
+                
+                list.innerHTML = allUsers.map(user => {
+                    return `
+                        <button 
+                            onclick="selectUser(${user.id}, '${escapeHtml(user.name)}', '${escapeHtml(user.email)}')"
+                            class="w-full p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-indigo-300 flex items-center space-x-4 group"
+                        >
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="flex-1 text-left">
+                                <h4 class="font-semibold text-gray-800 group-hover:text-indigo-600">${escapeHtml(user.name)}</h4>
+                                <p class="text-sm text-gray-500">${escapeHtml(user.email)}</p>
+                            </div>
+                        </button>
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('Error loading users:', error);
                 list.innerHTML = `
@@ -1140,12 +1215,8 @@
                 
                 console.log('👤 Selecting user:', { userId, userName, userEmail });
                 
-                const response = await fetch(`${API_URL}/user/set`, {
+                const response = await apiCall(`${API_URL}/set-user`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
                     body: JSON.stringify({ user_id: userId })
                 });
 

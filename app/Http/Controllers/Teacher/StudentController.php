@@ -17,7 +17,7 @@ class StudentController extends Controller
     use AuthorizesRequests;
 
     /**
-     * UC-GV-050: Quản lý học sinh - Hiển thị danh sách lớp học
+     * Quản lý học sinh - Hiển thị danh sách lớp học
      */
     public function index()
     {
@@ -35,7 +35,7 @@ class StudentController extends Controller
     }
 
     /**
-     * UC-GV-054: Xem thông tin học sinh trong lớp
+     * Xem thông tin học sinh trong lớp
      */
     public function show(ClassRoom $classRoom)
     {
@@ -123,7 +123,7 @@ class StudentController extends Controller
     }
 
     /**
-     * UC-GV-051: Thêm học sinh vào lớp
+     * Thêm học sinh vào lớp
      */
     public function addStudents(Request $request, ClassRoom $classRoom)
     {
@@ -215,7 +215,7 @@ class StudentController extends Controller
     }
 
     /**
-     * UC-GV-052: Xóa học sinh khỏi lớp
+     * Xóa học sinh khỏi lớp
      */
     public function removeStudent(ClassRoom $classRoom, $studentId)
     {
@@ -262,7 +262,7 @@ class StudentController extends Controller
     }
 
     /**
-     * UC-GV-053: Cập nhật thông tin học sinh trong lớp (ghi chú)
+     * Cập nhật thông tin học sinh trong lớp (ghi chú)
      */
     public function updateNotes(Request $request, ClassRoom $classRoom, $studentId)
     {

@@ -14,7 +14,7 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Thêm Môn học Mới</h1>
-                <p class="text-gray-600 mt-1">UC-GV-011: Tạo môn học mới trong hệ thống</p>
+                <p class="text-gray-600 mt-1">Tạo môn học mới trong hệ thống</p>
             </div>
         </div>
     </div>
@@ -118,7 +118,7 @@
             @enderror
         </div>
 
-        <!-- UC-GV-015: Create Chat Room Option -->
+        <!-- Create Chat Room Option -->
         <div class="mb-8">
             <div class="flex items-start space-x-3 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
                 <input 

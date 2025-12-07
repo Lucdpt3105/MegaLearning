@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Quản lý Học sinh</h1>
-        <p class="text-gray-600 mt-1">UC-GV-050: Quản lý danh sách học sinh trong các lớp học</p>
+        <p class="text-gray-600 mt-1">Quản lý danh sách học sinh trong các lớp học</p>
     </div>
 
     @if(session('success'))

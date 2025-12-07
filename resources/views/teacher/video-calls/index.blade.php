@@ -9,7 +9,7 @@
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Buổi học Trực tuyến 🎥</h1>
-                <p class="text-gray-600 mt-1">UC-GV-001: Quản lý các buổi học online</p>
+                <p class="text-gray-600 mt-1">Quản lý các buổi học online</p>
             </div>
             <a href="{{ route('teacher.video-calls.create') }}" 
                class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-lg hover:shadow-xl transition-all">
