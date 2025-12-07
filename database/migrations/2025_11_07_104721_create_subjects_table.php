@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->text('description')->nullable();
+            $table->foreignId('teacher_id')->constrained('users')->onDelete('cascade');
+            $table->enum('status', ['draft', 'active', 'archived'])->default('active');
+            $table->json('settings')->nullable();
             $table->timestamps();
         });
     }
