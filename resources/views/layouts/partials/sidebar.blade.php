@@ -1,19 +1,31 @@
-<aside class="w-72 bg-white border-r border-gray-200 flex-shrink-0 overflow-y-auto shadow-sm">
+<aside class="w-72 bg-gradient-to-b from-white via-blue-50/30 to-purple-50/30 border-r border-gray-200 flex-shrink-0 overflow-y-auto shadow-xl">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50">
+    @php
+        $dashboardUrl = '/';
+        if (Auth::check()) {
+            if (Auth::user()->hasRole('admin')) {
+                $dashboardUrl = '/admin';
+            } elseif (Auth::user()->hasRole('teacher')) {
+                $dashboardUrl = '/teacher/dashboard';
+            } elseif (Auth::user()->hasRole('student')) {
+                $dashboardUrl = '/student/dashboard';
+            }
+        }
+    @endphp
+    <a href="{{ $dashboardUrl }}" class="block p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
         <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
-                <span class="text-2xl">🎓</span>
+            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-300">
+                <span class="text-3xl">🎓</span>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-gray-900">MegaLearning</h1>
-                <p class="text-xs text-gray-500 font-medium">E-Learning Platform</p>
+                <h1 class="text-xl font-bold text-white">MegaLearning</h1>
+                <p class="text-xs text-blue-100 font-medium">E-Learning Platform</p>
             </div>
         </div>
-    </div>
+    </a>
 
     <!-- Navigation -->
-    <nav class="p-4 space-y-1">
+    <nav class="p-4 space-y-2">
         @auth
             @if(auth()->user()->hasRole('teacher'))
                 <!-- Teacher Navigation -->
@@ -59,10 +71,10 @@
                     </div>
                 </div>
 
-                <a href="/teacher/classes" class="nav-item {{ request()->is('teacher/classes*') || request()->is('teacher/video-calls*') ? 'active' : '' }}">
+                <a href="{{ route('teacher.video-calls.index') }}" class="nav-item {{ request()->is('teacher/classes*') || request()->is('teacher/video-calls*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-green-500 to-green-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div class="nav-content">
@@ -70,17 +82,6 @@
                         <span class="nav-desc">Video call & Classes</span>
                     </div>
                 </a>
-
-                <!-- Sub-menu for Video Calls -->
-                <div class="ml-12 space-y-1 mt-1" x-data="{ open: {{ request()->is('teacher/video-calls*') ? 'true' : 'false' }} }">
-                    <a href="{{ route('teacher.video-calls.index') }}" 
-                       class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors {{ request()->is('teacher/video-calls*') ? 'bg-red-50 text-red-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                        </svg>
-                        Buổi học Online
-                    </a>
-                </div>
 
                 <!-- Documents Section -->
                 <div class="nav-section-header">
@@ -110,7 +111,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('teacher.students.index') }}" class="nav-item {{ request()->is('teacher/students*') ? 'active' : '' }}">
+                <a href="{{ route('teacher.students') }}" class="nav-item {{ request()->is('teacher/students*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-emerald-500 to-emerald-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -174,7 +175,7 @@
                     </div>
                 </div>
 
-                <a href="/teacher/forum" class="nav-item {{ request()->is('teacher/forum*') ? 'active' : '' }}">
+                <a href="/forum" class="nav-item {{ request()->is('forum*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-indigo-500 to-indigo-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
@@ -196,7 +197,28 @@
                         <span class="nav-label">Chat</span>
                         <span class="nav-desc">Instant Messaging</span>
                     </div>
-                    <span class="nav-badge bg-red-500">5</span>
+                    @php
+                        $unreadCount = 0;
+                        if (Auth::check()) {
+                            $userId = Auth::id();
+                            $roomIds = \App\Models\ChatRoom::whereHas('members', function($query) use ($userId) {
+                                $query->where('user_id', $userId);
+                            })->pluck('id');
+                            
+                            $unreadCount = \App\Models\ChatMessage::whereIn('room_id', $roomIds)
+                                ->where('user_id', '!=', $userId)
+                                ->whereNotExists(function($query) use ($userId) {
+                                    $query->select(DB::raw(1))
+                                        ->from('chat_message_reads')
+                                        ->whereColumn('chat_message_reads.message_id', 'chat_messages.id')
+                                        ->where('chat_message_reads.user_id', $userId);
+                                })
+                                ->count();
+                        }
+                    @endphp
+                    @if($unreadCount > 0)
+                        <span class="nav-badge bg-red-500">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                    @endif
                 </a>
 
                 <!-- Reports Section -->
@@ -207,7 +229,7 @@
                     </div>
                 </div>
 
-                <a href="/teacher/statistics" class="nav-item {{ request()->is('teacher/statistics*') ? 'active' : '' }}">
+                <a href="{{ route('teacher.reports.index') }}" class="nav-item {{ request()->is('teacher/reports*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-cyan-500 to-cyan-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -297,25 +319,12 @@
             @endif
         @endauth
 
-<<<<<<< .merge_file_6cAVT0
-        <a href="/forum" class="sidebar-link {{ request()->is('forum*') ? 'active' : '' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <span>Forum</span>
-        </a>
-
-        <!-- Divider -->
-        <div class="pt-4 pb-2">
-            <p class="px-4 text-xs font-semibold text-purple-200 uppercase tracking-wider">Settings</p>
-=======
         <!-- Settings Section -->
         <div class="nav-section-header mt-6">
             <div class="flex items-center space-x-2">
                 <span class="text-2xl">⚙️</span>
                 <span>Cài đặt</span>
             </div>
->>>>>>> .merge_file_OVC1M8
         </div>
 
         <a href="{{ route('profile.edit') }}" class="nav-item {{ request()->is('profile*') ? 'active' : '' }}">
@@ -346,63 +355,3 @@
         </form>
     </nav>
 </aside>
-
-<style>
-/* Navigation Item Styles */
-.nav-item {
-    @apply flex items-center space-x-3 px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer;
-    @apply hover:bg-gray-50 relative group;
-}
-
-.nav-item.active {
-    @apply bg-gradient-to-r from-indigo-50 to-purple-50 shadow-sm;
-}
-
-.nav-item.active::before {
-    content: '';
-    @apply absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-indigo-600 to-purple-600 rounded-r-full;
-}
-
-/* Icon Styles */
-.nav-icon {
-    @apply w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm;
-    @apply transform transition-transform duration-200 group-hover:scale-110;
-}
-
-.nav-item.active .nav-icon {
-    @apply shadow-md;
-}
-
-/* Content Styles */
-.nav-content {
-    @apply flex-1 flex flex-col;
-}
-
-.nav-label {
-    @apply text-sm font-semibold text-gray-900;
-}
-
-.nav-desc {
-    @apply text-xs text-gray-500 font-medium;
-}
-
-.nav-item.active .nav-label {
-    @apply text-indigo-700;
-}
-
-/* Badge Styles */
-.nav-badge {
-    @apply px-2 py-0.5 rounded-full text-xs font-bold text-white;
-    @apply animate-pulse;
-}
-
-/* Section Header Styles */
-.nav-section-header {
-    @apply pt-6 pb-2 px-3 text-xs font-bold text-gray-600 uppercase tracking-wider;
-    @apply border-t border-gray-100 mt-2;
-}
-
-.nav-section-header:first-child {
-    @apply border-t-0 pt-0;
-}
-</style>

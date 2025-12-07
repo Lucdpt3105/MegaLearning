@@ -14,7 +14,7 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Chỉnh sửa Tài liệu</h1>
-                <p class="text-gray-600 mt-1">UC-GV-072: Cập nhật thông tin hoặc tải lên phiên bản mới</p>
+                <p class="text-gray-600 mt-1">Cập nhật thông tin hoặc tải lên phiên bản mới</p>
             </div>
         </div>
     </div>

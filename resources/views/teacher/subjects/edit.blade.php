@@ -14,7 +14,7 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Chỉnh sửa Môn học</h1>
-                <p class="text-gray-600 mt-1">UC-GV-012: Cập nhật thông tin môn học</p>
+                <p class="text-gray-600 mt-1">Cập nhật thông tin môn học</p>
             </div>
         </div>
     </div>

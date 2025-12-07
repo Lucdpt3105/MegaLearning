@@ -15,7 +15,7 @@ class SubjectController extends Controller
     use AuthorizesRequests;
 
     /**
-     * UC-GV-014: Xem danh sách môn học
+     * Xem danh sách môn học
      * Display a listing of the teacher's subjects.
      */
     public function index()
@@ -31,7 +31,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-011: Thêm môn học mới
+     * Thêm môn học mới
      * Show the form for creating a new subject.
      */
     public function create()
@@ -40,7 +40,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-011: Thêm môn học mới
+     * Thêm môn học mới
      * Store a newly created subject in storage.
      */
     public function store(Request $request)
@@ -65,7 +65,7 @@ class SubjectController extends Controller
                 'status' => $validated['status'],
             ]);
 
-            // UC-GV-015: Tự động tạo nhóm chat cho môn học
+            // Tự động tạo nhóm chat cho môn học
             if ($request->has('create_chat_room') && $request->create_chat_room) {
                 $chatRoom = ChatRoom::create([
                     'room_name' => "Chat - {$subject->name}",
@@ -126,7 +126,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-012: Cập nhật thông tin môn học
+     * Cập nhật thông tin môn học
      * Show the form for editing the specified subject.
      */
     public function edit(Subject $subject)
@@ -138,7 +138,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-012: Cập nhật thông tin môn học
+     * Cập nhật thông tin môn học
      * Update the specified subject in storage.
      */
     public function update(Request $request, Subject $subject)
@@ -174,7 +174,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-013: Xóa môn học
+     * Xóa môn học
      * Remove the specified subject from storage.
      */
     public function destroy(Subject $subject)
@@ -208,7 +208,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-015: Quản lý nhóm chat của môn học
+     * Quản lý nhóm chat của môn học
      */
     public function manageChatRoom(Subject $subject)
     {
@@ -249,7 +249,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-015: Tạo nhóm chat cho môn học
+     * Tạo nhóm chat cho môn học
      */
     public function createChatRoom(Subject $subject)
     {
@@ -310,7 +310,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-015: Thêm thành viên vào nhóm chat
+     * Thêm thành viên vào nhóm chat
      */
     public function addChatMember(Subject $subject, Request $request)
     {
@@ -350,7 +350,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-015: Xóa thành viên khỏi nhóm chat
+     * Xóa thành viên khỏi nhóm chat
      */
     public function removeChatMember(Subject $subject, $userId)
     {
@@ -390,7 +390,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * UC-GV-015: Đóng/Mở phòng chat
+     * Đóng/Mở phòng chat
      */
     public function toggleChatStatus(Subject $subject)
     {

@@ -14,7 +14,7 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Tải lên Tài liệu mới</h1>
-                <p class="text-gray-600 mt-1">UC-GV-071: Upload tài liệu và gửi kiểm duyệt</p>
+                <p class="text-gray-600 mt-1">Upload tài liệu và gửi kiểm duyệt</p>
             </div>
         </div>
     </div>
@@ -87,7 +87,7 @@
                 <!-- Folder (UC-GV-073) -->
                 <div class="mb-6">
                     <label for="folder" class="block text-sm font-medium text-gray-700 mb-2">
-                        Thư mục (UC-GV-073: Phân chia tài liệu)
+                        Thư mục (Phân chia tài liệu)
                     </label>
                     <input 
                         type="text" 

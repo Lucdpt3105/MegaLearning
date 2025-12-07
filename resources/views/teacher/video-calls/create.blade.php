@@ -15,7 +15,7 @@
                 </a>
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Tạo Buổi học Trực tuyến 🎥</h1>
-                    <p class="text-gray-600 mt-1">UC-GV-002: Tạo phòng học trực tuyến</p>
+                    <p class="text-gray-600 mt-1">Tạo phòng học trực tuyến</p>
                 </div>
             </div>
         </div>

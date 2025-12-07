@@ -19,9 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
-    })
-    ->withMiddleware(function (Middleware $middleware) {
-    $middleware->statefulApi(); // bật Sanctum cookie-based hoặc token-based
+        
+        // Enable stateful API for Sanctum with session support
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

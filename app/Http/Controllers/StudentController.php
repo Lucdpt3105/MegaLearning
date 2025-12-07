@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     /**
+     * Student Dashboard (Welcome page)
+     */
+    public function welcome()
+    {
+        return $this->dashboard();
+    }
+
+    /**
      * Student Dashboard
      */
     public function dashboard()

@@ -12,7 +12,7 @@ use Spatie\Permission\Models\Role;
 class UserManagementController extends Controller
 {
     /**
-     * UC-ADM-010: Quản lý người dùng - Hiển thị danh sách người dùng
+     * Quản lý người dùng - Hiển thị danh sách người dùng
      */
     public function index(Request $request)
     {
@@ -47,7 +47,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-011: Thêm tài khoản quản trị - Hiển thị form tạo
+     * Thêm tài khoản quản trị - Hiển thị form tạo
      */
     public function create()
     {
@@ -56,7 +56,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-011: Thêm tài khoản quản trị - Lưu tài khoản mới
+     * Thêm tài khoản quản trị - Lưu tài khoản mới
      */
     public function store(Request $request)
     {
@@ -106,7 +106,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-013: Sửa thông tin người dùng - Hiển thị form sửa
+     * Sửa thông tin người dùng - Hiển thị form sửa
      */
     public function edit(User $user)
     {
@@ -115,7 +115,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-013: Sửa thông tin người dùng - Cập nhật
+     * Sửa thông tin người dùng - Cập nhật
      */
     public function update(Request $request, User $user)
     {
@@ -157,7 +157,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-014: Xóa tài khoản
+     * Xóa tài khoản
      */
     public function destroy(Request $request, User $user)
     {
@@ -187,7 +187,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-015: Khóa/mở khóa tài khoản
+     * Khóa/mở khóa tài khoản
      */
     public function toggleLock(Request $request, User $user)
     {
@@ -221,7 +221,7 @@ class UserManagementController extends Controller
     }
 
     /**
-     * UC-ADM-012: Phân quyền
+     * Phân quyền
      */
     public function updatePermissions(Request $request, User $user)
     {
