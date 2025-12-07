@@ -71,6 +71,9 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/courses/{id}/schedule', [App\Http\Controllers\Student\CourseController::class, 'schedule'])->name('courses.schedule');
     Route::post('/courses/{id}/enroll', [App\Http\Controllers\Student\CourseController::class, 'enroll'])->name('courses.enroll');
     
+    // Documents Download
+    Route::get('/documents/{documentId}/download', [App\Http\Controllers\Student\CourseController::class, 'downloadDocument'])->name('documents.download');
+    
     // Exams Management
     Route::get('/exams', [App\Http\Controllers\Student\ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/{id}', [App\Http\Controllers\Student\ExamController::class, 'show'])->name('exams.show');

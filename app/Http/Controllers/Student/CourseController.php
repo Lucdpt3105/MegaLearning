@@ -115,6 +115,10 @@ class CourseController extends Controller
             'subject.topics' => function($query) {
                 $query->withCount('questions');
             },
+            'subject.documents' => function($query) {
+                $query->where('approval_status', 'approved')
+                      ->orderBy('created_at', 'desc');
+            },
             'enrollments' => function($query) use ($student) {
                 $query->where('student_id', $student->id);
             }
@@ -128,8 +132,9 @@ class CourseController extends Controller
         }
 
         $topics = $classRoom->subject->topics;
+        $documents = $classRoom->subject->documents;
 
-        return view('student.courses.materials', compact('classRoom', 'topics', 'enrollment'));
+        return view('student.courses.materials', compact('classRoom', 'topics', 'documents', 'enrollment'));
     }
 
     /**
@@ -247,5 +252,41 @@ class CourseController extends Controller
         ]);
 
         return redirect()->route('student.courses.index')->with('success', 'Đăng ký khóa học thành công!');
+    }
+
+    /**
+     * Download document
+     */
+    public function downloadDocument($documentId)
+    {
+        $student = Auth::user();
+        $document = \App\Models\Document::findOrFail($documentId);
+
+        // Check if document is approved
+        if ($document->approval_status !== 'approved') {
+            abort(403, 'Tài liệu này chưa được phê duyệt');
+        }
+
+        // Check if student is enrolled in a class with this subject
+        $enrolledInSubject = $student->enrolledClasses()
+            ->where('subject_id', $document->subject_id)
+            ->where('class_enrollments.status', 'active')
+            ->exists();
+
+        if (!$enrolledInSubject) {
+            abort(403, 'Bạn không có quyền tải tài liệu này');
+        }
+
+        // Increment download count
+        $document->incrementDownloadCount();
+
+        // Download file
+        $filePath = storage_path('app/public/' . $document->file_path);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'Tệp tin không tồn tại');
+        }
+
+        return response()->download($filePath, $document->file_name);
     }
 }
