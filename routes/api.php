@@ -93,6 +93,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('exams', ExamController::class);
 
     // Forum Q&A (public index/show, rest require auth)
+    // TEMPORARILY COMMENTED OUT - Fix ForumQuestionController issue
+    /*
     Route::prefix('forum')->group(function () {
         Route::get('questions', [ForumQuestionController::class, 'index']);
         Route::get('questions/{id}', [ForumQuestionController::class, 'show']);
@@ -108,8 +110,9 @@ Route::prefix('v1')->group(function () {
             Route::delete('questions/{questionId}/answers/{answerId}', [ForumQuestionController::class, 'destroyAnswer']);
         });
     });
+    */
     
-    // Chat API Routes - stateful API with session support (no web middleware needed)
+    // Chat API Routes - stateful API with session support
     Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
         // All chat routes require authentication
         Route::get('current-user', [ChatController::class, 'getCurrentUser']);
