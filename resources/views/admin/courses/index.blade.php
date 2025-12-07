@@ -2,154 +2,90 @@
 
 @section('title', 'Quản lý khóa học')
 @section('page-title', 'Quản lý khóa học')
-@section('page-description', 'Danh sách toàn bộ khóa học trong hệ thống.')
+@section('page-description', 'Danh sách tất cả các lớp học đang hoạt động trong hệ thống.')
 
 @section('content')
 
-{{-- Toolbar --}}
-<div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-
-    <div class="flex items-center gap-3">
-        <form method="GET" class="flex items-center gap-3">
-
-            {{-- Filter by subject --}}
-            <select name="subject"
-                    class="px-4 py-2 rounded-xl border border-slate-300 focus:ring-indigo-500 text-sm">
-                <option value="">Tất cả môn học</option>
-                @foreach ($subjects as $subject)
-                    <option value="{{ $subject->id }}" {{ request('subject') == $subject->id ? 'selected' : '' }}>
-                        {{ $subject->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            {{-- Filter by teacher --}}
-            <select name="teacher"
-                    class="px-4 py-2 rounded-xl border border-slate-300 focus:ring-indigo-500 text-sm">
-                <option value="">Tất cả giáo viên</option>
-                @foreach ($teachers as $teacher)
-                    <option value="{{ $teacher->id }}" {{ request('teacher') == $teacher->id ? 'selected' : '' }}>
-                        {{ $teacher->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            {{-- Filter by status --}}
-            <select name="status"
-                    class="px-4 py-2 rounded-xl border border-slate-300 focus:ring-indigo-500 text-sm">
-                <option value="">Trạng thái</option>
-                <option value="active" {{ request('status')=='active'?'selected':'' }}>Đang mở</option>
-                <option value="closed" {{ request('status')=='closed'?'selected':'' }}>Đã đóng</option>
-            </select>
-
-            <button type="submit"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm shadow">
-                Lọc
-            </button>
-        </form>
-    </div>
+<div class="mb-6 flex justify-between items-center">
+    <form class="flex gap-2">
+        <input type="text" name="search"
+               placeholder="Tìm kiếm khóa học..."
+               value="{{ request('search') }}"
+               class="px-4 py-2 rounded-xl border border-slate-300 w-64">
+        <select name="status" class="px-4 py-2 rounded-xl border border-slate-300">
+            <option value="">Tất cả trạng thái</option>
+            <option value="active" @selected(request('status')=='active')>Đang hoạt động</option>
+            <option value="closed" @selected(request('status')=='closed')>Đã đóng</option>
+            <option value="draft" @selected(request('status')=='draft')>Bản nháp</option>
+        </select>
+        <button class="px-4 py-2 bg-indigo-600 text-white rounded-xl">Lọc</button>
+    </form>
 
     <a href="{{ route('admin.courses.create') }}"
-       class="px-5 py-2 bg-purple-600 text-white rounded-xl shadow hover:bg-purple-700 text-sm flex items-center gap-2">
-        <i data-feather="plus-circle" class="w-4 h-4"></i>
-        Thêm khóa học
+       class="px-4 py-2 bg-purple-600 text-white rounded-xl shadow hover:bg-purple-700">
+        + Tạo khóa học
     </a>
 </div>
 
+{{-- LIST COURSES USING NEO CARD STYLE --}}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-{{-- Courses Table --}}
-<div class="bg-white border border-slate-200 shadow rounded-2xl overflow-hidden">
+    @foreach ($courses as $course)
+    <div class="bg-white shadow rounded-2xl p-6 border border-slate-200 hover:shadow-lg transition">
 
-    <table class="w-full text-sm">
-        <thead class="bg-slate-100 text-slate-700">
-            <tr>
-                <th class="px-4 py-3 text-left">Khóa học</th>
-                <th class="px-4 py-3 text-left">Môn học</th>
-                <th class="px-4 py-3 text-left">Giáo viên</th>
-                <th class="px-4 py-3 text-center">Học viên</th>
-                <th class="px-4 py-3 text-center">Ngày bắt đầu</th>
-                <th class="px-4 py-3 text-center">Trạng thái</th>
-                <th class="px-4 py-3 text-center">Thao tác</th>
-            </tr>
-        </thead>
+        {{-- Header --}}
+        <div class="flex justify-between">
+            <h3 class="text-lg font-semibold text-slate-800">{{ $course->name }}</h3>
 
-        <tbody>
-            @foreach ($courses as $course)
-            <tr class="border-t border-slate-200 hover:bg-slate-50">
+            <span class="px-3 py-1 rounded-full text-xs 
+            @if($course->status=='active') bg-green-100 text-green-700
+            @elseif($course->status=='closed') bg-slate-200 text-slate-700
+            @else bg-yellow-100 text-yellow-700 @endif">
+                {{ ucfirst($course->status) }}
+            </span>
+        </div>
 
-                {{-- Course name --}}
-                <td class="px-4 py-3 font-medium text-slate-900">
-                    {{ $course->name }}
-                </td>
+        <p class="text-sm text-slate-500 mt-1">{{ $course->subject->name }}</p>
 
-                {{-- Subject --}}
-                <td class="px-4 py-3 text-slate-700">
-                    {{ $course->subject->name }}
-                </td>
+        {{-- Info --}}
+        <div class="mt-4 space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-slate-600">Giáo viên:</span>
+                <span class="font-medium">{{ $course->teacher->name }}</span>
+            </div>
 
-                {{-- Teacher --}}
-                <td class="px-4 py-3 flex items-center gap-2">
-                    <img src="https://ui-avatars.com/api/?name={{ $course->teacher->name }}&size=32"
-                         class="h-7 w-7 rounded-full">
-                    <span>{{ $course->teacher->name }}</span>
-                </td>
+            <div class="flex justify-between">
+                <span class="text-slate-600">Học viên:</span>
+                <span class="font-medium">{{ $course->enrollments_count }} / {{ $course->max_students }}</span>
+            </div>
 
-                {{-- Students count --}}
-                <td class="px-4 py-3 text-center font-semibold text-indigo-700">
-                    {{ $course->active_students_count }} / {{ $course->max_students }}
-                </td>
+            <div class="flex justify-between">
+                <span class="text-slate-600">Ngày bắt đầu:</span>
+                <span class="font-medium">{{ $course->start_date }}</span>
+            </div>
+        </div>
 
-                {{-- Start date --}}
-                <td class="px-4 py-3 text-center text-slate-600">
-                    {{ $course->start_date->format('d/m/Y') }}
-                </td>
+        {{-- Actions --}}
+        <div class="mt-5 flex justify-between">
+            <a href="{{ route('admin.courses.edit', $course->id) }}"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
+                Chỉnh sửa
+            </a>
 
-                {{-- Status --}}
-                <td class="px-4 py-3 text-center">
-                    @if ($course->status == 'active')
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 font-semibold">
-                            Đang mở
-                        </span>
-                    @else
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 font-semibold">
-                            Đã đóng
-                        </span>
-                    @endif
-                </td>
+            <form action="{{ route('admin.courses.destroy', $course->id) }}"
+                  method="POST" onsubmit="return confirm('Xóa khóa học?')">
+                @csrf @method('DELETE')
+                <button class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700">
+                    Xóa
+                </button>
+            </form>
+        </div>
 
-                {{-- Actions --}}
-                <td class="px-4 py-3 text-center flex items-center justify-center gap-2">
-
-                    <a href="{{ route('admin.courses.show', $course->id) }}"
-                        class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200">
-                        <i data-feather="eye" class="w-4 h-4 text-slate-700"></i>
-                    </a>
-
-                    <a href="{{ route('admin.courses.edit', $course->id) }}"
-                        class="p-2 rounded-lg bg-indigo-100 hover:bg-indigo-200">
-                        <i data-feather="edit" class="w-4 h-4 text-indigo-700"></i>
-                    </a>
-
-                    <form action="{{ route('admin.courses.destroy', $course->id) }}"
-                          method="POST"
-                          onsubmit="return confirm('Xác nhận xóa khóa học?')">
-                        @csrf
-                        @method('DELETE')
-                        <button class="p-2 rounded-lg bg-red-100 hover:bg-red-200">
-                            <i data-feather="trash" class="w-4 h-4 text-red-700"></i>
-                        </button>
-                    </form>
-
-                </td>
-
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    </div>
+    @endforeach
 
 </div>
 
-{{-- Pagination --}}
 <div class="mt-6">
     {{ $courses->links() }}
 </div>
