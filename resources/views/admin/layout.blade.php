@@ -17,7 +17,7 @@
     {{-- Font --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    {{-- CSS custom cho admin --}}
+    {{-- CSS custom cho admin (Tailwind layer custom) --}}
     <link href="{{ asset('assets/css/admin.css') }}" rel="stylesheet">
 
     {{-- Tailwind / app CSS --}}
@@ -29,7 +29,7 @@
 
     <div class="min-h-screen flex">
 
-        {{-- SIDEBAR --}}
+        {{-- SIDEBAR DESKTOP --}}
         <aside class="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white">
             {{-- Logo --}}
             <a href="{{ route('admin.dashboard') }}"
@@ -40,55 +40,279 @@
             </a>
 
             {{-- Menu --}}
-            <nav class="flex-1 mt-4 px-2 space-y-1">
+            <nav class="flex-1 mt-4 px-2 space-y-2 text-sm">
+
                 {{-- Dashboard --}}
                 <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium
+                   class="flex items-center gap-2 px-3 py-2 rounded-xl font-medium
                           {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 shadow-md' : 'hover:bg-white/10' }}">
-                    <span class="flex items-center gap-2">
-                        <i data-feather="home" class="w-4 h-4"></i>
-                        <span>Dashboard</span>
-                    </span>
+                    <i data-feather="home" class="w-4 h-4"></i>
+                    <span>Bảng điều khiển</span>
                 </a>
 
                 {{-- Người dùng --}}
-                <a href="{{ route('admin.users.index') }}"
-                   class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium
-                          {{ request()->routeIs('admin.users.*') ? 'bg-white/20 shadow-md' : 'hover:bg-white/10' }}">
-                    <span class="flex items-center gap-2">
-                        <i data-feather="users" class="w-4 h-4"></i>
-                        <span>Người dùng</span>
-                    </span>
-                </a>
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="users" class="w-4 h-4"></i>
+                            <span>Người dùng</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.students.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Học sinh</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.teachers.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Giáo viên</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.admins.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Quản trị viên</span>
+                        </a>
+                    </div>
+                </div>
 
-                {{-- Thống kê --}}
-                <a href="{{ route('admin.statistics.index') }}"
-                   class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium
-                          {{ request()->routeIs('admin.statistics.*') ? 'bg-white/20 shadow-md' : 'hover:bg-white/10' }}">
-                    <span class="flex items-center gap-2">
-                        <i data-feather="bar-chart-2" class="w-4 h-4"></i>
-                        <span>Thống kê</span>
-                    </span>
-                </a>
+                {{-- Khóa học --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="book-open" class="w-4 h-4"></i>
+                            <span>Khóa học</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Danh sách khóa học</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.courses.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Thêm khóa học</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Danh mục</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.lessons.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Bài học</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Hệ thống Thi --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="edit-3" class="w-4 h-4"></i>
+                            <span>Hệ thống thi</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.exams.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.exams.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Danh sách bài thi</span>
+                        </a>
+                        <a href="{{ route('admin.exams.create') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.exams.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Tạo bài thi</span>
+                        </a>
+                        <a href="{{ route('admin.questions.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.questions.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Ngân hàng câu hỏi</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Kết quả thi</span>
+                        </a>
+                    </div>
+                </div>
 
                 {{-- Diễn đàn --}}
-                <a href="{{ route('forum.index') }}"
-                   class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium
-                          {{ request()->routeIs('forum.*') ? 'bg-white/20 shadow-md' : 'hover:bg-white/10' }}">
-                    <span class="flex items-center gap-2">
-                        <i data-feather="message-circle" class="w-4 h-4"></i>
-                        <span>Diễn đàn</span>
-                    </span>
-                </a>
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="message-circle" class="w-4 h-4"></i>
+                            <span>Diễn đàn</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Chủ đề thảo luận</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Bài viết</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Kiểm duyệt</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Họp nhóm --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="video" class="w-4 h-4"></i>
+                            <span>Họp nhóm</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Phòng họp</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Lịch họp</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*y') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Lịch sử họp</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Tài liệu --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="file-text" class="w-4 h-4"></i>
+                            <span>Tài liệu</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Quản lý file</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Tải lên</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Báo cáo --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="bar-chart-2" class="w-4 h-4"></i>
+                            <span>Báo cáo</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Thống kê học sinh</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Thống kê khóa học</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Thống kê bài thi</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Cài đặt --}}
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                text-indigo-100/80">
+                        <span class="flex items-center gap-2">
+                            <i data-feather="settings" class="w-4 h-4"></i>
+                            <span>Cài đặt</span>
+                        </span>
+                    </div>
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Cài đặt chung</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Email</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}"
+                           class="flex items-center gap-2 py-1.5 rounded-lg
+                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+                            <span>Thanh toán</span>
+                        </a>
+                    </div>
+                </div>
+
             </nav>
 
-            {{-- Footer sidebar (optional) --}}
-            <div class="px-4 py-3 text-xs text-indigo-100/80 border-t border-white/10">
+            {{-- Footer sidebar --}}
+            <div class="px-4 py-3 text-[11px] text-indigo-100/80 border-t border-white/10">
                 <span>MegaLearning Admin</span>
             </div>
         </aside>
 
-        {{-- MOBILE SIDEBAR (simple version, optional toggle sau) --}}
+        {{-- MOBILE SIDEBAR (simple icon bar) --}}
         <aside class="md:hidden w-16 flex flex-col items-center bg-gradient-to-b from-indigo-600 to-purple-600 text-white py-4 space-y-4">
             <a href="{{ route('admin.dashboard') }}"
                class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.dashboard') ? 'bg-white/20' : '' }}">
@@ -98,9 +322,9 @@
                class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.users.*') ? 'bg-white/20' : '' }}">
                 <i data-feather="users" class="w-5 h-5"></i>
             </a>
-            <a href="{{ route('admin.statistics.index') }}"
-               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.statistics.*') ? 'bg-white/20' : '' }}">
-                <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+            <a href="{{ route('admin.users.index') }}"
+               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.courses.*') ? 'bg-white/20' : '' }}">
+                <i data-feather="book-open" class="w-5 h-5"></i>
             </a>
             <a href="{{ route('forum.index') }}"
                class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('forum.*') ? 'bg-white/20' : '' }}">
@@ -170,7 +394,7 @@
         </div>
     </div>
 
-    {{-- JS --}}
+    {{-- JS: Feather + custom admin --}}
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="{{ asset('assets/js/admin.js') }}"></script>
 
