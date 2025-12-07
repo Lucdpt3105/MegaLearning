@@ -74,6 +74,12 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     // Documents Download
     Route::get('/documents/{documentId}/download', [App\Http\Controllers\Student\CourseController::class, 'downloadDocument'])->name('documents.download');
     
+    // Video Calls Management
+    Route::get('/video-calls', [App\Http\Controllers\Student\VideoCallController::class, 'index'])->name('video-calls.index');
+    Route::get('/video-calls/{id}', [App\Http\Controllers\Student\VideoCallController::class, 'show'])->name('video-calls.show');
+    Route::get('/video-calls/{id}/join', [App\Http\Controllers\Student\VideoCallController::class, 'join'])->name('video-calls.join');
+    Route::post('/video-calls/{id}/leave', [App\Http\Controllers\Student\VideoCallController::class, 'leave'])->name('video-calls.leave');
+    
     // Exams Management
     Route::get('/exams', [App\Http\Controllers\Student\ExamController::class, 'index'])->name('exams.index');
     Route::get('/exams/{id}', [App\Http\Controllers\Student\ExamController::class, 'show'])->name('exams.show');
