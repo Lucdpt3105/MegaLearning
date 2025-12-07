@@ -11,7 +11,7 @@ class ZoomService
     private string $accountId;
     private string $clientId;
     private string $clientSecret;
-    private string $sdkKey;
+    private ?string $sdkKey;
     private string $baseUrl = 'https://api.zoom.us/v2';
 
     public function __construct()
