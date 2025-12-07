@@ -279,6 +279,36 @@
                     </div>
                 </a>
 
+                <a href="{{ route('student.video-calls.index') }}" class="nav-item {{ request()->is('student/video-calls*') ? 'active' : '' }}">
+                    <div class="nav-icon bg-gradient-to-br from-blue-500 to-cyan-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div class="nav-content">
+                        <span class="nav-label">Họp Online</span>
+                        <span class="nav-desc">Video Meetings</span>
+                    </div>
+                    @php
+                        // Get enrolled class IDs
+                        $enrolledClassIds = auth()->user()->enrolledClasses()
+                            ->where('class_enrollments.status', 'active')
+                            ->pluck('class_rooms.id')
+                            ->toArray();
+                        
+                        $upcomingMeetings = !empty($enrolledClassIds) 
+                            ? \App\Models\VideoCall::whereIn('class_room_id', $enrolledClassIds)
+                                ->where('status', 'scheduled')
+                                ->where('scheduled_at', '>', now())
+                                ->where('scheduled_at', '<=', now()->addHours(24))
+                                ->count()
+                            : 0;
+                    @endphp
+                    @if($upcomingMeetings > 0)
+                        <span class="nav-badge bg-blue-500">{{ $upcomingMeetings }}</span>
+                    @endif
+                </a>
+
                 <a href="/student/grades" class="nav-item {{ request()->is('student/grades*') ? 'active' : '' }}">
                     <div class="nav-icon bg-gradient-to-br from-green-500 to-green-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
