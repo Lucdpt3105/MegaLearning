@@ -107,6 +107,37 @@ class ExamController extends Controller
             'auto_gen_topics' => 'nullable|array',
         ]);
 
+        // Validate auto-generate criteria
+        if ($request->boolean('auto_generate')) {
+            $totalByLevel = ($request->input('auto_gen_level_1', 0) ?? 0) + 
+                           ($request->input('auto_gen_level_2', 0) ?? 0) + 
+                           ($request->input('auto_gen_level_3', 0) ?? 0) + 
+                           ($request->input('auto_gen_level_4', 0) ?? 0);
+            
+            $totalByType = ($request->input('auto_gen_multiple_choice', 0) ?? 0) + 
+                          ($request->input('auto_gen_essay', 0) ?? 0);
+
+            // Check if total questions by type exceeds total by level
+            if ($totalByType > $totalByLevel) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\nTổng số câu theo loại: {$totalByType} câu\n(Trắc nghiệm: {$request->input('auto_gen_multiple_choice', 0)} + Tự luận: {$request->input('auto_gen_essay', 0)})\n\nTổng số câu theo mức độ: {$totalByLevel} câu\n(Mức 1: {$request->input('auto_gen_level_1', 0)} + Mức 2: {$request->input('auto_gen_level_2', 0)} + Mức 3: {$request->input('auto_gen_level_3', 0)} + Mức 4: {$request->input('auto_gen_level_4', 0)})\n\n❌ Số câu theo loại KHÔNG ĐƯỢC vượt quá số câu theo mức độ!\n\nVui lòng điều chỉnh lại số lượng.");
+            }
+
+            // Check if total is valid
+            if ($totalByLevel == 0) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo mức độ (Mức 1, 2, 3, hoặc 4).');
+            }
+
+            if ($totalByType == 0) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo loại (Trắc nghiệm hoặc Tự luận).');
+            }
+        }
+
         // Check subject ownership
         $subject = Subject::findOrFail($validated['subject_id']);
         if ($subject->teacher_id !== Auth::id()) {
@@ -451,70 +482,213 @@ class ExamController extends Controller
         $selectedQuestions = [];
         $order = 1;
 
-        // Get questions by Bloom level
-        foreach (['level_1' => 1, 'level_2' => 2, 'level_3' => 3, 'level_4' => 4] as $key => $bloomLevel) {
-            $count = $criteria[$key];
-            if ($count > 0) {
-                $questions = $this->getQuestionsForCriteria(
-                    $exam->subject_id,
-                    $bloomLevel,
-                    null,
-                    $criteria['topics'],
-                    $count
-                );
-                
-                foreach ($questions as $question) {
-                    $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 1];
-                }
-            }
-        }
-
-        // Get questions by type (if not already selected by level)
+        // NEW APPROACH: Select by TYPE first, then distribute by LEVEL
+        
+        $insufficientQuestions = [];
+        
+        // 1. Select Multiple Choice questions distributed by level
         if ($criteria['multiple_choice'] > 0) {
-            $existing = count($selectedQuestions);
-            $needed = max(0, $criteria['multiple_choice'] - $existing);
+            $mcByLevel = $this->distributeQuestionsByLevel(
+                $criteria['multiple_choice'],
+                $criteria['level_1'],
+                $criteria['level_2'],
+                $criteria['level_3'],
+                $criteria['level_4']
+            );
             
-            if ($needed > 0) {
-                $questions = $this->getQuestionsForCriteria(
-                    $exam->subject_id,
-                    null,
-                    'multiple_choice',
-                    $criteria['topics'],
-                    $needed,
-                    array_keys($selectedQuestions)
-                );
-                
-                foreach ($questions as $question) {
-                    if (!isset($selectedQuestions[$question->id])) {
-                        $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 1];
+            \Log::info('MC Distribution:', ['distribution' => $mcByLevel, 'total_needed' => $criteria['multiple_choice']]);
+            
+            $mcCollected = 0;
+            $mcDetails = [];
+            
+            foreach ($mcByLevel as $bloomLevel => $count) {
+                if ($count > 0) {
+                    $questions = $this->getQuestionsForCriteria(
+                        $exam->subject_id,
+                        $bloomLevel,
+                        'multiple_choice',
+                        $criteria['topics'],
+                        $count,
+                        array_keys($selectedQuestions)
+                    );
+                    
+                    $found = $questions->count();
+                    $mcCollected += $found;
+                    $mcDetails[] = "Level $bloomLevel: cần $count, có $found";
+                    
+                    \Log::info("MC Level $bloomLevel:", ['requested' => $count, 'found' => $found]);
+                    
+                    if ($found < $count) {
+                        $insufficientQuestions[] = "Trắc nghiệm Level $bloomLevel: cần $count câu nhưng chỉ tìm thấy $found câu";
+                    }
+                    
+                    foreach ($questions as $question) {
+                        $selectedQuestions[$question->id] = [
+                            'order' => $order++,
+                            'points' => 1, // Will be recalculated
+                            'type' => 'multiple_choice'
+                        ];
                     }
                 }
             }
-        }
-
-        if ($criteria['essay'] > 0) {
-            $questions = $this->getQuestionsForCriteria(
-                $exam->subject_id,
-                null,
-                'essay',
-                $criteria['topics'],
-                $criteria['essay'],
-                array_keys($selectedQuestions)
-            );
             
-            foreach ($questions as $question) {
-                if (!isset($selectedQuestions[$question->id])) {
-                    $selectedQuestions[$question->id] = ['order' => $order++, 'points' => 2];
-                }
+            // If insufficient MC questions, show error
+            if ($mcCollected < $criteria['multiple_choice']) {
+                $details = implode("; ", $mcDetails);
+                return redirect()->back()
+                    ->with('error_popup', "Không đủ câu trắc nghiệm!\n\nCần: {$criteria['multiple_choice']} câu\nCó: $mcCollected câu\n\nChi tiết: $details")
+                    ->withInput();
             }
         }
 
-        // Attach questions to exam
+        // 2. Select Essay questions distributed by level
+        if ($criteria['essay'] > 0) {
+            $essayByLevel = $this->distributeQuestionsByLevel(
+                $criteria['essay'],
+                $criteria['level_1'],
+                $criteria['level_2'],
+                $criteria['level_3'],
+                $criteria['level_4']
+            );
+            
+            $essayCollected = 0;
+            $essayDetails = [];
+            
+            foreach ($essayByLevel as $bloomLevel => $count) {
+                if ($count > 0) {
+                    $questions = $this->getQuestionsForCriteria(
+                        $exam->subject_id,
+                        $bloomLevel,
+                        'essay',
+                        $criteria['topics'],
+                        $count,
+                        array_keys($selectedQuestions)
+                    );
+                    
+                    $found = $questions->count();
+                    $essayCollected += $found;
+                    $essayDetails[] = "Level $bloomLevel: cần $count, có $found";
+                    
+                    if ($found < $count) {
+                        $insufficientQuestions[] = "Tự luận Level $bloomLevel: cần $count câu nhưng chỉ tìm thấy $found câu";
+                    }
+                    
+                    foreach ($questions as $question) {
+                        $selectedQuestions[$question->id] = [
+                            'order' => $order++,
+                            'points' => 1, // Will be recalculated
+                            'type' => 'essay'
+                        ];
+                    }
+                }
+            }
+            
+            // If insufficient Essay questions, show error
+            if ($essayCollected < $criteria['essay']) {
+                $details = implode("; ", $essayDetails);
+                return redirect()->back()
+                    ->with('error_popup', "Không đủ câu tự luận!\n\nCần: {$criteria['essay']} câu\nCó: $essayCollected câu\n\nChi tiết: $details")
+                    ->withInput();
+            }
+        }
+
+        // Calculate points to distribute evenly to reach 10 total
         if (!empty($selectedQuestions)) {
-            $exam->questions()->attach($selectedQuestions);
+            $totalQuestions = count($selectedQuestions);
+            $totalPoints = 10; // Target total points
+            
+            // Calculate base points per question
+            $basePoints = floor(($totalPoints * 10) / $totalQuestions) / 10; // Round to 1 decimal
+            $remainder = round($totalPoints - ($basePoints * $totalQuestions), 1);
+            
+            // Distribute points
+            $questionIndex = 0;
+            $finalQuestions = [];
+            
+            foreach ($selectedQuestions as $qId => $qData) {
+                $points = $basePoints;
+                
+                // Add remainder to first few questions
+                if ($questionIndex < round($remainder * 10)) {
+                    $points += 0.1;
+                }
+                
+                $finalQuestions[$qId] = [
+                    'order' => $qData['order'],
+                    'points' => round($points, 1)
+                ];
+                
+                $questionIndex++;
+            }
+            
+            // Verify total is exactly 10
+            $actualTotal = array_sum(array_column($finalQuestions, 'points'));
+            if (abs($actualTotal - 10) > 0.01) {
+                // Adjust last question to make it exactly 10
+                $lastKey = array_key_last($finalQuestions);
+                $finalQuestions[$lastKey]['points'] = round(
+                    $finalQuestions[$lastKey]['points'] + (10 - $actualTotal), 
+                    1
+                );
+            }
+            
+            // Attach questions to exam
+            $exam->questions()->attach($finalQuestions);
         }
 
         return count($selectedQuestions);
+    }
+
+    /**
+     * Distribute total questions across difficulty levels proportionally
+     */
+    protected function distributeQuestionsByLevel($totalNeeded, $level1, $level2, $level3, $level4)
+    {
+        $totalByLevel = $level1 + $level2 + $level3 + $level4;
+        
+        if ($totalByLevel == 0) {
+            return [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+        }
+        
+        // If total needed matches total by level, use exact distribution
+        if ($totalNeeded == $totalByLevel) {
+            return [
+                1 => $level1,
+                2 => $level2,
+                3 => $level3,
+                4 => $level4,
+            ];
+        }
+        
+        // Calculate proportional distribution using floor first
+        $distribution = [
+            1 => $level1 > 0 ? floor(($level1 / $totalByLevel) * $totalNeeded) : 0,
+            2 => $level2 > 0 ? floor(($level2 / $totalByLevel) * $totalNeeded) : 0,
+            3 => $level3 > 0 ? floor(($level3 / $totalByLevel) * $totalNeeded) : 0,
+            4 => $level4 > 0 ? floor(($level4 / $totalByLevel) * $totalNeeded) : 0,
+        ];
+        
+        // Distribute remainder to levels that had questions, prioritizing higher levels
+        $currentTotal = array_sum($distribution);
+        $remainder = $totalNeeded - $currentTotal;
+        
+        if ($remainder > 0) {
+            // Sort by original count (descending) to distribute remainder fairly
+            $levelCounts = [1 => $level1, 2 => $level2, 3 => $level3, 4 => $level4];
+            arsort($levelCounts);
+            
+            foreach ($levelCounts as $level => $count) {
+                if ($remainder > 0 && $count > 0) {
+                    $distribution[$level]++;
+                    $remainder--;
+                }
+            }
+        }
+        
+        // Sort back by level
+        ksort($distribution);
+        
+        return $distribution;
     }
 
     /**
@@ -523,8 +697,9 @@ class ExamController extends Controller
     protected function getQuestionsForCriteria($subjectId, $bloomLevel = null, $type = null, $topics = [], $limit = 10, $exclude = [])
     {
         $query = Question::where('subject_id', $subjectId)
-            ->where('in_question_bank', true)
-            ->where('created_by', Auth::id());
+            ->where('in_question_bank', true);
+            // Removed: ->where('created_by', Auth::id())
+            // Allow selecting from all questions in the question bank, not just own questions
 
         if ($bloomLevel) {
             if ($bloomLevel == 4) {

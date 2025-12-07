@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Error Popup</title>
+</head>
+<body style="padding: 50px; font-family: system-ui, -apple-system, sans-serif;">
+    <h1>Demo Popup Lỗi Số Lượng Câu Hỏi</h1>
+    <p>Click nút dưới để xem popup lỗi:</p>
+    
+    <button onclick="showErrorPopup(demoMessage)" style="
+        background: linear-gradient(to right, #3B82F6, #1D4ED8);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 10px 5px;
+    ">
+        Xem Popup Lỗi Vượt Quá
+    </button>
+
+    <script>
+        const demoMessage = `⚠️ Lỗi số lượng câu hỏi!
+
+Tổng số câu theo loại: 21 câu
+(Trắc nghiệm: 20 + Tự luận: 1)
+
+Tổng số câu theo mức độ: 20 câu
+(Mức 1: 5 + Mức 2: 5 + Mức 3: 5 + Mức 4: 5)
+
+❌ Số câu theo loại KHÔNG ĐƯỢC vượt quá số câu theo mức độ!
+
+Vui lòng điều chỉnh lại số lượng.`;
+
+        // Custom error popup function
+        function showErrorPopup(message) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            // Create popup
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                animation: slideDown 0.3s ease-out;
+            `;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        transform: translateY(-50px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            popup.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 60px; height: 60px; background: #FEE2E2; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <svg style="width: 30px; height: 30px; color: #DC2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 10px;">Lỗi Số Lượng Câu Hỏi!</h3>
+                </div>
+                <div style="background: #F9FAFB; border-left: 4px solid #DC2626; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <pre style="white-space: pre-wrap; font-family: inherit; margin: 0; color: #374151; line-height: 1.6;">${message}</pre>
+                </div>
+                <button onclick="this.closest('[style*=fixed]').remove()" style="
+                    width: 100%;
+                    background: linear-gradient(to right, #DC2626, #B91C1C);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    Đã hiểu, để tôi sửa lại
+                </button>
+            `;
+            
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+            
+            // Close on overlay click
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
