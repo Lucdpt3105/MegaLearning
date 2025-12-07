@@ -38,7 +38,7 @@ class AuthController extends Controller
             } elseif ($user->hasRole('teacher')) {
                 return redirect()->intended('/teacher/dashboard');
             } else {
-                return redirect()->intended('/'); // Student route: / (welcome page)
+                return redirect()->intended('/student/dashboard'); // Student route: /student/dashboard
             }
         }
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với MegaLearning 🎉');
+        return redirect('/student/dashboard')->with('success', 'Đăng ký thành công! Chào mừng bạn đến với MegaLearning 🎉');
     }
 
     /**
