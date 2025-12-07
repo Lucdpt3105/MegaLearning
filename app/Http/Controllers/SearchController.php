@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Models\ForumQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
@@ -130,12 +131,12 @@ class SearchController extends Controller
                 ->get()
                 ->map(function($question) {
                     return [
-                        'id' => $question->forum_question_id,
+                        'id' => $question->getKey(),
                         'title' => $question->title,
                         'content' => substr(strip_tags($question->content), 0, 100) . '...',
                         'author' => $question->user->name ?? 'Unknown',
                         'type' => 'forum',
-                        'url' => route('forum.show', $question->forum_question_id),
+                        'url' => route('forum.show', $question->getKey()),
                     ];
                 });
 
@@ -157,7 +158,7 @@ class SearchController extends Controller
                 'query' => $query,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Search error: ' . $e->getMessage());
+            Log::error('Search error: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

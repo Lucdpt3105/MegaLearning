@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('global-search-input');
     const searchLoading = document.getElementById('search-loading');
     const searchResults = document.getElementById('search-results-dropdown');
+    const searchRoute = '{{ route('search') }}';
     let searchTimeout = null;
 
     // Handle search input
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function performSearch(query) {
         searchLoading.classList.remove('hidden');
 
-        fetch(`{{ route('search') }}?query=${encodeURIComponent(query)}`, {
+        fetch(`${searchRoute}?query=${encodeURIComponent(query)}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
@@ -163,14 +164,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayResults(results, total, query) {
         if (total === 0) {
-            searchResults.innerHTML = `
-                <div class="p-4 text-center text-gray-500">
-                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    No results found for "${escapeHtml(query)}"
-                </div>
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.className = 'p-4 text-center text-gray-500';
+            noResultsDiv.innerHTML = `
+                <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             `;
+            const queryText = document.createElement('div');
+            queryText.textContent = `No results found for "${query}"`;
+            noResultsDiv.appendChild(queryText);
+            
+            searchResults.innerHTML = '';
+            searchResults.appendChild(noResultsDiv);
             searchResults.classList.remove('hidden');
             return;
         }
@@ -183,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase">Exams / Quizzes</div>`;
             results.exams.forEach(exam => {
                 html += `
-                    <a href="${exam.url}" class="block px-4 py-3 hover:bg-purple-50 transition">
+                    <a href="${escapeHtml(exam.url)}" class="block px-4 py-3 hover:bg-purple-50 transition">
                         <div class="font-medium text-gray-800">${escapeHtml(exam.title)}</div>
                         <div class="text-sm text-gray-500">${escapeHtml(exam.subject)}</div>
                     </a>`;
@@ -197,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase">Subjects / Courses</div>`;
             results.subjects.forEach(subject => {
                 html += `
-                    <a href="${subject.url}" class="block px-4 py-3 hover:bg-purple-50 transition">
+                    <a href="${escapeHtml(subject.url)}" class="block px-4 py-3 hover:bg-purple-50 transition">
                         <div class="flex items-center justify-between">
                             <div class="font-medium text-gray-800">${escapeHtml(subject.title)}</div>
                             <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">${escapeHtml(subject.code)}</span>
@@ -214,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase">Topics</div>`;
             results.topics.forEach(topic => {
                 html += `
-                    <a href="${topic.url}" class="block px-4 py-3 hover:bg-purple-50 transition">
+                    <a href="${escapeHtml(topic.url)}" class="block px-4 py-3 hover:bg-purple-50 transition">
                         <div class="font-medium text-gray-800">${escapeHtml(topic.title)}</div>
                         <div class="text-sm text-gray-500">${escapeHtml(topic.subject)}</div>
                     </a>`;
@@ -228,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase">Documents</div>`;
             results.documents.forEach(document => {
                 html += `
-                    <a href="${document.url}" class="block px-4 py-3 hover:bg-purple-50 transition">
+                    <a href="${escapeHtml(document.url)}" class="block px-4 py-3 hover:bg-purple-50 transition">
                         <div class="flex items-center justify-between">
                             <div class="font-medium text-gray-800">${escapeHtml(document.title)}</div>
                             <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase">${escapeHtml(document.file_type)}</span>
@@ -245,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-600 uppercase">Forum Questions</div>`;
             results.forum_questions.forEach(question => {
                 html += `
-                    <a href="${question.url}" class="block px-4 py-3 hover:bg-purple-50 transition">
+                    <a href="${escapeHtml(question.url)}" class="block px-4 py-3 hover:bg-purple-50 transition">
                         <div class="font-medium text-gray-800">${escapeHtml(question.title)}</div>
                         <div class="text-sm text-gray-500">By ${escapeHtml(question.author)}</div>
                     </a>`;
