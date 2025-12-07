@@ -60,8 +60,27 @@ Route::middleware(['auth'])->group(function () {
 
 // Student Dashboard (authenticated students)
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
-    Route::get('/dashboard', [StudentController::class, 'welcome'])->name('dashboard');
-    Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
+    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
+    Route::get('/welcome', [StudentController::class, 'dashboard'])->name('welcome'); // Keep for backward compatibility
+    
+    // Courses Management (UC-STUDENT-001 to UC-STUDENT-006)
+    Route::get('/courses', [App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/browse', [App\Http\Controllers\Student\CourseController::class, 'browse'])->name('courses.browse');
+    Route::get('/courses/{id}', [App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/materials', [App\Http\Controllers\Student\CourseController::class, 'materials'])->name('courses.materials');
+    Route::get('/courses/{id}/schedule', [App\Http\Controllers\Student\CourseController::class, 'schedule'])->name('courses.schedule');
+    Route::post('/courses/{id}/enroll', [App\Http\Controllers\Student\CourseController::class, 'enroll'])->name('courses.enroll');
+    
+    // Exams Management
+    Route::get('/exams', [App\Http\Controllers\Student\ExamController::class, 'index'])->name('exams.index');
+    Route::get('/exams/{id}', [App\Http\Controllers\Student\ExamController::class, 'show'])->name('exams.show');
+    Route::match(['get', 'post'], '/exams/{id}/take', [App\Http\Controllers\Student\ExamController::class, 'take'])->name('exams.take');
+    Route::post('/exams/{id}/submit', [App\Http\Controllers\Student\ExamController::class, 'submit'])->name('exams.submit');
+    Route::get('/exams/result/{submissionId}', [App\Http\Controllers\Student\ExamController::class, 'result'])->name('exams.result');
+    
+    // Grades Management
+    Route::get('/grades', [App\Http\Controllers\Student\GradeController::class, 'index'])->name('grades.index');
+    Route::get('/grades/{submissionId}', [App\Http\Controllers\Student\GradeController::class, 'show'])->name('grades.show');
 });
 
 // Teacher Routes
