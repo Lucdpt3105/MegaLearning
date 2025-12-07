@@ -28,7 +28,7 @@
         <!-- Score Display -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
             <div class="bg-blue-50 p-6 rounded-lg text-center">
-                <div class="text-4xl font-bold text-blue-600 mb-2">{{ number_format($submission->score, 1) }}</div>
+                <div class="text-4xl font-bold text-blue-600 mb-2">{{ number_format($submission->score ?? 0, 1) }}</div>
                 <div class="text-sm text-gray-600">Điểm Của Bạn</div>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg text-center">
@@ -36,7 +36,7 @@
                 <div class="text-sm text-gray-600">Điểm Tối Đa</div>
             </div>
             <div class="bg-purple-50 p-6 rounded-lg text-center">
-                <div class="text-4xl font-bold text-purple-600 mb-2">{{ number_format(($submission->score / $exam->total_points) * 100, 1) }}%</div>
+                <div class="text-4xl font-bold text-purple-600 mb-2">{{ $exam->total_points > 0 ? number_format(($submission->score ?? 0 / $exam->total_points) * 100, 1) : 0 }}%</div>
                 <div class="text-sm text-gray-600">Phần Trăm</div>
             </div>
             <div class="bg-green-50 p-6 rounded-lg text-center">
@@ -44,6 +44,27 @@
                 <div class="text-sm text-gray-600">Điểm Đạt</div>
             </div>
         </div>
+        
+        @php
+            $mcQuestions = $questions->where('type', 'multiple_choice');
+            $correctCount = $mcQuestions->where('is_correct', true)->count();
+            $totalMC = $mcQuestions->count();
+        @endphp
+        
+        @if($totalMC > 0)
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-1">📊 Thống Kê Trắc Nghiệm</h3>
+                        <p class="text-sm text-gray-600">Số câu trả lời đúng / Tổng số câu trắc nghiệm</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-blue-600">{{ $correctCount }}/{{ $totalMC }}</div>
+                        <div class="text-sm text-gray-600">{{ $totalMC > 0 ? number_format(($correctCount / $totalMC) * 100, 1) : 0 }}% đúng</div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Additional Info -->
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -98,12 +119,18 @@
                                     <p class="text-lg font-medium text-gray-900">
                                         {{ $question->pivot->custom_content ?? $question->content }}
                                     </p>
-                                    <div class="ml-4 text-sm">
+                                    <div class="ml-4 text-sm flex-shrink-0">
                                         @if(isset($question->is_correct))
                                             @if($question->is_correct)
-                                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">✓ Đúng</span>
+                                                <div class="text-right">
+                                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">✓ Đúng</span>
+                                                    <div class="mt-1 text-green-600 font-bold">+{{ $question->pivot->points ?? 1 }} điểm</div>
+                                                </div>
                                             @else
-                                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">✗ Sai</span>
+                                                <div class="text-right">
+                                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">✗ Sai</span>
+                                                    <div class="mt-1 text-red-600 font-bold">0 điểm</div>
+                                                </div>
                                             @endif
                                         @else
                                             <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full">{{ $question->pivot->points ?? 1 }} điểm</span>
