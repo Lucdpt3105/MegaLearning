@@ -16,16 +16,21 @@
 
 @layer base {
     :root {
-        /* Primary Colors */
-        --color-primary: #3A7BFF;
-        --color-primary-light: #5B93FF;
-        --color-primary-dark: #2563EB;
+        /* Primary Colors - Deep Purple to Blue */
+        --color-primary: #4f46e5;
+        --color-primary-light: #6366f1;
+        --color-primary-dark: #312e81;
+        --color-primary-darker: #1e1b4b;
         
-        /* Secondary Colors */
-        --color-turquoise: #06B6D4;
-        --color-pastel-green: #86EFAC;
-        --color-light-purple: #C084FC;
-        --color-soft-pink: #F9A8D4;
+        /* Secondary Colors - Cyan */
+        --color-secondary: #22d3ee;
+        --color-secondary-light: #5fe3fa;
+        --color-secondary-dark: #06b6d4;
+        
+        /* Accent Colors */
+        --color-accent: #d946ef;
+        --color-accent-light: #f0abfc;
+        --color-accent-dark: #c026d3;
         
         /* Neutral Colors */
         --color-white: #FFFFFF;
@@ -38,9 +43,9 @@
         
         /* Shadows */
         --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08);
-        --shadow-lg: 0 8px 16px -2px rgb(0 0 0 / 0.1);
-        --shadow-xl: 0 12px 24px -4px rgb(0 0 0 / 0.12);
+        --shadow-md: 0 4px 6px -1px rgb(79 70 229 / 0.1);
+        --shadow-lg: 0 8px 16px -2px rgb(79 70 229 / 0.12);
+        --shadow-xl: 0 12px 24px -4px rgb(79 70 229 / 0.15);
         
         /* Border Radius */
         --radius-sm: 8px;
@@ -146,22 +151,27 @@
 }
 
 .btn-primary {
-    background: linear-gradient(to right, #3b82f6, #2563eb);
+    background: #4f46e5;
     color: white;
+    font-weight: 500;
+    transition: all 0.15s ease;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    background: #4338ca;
 }
 
 .btn-secondary {
-    background-color: white;
+    background: white;
     color: #374151;
     border: 1px solid #e5e7eb;
+    font-weight: 500;
+    transition: all 0.15s ease;
 }
 
 .btn-secondary:hover {
-    background-color: #f9fafb;
+    background: #f9fafb;
+    border-color: #d1d5db;
 }
 
 .btn-success {
@@ -181,17 +191,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    box-shadow: 0 2px 8px 0 rgb(79 70 229 / 0.1);
 }
 
 .icon-box-blue {
-    background: linear-gradient(to bottom right, #dbeafe, #bfdbfe);
-    color: #2563eb;
+    background: linear-gradient(to bottom right, #e0e9ff, #c7d7fe);
+    color: #4f46e5;
 }
 
 .icon-box-purple {
-    background: linear-gradient(to bottom right, #f3e8ff, #e9d5ff);
-    color: #9333ea;
+    background: linear-gradient(to bottom right, #fae8ff, #f5d0fe);
+    color: #c026d3;
 }
 
 .icon-box-green {
@@ -342,40 +352,38 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    transition: all 0.2s ease;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    transition: all 0.15s ease;
     cursor: pointer;
+    margin-bottom: 0.25rem;
 }
 
 .nav-item:not(.active) {
-    color: #374151;
+    color: #4b5563;
 }
 
 .nav-item:not(.active):hover {
-    background: linear-gradient(to right, #eff6ff, #f5f3ff);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08);
+    background: #f3f4f6;
+    color: #1f2937;
 }
 
 .nav-item.active {
-    background: linear-gradient(to right, #3b82f6, #9333ea);
+    background: #4f46e5;
     color: white;
-    box-shadow: 0 8px 16px -2px rgb(0 0 0 / 0.1);
-    transform: translateX(4px);
 }
 
 /* Nav Icon */
 .nav-icon {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 12px;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     color: white;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08);
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
 }
 
 .nav-item:not(.active) .nav-icon {
@@ -383,14 +391,11 @@
 }
 
 .nav-item:hover .nav-icon {
-    transform: scale(1.1) rotate(-5deg);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    transform: scale(1.05);
 }
 
 .nav-item.active .nav-icon {
-    background-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 24px -4px rgb(0 0 0 / 0.12);
-    animation: pulse 2s infinite;
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* Nav Content */
@@ -401,33 +406,33 @@
 
 .nav-label {
     display: block;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.875rem;
     line-height: 1.25;
 }
 
 .nav-item.active .nav-label {
     color: white;
+    font-weight: 600;
 }
 
 .nav-desc {
     display: block;
     font-size: 0.75rem;
-    opacity: 0.75;
+    opacity: 0.7;
     margin-top: 0.125rem;
 }
 
 /* Nav Section Header - Major Categories */
 .nav-section-header {
-    padding: 0.875rem 1rem;
-    margin-top: 1.25rem;
-    margin-bottom: 0.75rem;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(147, 51, 234, 0.08));
-    border-radius: 12px;
-    border-left: 4px solid;
-    border-image: linear-gradient(to bottom, #3b82f6, #9333ea) 1;
-    position: relative;
-    overflow: hidden;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .nav-section-header::before {
@@ -437,7 +442,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -518,6 +522,432 @@
     font-size: 0.625rem;
     font-weight: 700;
     color: white;
+    background-color: #ef4444;
     animation: pulse 2s infinite;
+    margin-left: auto;
 }
 
+/* ===========================
+   🎯 COLLAPSIBLE SIDEBAR
+   =========================== */
+
+/* Sidebar Container */
+.sidebar-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 14rem;
+    z-index: 40;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-container.collapsed {
+    width: 3.5rem;
+}
+
+/* Hamburger Toggle Button */
+.hamburger-icon {
+    position: relative;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.collapsed .hamburger-line:first-child {
+    transform: translateY(3px) rotate(45deg);
+}
+
+.collapsed .hamburger-line:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+}
+
+#sidebarToggle.collapsed .hamburger-line:first-child {
+    transform: translateY(3px) rotate(135deg);
+}
+
+#sidebarToggle.collapsed .hamburger-line:last-child {
+    transform: translateY(-3px) rotate(-135deg);
+}
+
+/* Logo Container */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.5s ease;
+}
+
+.sidebar-container.collapsed .logo-container {
+    justify-content: center;
+}
+
+.logo-text {
+    transition: opacity 0.3s ease, width 0.5s ease;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar-container.collapsed .logo-text {
+    opacity: 0;
+    width: 0;
+}
+
+/* Navigation Container */
+.nav-container {
+    max-height: calc(100vh - 200px);
+}
+
+.nav-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.nav-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.nav-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Sidebar Nav Item */
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+}
+
+.sidebar-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.sidebar-nav-item.active {
+    background-color: #4f46e5;
+    color: white;
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+.sidebar-container.collapsed .sidebar-nav-item {
+    justify-content: center;
+    padding: 0.625rem;
+}
+
+/* Nav Icon Wrapper */
+.nav-icon-wrapper {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Nav Text */
+.nav-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, width 0.5s ease;
+}
+
+.sidebar-container.collapsed .nav-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* Section Headers */
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+    margin-top: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+}
+
+.sidebar-container.collapsed .sidebar-section-header {
+    justify-content: center;
+    padding: 0.75rem 0.5rem 0.5rem;
+}
+
+.section-emoji {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.section-text {
+    white-space: nowrap;
+    transition: opacity 0.3s ease, width 0.5s ease;
+}
+
+.sidebar-container.collapsed .section-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* Profile Section */
+.profile-section {
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.profile-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.profile-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-container.collapsed .profile-toggle {
+    justify-content: center;
+}
+
+.profile-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    transition: border-color 0.3s ease;
+}
+
+.profile-toggle:hover .profile-avatar {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-details {
+    flex: 1;
+    text-align: left;
+    transition: opacity 0.3s ease, width 0.5s ease;
+    overflow: hidden;
+}
+
+.sidebar-container.collapsed .profile-details {
+    opacity: 0;
+    width: 0;
+}
+
+.profile-name {
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.profile-link {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.profile-link:hover {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+}
+
+/* Profile Menu (Dropdown) */
+.profile-menu {
+    display: none;
+    margin-top: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 0.5rem;
+    animation: slideDown 0.3s ease;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+.sidebar-container.collapsed .profile-menu {
+    position: absolute;
+    bottom: 4.5rem;
+    left: 4rem;
+    width: 12rem;
+    background-color: #1f2937;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.profile-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.profile-menu-item svg {
+    flex-shrink: 0;
+}
+
+/* Tooltip for collapsed state */
+.sidebar-container.collapsed .sidebar-nav-item::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    margin-left: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: #1f2937;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+}
+
+.sidebar-container.collapsed .sidebar-nav-item:hover::after {
+    opacity: 1;
+}
+
+/* ===========================
+   🎯 DROPDOWN NAVIGATION
+   =========================== */
+
+/* Dropdown Toggle Button */
+.dropdown-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.dropdown-toggle.active {
+    color: white;
+}
+
+.dropdown-toggle .dropdown-arrow {
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-container.collapsed .dropdown-toggle .dropdown-arrow {
+    opacity: 0;
+    width: 0;
+}
+
+.dropdown-toggle.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Content */
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.dropdown-content.active {
+    max-height: 500px;
+}
+
+.dropdown-content .sidebar-nav-item {
+    padding-left: 2.5rem;
+}
+
+.sidebar-container.collapsed .dropdown-content .sidebar-nav-item {
+    padding-left: 0.625rem;
+}
+
+/* Collapsed state - hide dropdown content */
+.sidebar-container.collapsed .dropdown-content {
+    display: none;
+}
+
+/* ===========================
+   📊 Dashboard Header Styles
+   =========================== */
+
+.header-indigo {
+    @apply bg-gradient-to-r from-indigo-600 to-indigo-700 p-4 rounded-t-xl;
+}
+
+.header-green {
+    @apply bg-gradient-to-r from-green-600 to-green-700 p-4 rounded-t-xl;
+}
+
+.header-purple {
+    @apply bg-gradient-to-r from-purple-600 to-purple-700 p-4 rounded-t-xl;
+}
+
+.header-amber {
+    @apply bg-gradient-to-r from-amber-600 to-orange-600 p-4 rounded-t-xl;
+}

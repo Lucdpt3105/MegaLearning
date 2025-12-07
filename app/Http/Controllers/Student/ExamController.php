@@ -309,23 +309,34 @@ class ExamController extends Controller
         $earnedPoints = 0;
         
         foreach ($exam->questions as $question) {
+            // Get points from pivot table (exam_questions)
             $points = $question->pivot->points ?? 1;
-            $totalPoints += $points;
             
+            // Only count multiple choice questions towards total for auto-grading
             if ($question->type === 'multiple_choice') {
-                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                $totalPoints += $points;
+                
+                // Get student's answer for this question
                 $studentAnswer = $answers[$question->id] ?? null;
                 
-                if ($correctAnswer && $studentAnswer == $correctAnswer->id) {
+                // Find the correct answer
+                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                
+                // Check if student answered correctly
+                if ($correctAnswer && $studentAnswer && $studentAnswer == $correctAnswer->id) {
                     $earnedPoints += $points;
                 }
             }
         }
         
+        // If no multiple choice questions, return 0
         if ($totalPoints == 0) {
             return 0;
         }
         
-        return ($earnedPoints / $totalPoints) * $exam->total_points;
+        // Calculate final score proportional to total exam points
+        // Example: If MC questions worth 6 points out of 10 total, and student got 4/6
+        // Score = (4/6) * 6 = 4.0
+        return round($earnedPoints, 2);
     }
 }
