@@ -325,9 +325,9 @@
         
         // State
         let currentRoom = null;
-        let currentUser = { id: 1, name: 'Guest User' };
+        let currentUser = @json(auth()->check() ? auth()->user() : ['id' => 1, 'name' => 'Guest User']);
         let echoInstance = null;
-        let isAuthenticatedUser = false; // Track if user is logged in via Laravel Auth
+        let isAuthenticatedUser = @json(auth()->check()); // Track if user is logged in via Laravel Auth
 
         // Initialize Echo for Pusher
         function initializeEcho() {
@@ -1083,6 +1083,10 @@
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
+<<<<<<< HEAD
+=======
+                // Try authenticated endpoint first, fallback to session-based
+>>>>>>> b124edea52cea2b6bb2e93bcce1b685ab5619d7b
                 const response = await apiCall(`${API_URL}/current-user`);
                 const data = await response.json();
                 
