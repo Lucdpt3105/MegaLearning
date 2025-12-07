@@ -8,6 +8,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ForumQuestionController;
+use App\Http\Controllers\SearchController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -38,6 +39,9 @@ Route::get('/', function () {
 // Chat route - Requires authentication
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    
+    // Global Search Route
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
 });
 
 // Universal Dashboard Route (redirects based on role)
