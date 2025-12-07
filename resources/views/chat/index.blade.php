@@ -51,7 +51,7 @@
                         id="changeUserBtn"
                         onclick="showSelectUserModal()"
                         class="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl shadow-sm transition-all duration-200"
-                        style="display: none;">
+                        style="display: {{ auth()->check() ? 'none' : 'none' }};">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
@@ -259,9 +259,9 @@
         
         // State
         let currentRoom = null;
-        let currentUser = { id: 1, name: 'Guest User' };
+        let currentUser = @json(auth()->check() ? auth()->user() : ['id' => 1, 'name' => 'Guest User']);
         let echoInstance = null;
-        let isAuthenticatedUser = false; // Track if user is logged in via Laravel Auth
+        let isAuthenticatedUser = @json(auth()->check()); // Track if user is logged in via Laravel Auth
 
         // Initialize Echo for Pusher
         function initializeEcho() {
