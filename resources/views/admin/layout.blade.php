@@ -52,14 +52,21 @@
 
                 {{-- Người dùng --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="users">
                         <span class="flex items-center gap-2">
                             <i data-feather="users" class="w-4 h-4"></i>
                             <span>Người dùng</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="users"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="users">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.students.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -83,14 +90,21 @@
 
                 {{-- Khóa học --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="courses">
                         <span class="flex items-center gap-2">
                             <i data-feather="book-open" class="w-4 h-4"></i>
                             <span>Khóa học</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="courses"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="courses">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -120,14 +134,21 @@
 
                 {{-- Hệ thống Thi --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="exams">
                         <span class="flex items-center gap-2">
                             <i data-feather="edit-3" class="w-4 h-4"></i>
                             <span>Hệ thống thi</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="exams"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="exams">
                         <a href="{{ route('admin.exams.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.exams.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -157,14 +178,21 @@
 
                 {{-- Diễn đàn --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="forum">
                         <span class="flex items-center gap-2">
                             <i data-feather="message-circle" class="w-4 h-4"></i>
                             <span>Diễn đàn</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="forum"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="forum">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -188,14 +216,21 @@
 
                 {{-- Họp nhóm --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="meetings">
                         <span class="flex items-center gap-2">
                             <i data-feather="video" class="w-4 h-4"></i>
                             <span>Họp nhóm</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="meetings"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="meetings">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -219,14 +254,21 @@
 
                 {{-- Tài liệu --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="files">
                         <span class="flex items-center gap-2">
                             <i data-feather="file-text" class="w-4 h-4"></i>
                             <span>Tài liệu</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="files"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="files">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -244,14 +286,21 @@
 
                 {{-- Báo cáo --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="reports">
                         <span class="flex items-center gap-2">
                             <i data-feather="bar-chart-2" class="w-4 h-4"></i>
                             <span>Báo cáo</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="reports"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="reports">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -275,14 +324,21 @@
 
                 {{-- Cài đặt --}}
                 <div class="space-y-1">
-                    <div class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                text-indigo-100/80">
+                    <button type="button"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                                       text-indigo-100/80 hover:bg-white/10 transition"
+                            data-sidebar-toggle="settings">
                         <span class="flex items-center gap-2">
                             <i data-feather="settings" class="w-4 h-4"></i>
                             <span>Cài đặt</span>
                         </span>
-                    </div>
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90">
+                        <i data-feather="chevron-right"
+                           class="w-3 h-3 ml-1 transition-transform duration-200"
+                           data-sidebar-chevron="settings"></i>
+                    </button>
+
+                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+                         data-sidebar-body="settings">
                         <a href="{{ route('admin.users.index') }}"
                            class="flex items-center gap-2 py-1.5 rounded-lg
                                   {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
@@ -348,43 +404,43 @@
                     @endif
                 </div>
 
-                <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4">
 
-                    {{-- Search --}}
-                    <form class="hidden md:block w-72">
-                        <div class="flex items-center gap-2 bg-slate-900 rounded-full px-3 py-1.5">
-                            <span class="text-slate-400">
-                                <i data-feather="search" class="w-4 h-4"></i>
-                            </span>
-                            <input
-                                type="text"
-                                name="q"
-                                placeholder="Tìm kiếm..."
-                                class="w-full bg-transparent border-none outline-none text-xs text-slate-100 placeholder:text-slate-400"
-                            >
-                        </div>
-                    </form>
-
-                    {{-- Notification --}}
-                    <button type="button"
-                            class="relative inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-900 text-slate-100 hover:bg-slate-800 transition">
-                        <i data-feather="bell" class="w-4 h-4"></i>
-                        <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] leading-none px-1.5 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold">
-                            3
+                {{-- Search --}}
+                <form class="hidden md:block w-72">
+                    <div class="flex items-center gap-2 bg-slate-900 rounded-full px-3 py-1.5">
+                        <span class="text-slate-400">
+                            <i data-feather="search" class="w-4 h-4"></i>
                         </span>
-                    </button>
+                        <input
+                            type="text"
+                            name="q"
+                            placeholder="Tìm kiếm..."
+                            class="w-full bg-transparent border-none outline-none text-xs text-slate-100 placeholder:text-slate-400"
+                        >
+                    </div>
+                </form>
 
-                    {{-- Avatar --}}
-                    <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
-                            A
-                        </div>
-                        <div class="hidden md:flex flex-col leading-tight">
-                            <span class="text-xs font-medium text-slate-800">Admin</span>
-                            <span class="text-[11px] text-slate-400">Quản trị viên</span>
-                        </div>
+                {{-- Notification --}}
+                <button type="button"
+                        class="relative inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-900 text-slate-100 hover:bg-slate-800 transition">
+                    <i data-feather="bell" class="w-4 h-4"></i>
+                    <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] leading-none px-1.5 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold">
+                        3
+                    </span>
+                </button>
+
+                {{-- Avatar --}}
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                        A
+                    </div>
+                    <div class="hidden md:flex flex-col leading-tight">
+                        <span class="text-xs font-medium text-slate-800">Admin</span>
+                        <span class="text-[11px] text-slate-400">Quản trị viên</span>
                     </div>
                 </div>
+            </div>
             </header>
 
             {{-- MAIN WRAPPER / CONTENT --}}
