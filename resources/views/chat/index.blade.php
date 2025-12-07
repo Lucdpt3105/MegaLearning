@@ -1083,6 +1083,7 @@
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
+                // Try authenticated endpoint first, fallback to session-based
                 const response = await apiCall(`${API_URL}/current-user`);
                 const data = await response.json();
                 

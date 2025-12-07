@@ -38,7 +38,8 @@ class AIService
             }
 
             // DEMO MODE: If no API key, use mock responses
-            if (empty($this->apiKey)) {
+            if (empty($this->apiKey) || $this->apiKey === 'your-gemini-api-key-here') {
+                Log::info('Using mock response - no valid API key');
                 return $this->generateMockResponse($latestMessage);
             }
 
@@ -49,14 +50,23 @@ class AIService
             $systemPrompt = $this->buildSystemPrompt($room);
 
             // Call Gemini API
-            return $this->callGeminiAPI($context, $systemPrompt);
+            $response = $this->callGeminiAPI($context, $systemPrompt, $latestMessage);
+            
+            // If API call failed but we should still respond, use mock
+            if ($response === null) {
+                Log::info('API failed, using mock response as fallback');
+                return $this->generateMockResponse($latestMessage);
+            }
+            
+            return $response;
 
         } catch (\Exception $e) {
             Log::error('AI Service Exception', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return null;
+            // Fallback to mock response on exception
+            return $this->generateMockResponse($latestMessage);
         }
     }
 
@@ -65,9 +75,10 @@ class AIService
      * 
      * @param array $context
      * @param string $systemPrompt
+     * @param ChatMessage $latestMessage
      * @return string|null
      */
-    protected function callGeminiAPI(array $context, string $systemPrompt): ?string
+    protected function callGeminiAPI(array $context, string $systemPrompt, ChatMessage $latestMessage): ?string
     {
         try {
             // Build conversation for Gemini (different format than OpenAI)
@@ -106,10 +117,18 @@ class AIService
                 return trim($data['candidates'][0]['content']['parts'][0]['text'] ?? null);
             }
 
+            // If quota exceeded or other API error, fallback to mock response
+            $status = $response->status();
             Log::error('Gemini API Error', [
-                'status' => $response->status(),
+                'status' => $status,
                 'body' => $response->body()
             ]);
+
+            // Return mock response as fallback for quota/rate limit errors
+            if ($status === 429 || $status >= 500) {
+                Log::info('Using mock response due to API error', ['status' => $status]);
+                return $this->generateMockResponse($latestMessage);
+            }
 
             return null;
 
