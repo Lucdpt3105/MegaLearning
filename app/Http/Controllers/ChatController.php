@@ -23,11 +23,11 @@ class ChatController extends Controller
      */
     public function index()
     {
-        // Lấy userId nếu đã đăng nhập, nếu không thì lấy tất cả rooms public
+        // Only show rooms for authenticated users
         $userId = Auth::check() ? Auth::id() : null;
         
         if ($userId) {
-            // Get all rooms user is member of
+            // Get ONLY rooms where this specific user is a member
             $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -36,12 +36,8 @@ class ChatController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
         } else {
-            // Get all public rooms (group type)
-            $rooms = ChatRoom::where('is_active', true)
-                ->where('room_type', 'group')
-                ->with(['latestMessage.user', 'members'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
+            // Guest users: return empty collection (must login to see rooms)
+            $rooms = collect([]);
         }
 
         return view('chat.index', compact('rooms'));
@@ -344,13 +340,14 @@ class ChatController extends Controller
     
     /**
      * Get all chat rooms (API)
+     * Only returns rooms where the authenticated user is a member
      */
     public function getRooms(Request $request)
     {
         $userId = Auth::check() ? Auth::id() : null;
         
         if ($userId) {
-            // Get all rooms user is member of
+            // Get ONLY rooms where this specific user is a member
             $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -363,17 +360,16 @@ class ChatController extends Controller
             $rooms->each(function($room) use ($userId) {
                 $room->unread_count = $this->getUnreadCount($room->id, $userId);
             });
+            
+            \Log::info('getRooms() - User authenticated', [
+                'user_id' => $userId,
+                'rooms_count' => $rooms->count()
+            ]);
         } else {
-            // Get all public rooms (group type)
-            $rooms = ChatRoom::where('is_active', true)
-                ->where('room_type', 'group')
-                ->with(['latestMessage.user', 'members'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-                
-            $rooms->each(function($room) {
-                $room->unread_count = 0;
-            });
+            // Guest users: return empty array (must login to see rooms)
+            $rooms = collect([]);
+            
+            \Log::info('getRooms() - Guest user, returning empty rooms');
         }
         
         return response()->json([
@@ -545,11 +541,18 @@ class ChatController extends Controller
             ]);
         }
         
-        // No user found - must login
+        // No user found - return guest status (not an error)
         return response()->json([
-            'success' => false,
-            'message' => 'Not authenticated. Please login first.'
-        ], 401);
+            'success' => true,
+            'data' => [
+                'id' => null,
+                'name' => 'Guest',
+                'email' => null,
+                'role' => 'guest',
+                'is_authenticated' => false,
+                'source' => 'guest'
+            ]
+        ]);
     }
     
     /**
