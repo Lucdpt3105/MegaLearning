@@ -6,9 +6,10 @@
 <div class="space-y-8">
     
     <div class="relative overflow-hidden rounded-2xl shadow-xl h-64">
-        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80" 
+        <img src="{{ asset('images/hero-bg.jpg') }}" 
              alt="Students Learning" 
-             class="absolute inset-0 w-full h-full object-cover">
+             class="absolute inset-0 w-full h-full object-cover"
+             onerror="this.style.display='none'; this.parentElement.classList.add('bg-gradient-to-r', 'from-indigo-600', 'to-purple-600')">
         <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/90 via-indigo-800/85 to-purple-900/80"></div>
         <div class="relative h-full flex items-center justify-between p-8">
             <div class="max-w-2xl">
@@ -161,87 +162,182 @@
             </div>
             <div class="bg-white p-6">
                 @if($upcomingEvents->isEmpty())
-                    <div class="empty-state">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <p class="font-medium">Chưa có sự kiện nào</p>
-                        <p class="text-sm">Hãy đăng ký thêm khóa học để tham gia kiểm tra và lịch học</p>
+                    <div class="text-center py-12">
+                        <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-6">
+                            <svg class="w-12 h-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Chưa có sự kiện nào sắp tới</h3>
+                        <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                            Hiện tại bạn chưa có bài thi hoặc buổi học trực tuyến nào. 
+                            Hãy đăng ký thêm khóa học để không bỏ lỡ các sự kiện quan trọng!
+                        </p>
+                        <div class="flex gap-3 justify-center">
+                            <a href="{{ route('student.courses.index') }}" 
+                               class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition-colors">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                Khám phá khóa học
+                            </a>
+                            <a href="{{ route('student.exams.index') }}" 
+                               class="inline-flex items-center px-6 py-3 bg-white border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 font-semibold transition-colors">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                Xem bài thi
+                            </a>
+                        </div>
                     </div>
                 @else
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         @foreach($upcomingEvents as $event)
                             @if($event['type'] == 'exam')
-                                <div class="event-card border-l-4 border-indigo-500 bg-indigo-50 hover:bg-indigo-100 transition-colors">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span class="px-2 py-1 bg-indigo-600 text-white text-xs font-semibold rounded">BÀI THI</span>
-                                                <h3 class="font-extrabold text-gray-900 text-base">{{ $event['title'] }}</h3>
+                                <div class="group relative bg-white rounded-xl border-2 border-indigo-200 hover:border-indigo-400 hover:shadow-lg transition-all duration-300 overflow-hidden">
+                                    <!-- Accent bar -->
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 to-indigo-700"></div>
+                                    
+                                    <div class="p-4 pl-6">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="flex-1 min-w-0">
+                                                <!-- Badge & Title -->
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <span class="inline-flex items-center px-2.5 py-1 bg-indigo-600 text-white text-xs font-bold rounded-md">
+                                                        📝 BÀI THI
+                                                    </span>
+                                                    <h3 class="font-bold text-gray-900 text-base truncate">{{ $event['title'] }}</h3>
+                                                </div>
+                                                
+                                                <!-- Subject & Class -->
+                                                <p class="text-sm text-gray-700 font-semibold mb-3">
+                                                    {{ $event['subject'] }} <span class="text-gray-400">•</span> {{ $event['class'] }}
+                                                </p>
+                                                
+                                                <!-- Event Details -->
+                                                <div class="grid grid-cols-3 gap-3">
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900">{{ $event['datetime']->format('H:i') }}</span>
+                                                            <span class="text-gray-500">{{ $event['datetime']->format('d/m/Y') }}</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900">{{ $event['duration'] }}</span>
+                                                            <span class="text-gray-500">phút</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900">{{ $event['points'] }}</span>
+                                                            <span class="text-gray-500">điểm</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p class="text-sm text-gray-800 font-medium">{{ $event['subject'] }} - {{ $event['class'] }}</p>
-                                            <div class="flex items-center gap-4 mt-2 text-xs text-gray-700 font-medium">
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                    </svg>
-                                                    {{ $event['datetime']->format('d/m/Y H:i') }}
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    {{ $event['duration'] }} phút
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                                    </svg>
-                                                    {{ $event['points'] }} điểm
-                                                </span>
-                                            </div>
+                                            
+                                            <!-- Action Button -->
+                                            <a href="{{ $event['url'] }}" 
+                                               class="flex-shrink-0 self-center inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors group-hover:shadow-md">
+                                                <span>Xem</span>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                </svg>
+                                            </a>
                                         </div>
-                                        <a href="{{ $event['url'] }}" class="btn-indigo-primary text-sm">
-                                            Xem
-                                        </a>
                                     </div>
                                 </div>
                             @else
-                                <div class="event-card border-l-4 border-green-500 bg-green-50 hover:bg-green-100 transition-colors">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span class="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                                    </svg>
-                                                    ZOOM
-                                                </span>
-                                                <h3 class="font-extrabold text-gray-900 text-base">{{ $event['title'] }}</h3>
+                                <div class="group relative bg-white rounded-xl border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all duration-300 overflow-hidden">
+                                    <!-- Accent bar -->
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-green-500 to-green-700"></div>
+                                    
+                                    <div class="p-4 pl-6">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="flex-1 min-w-0">
+                                                <!-- Badge & Title -->
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <span class="inline-flex items-center px-2.5 py-1 bg-green-600 text-white text-xs font-bold rounded-md">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                        </svg>
+                                                        ZOOM
+                                                    </span>
+                                                    <h3 class="font-bold text-gray-900 text-base truncate">{{ $event['title'] }}</h3>
+                                                </div>
+                                                
+                                                <!-- Subject & Class -->
+                                                <p class="text-sm text-gray-700 font-semibold mb-3">
+                                                    {{ $event['subject'] }} <span class="text-gray-400">•</span> {{ $event['class'] }}
+                                                </p>
+                                                
+                                                <!-- Event Details -->
+                                                <div class="grid grid-cols-3 gap-3">
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900">{{ $event['datetime']->format('H:i') }}</span>
+                                                            <span class="text-gray-500">{{ $event['datetime']->format('d/m/Y') }}</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900">{{ $event['duration'] }}</span>
+                                                            <span class="text-gray-500">phút</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                                        <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="font-semibold text-gray-900 text-xs truncate">{{ $event['host'] }}</span>
+                                                            <span class="text-gray-500">Host</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p class="text-sm text-gray-800 font-medium">{{ $event['subject'] }} - {{ $event['class'] }}</p>
-                                            <div class="flex items-center gap-4 mt-2 text-xs text-gray-700 font-medium">
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                                    </svg>
-                                                    {{ $event['datetime']->format('d/m/Y H:i') }}
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    {{ $event['duration'] }} phút
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                                    </svg>
-                                                    {{ $event['host'] }}
-                                                </span>
-                                            </div>
+                                            
+                                            <!-- Action Button -->
+                                            <a href="{{ $event['url'] }}" 
+                                               class="flex-shrink-0 self-center inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors group-hover:shadow-md">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                                <span>Tham gia</span>
+                                            </a>
                                         </div>
-                                        <a href="{{ $event['url'] }}" class="btn-green-primary text-sm">
-                                            Tham gia
-                                        </a>
                                     </div>
                                 </div>
                             @endif

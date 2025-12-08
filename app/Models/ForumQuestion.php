@@ -12,7 +12,11 @@ class ForumQuestion extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     // Enable automatic updated_at management (column added via migration)
-    protected $fillable = ['user_id', 'title', 'content'];
+    protected $fillable = ['user_id', 'title', 'content', 'image_path', 'tags'];
+    
+    protected $casts = [
+        'tags' => 'array',
+    ];
 
     public function user() {
         return $this->belongsTo(User::class);
