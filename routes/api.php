@@ -113,20 +113,28 @@ Route::prefix('v1')->group(function () {
     */
     
     // Chat API Routes - stateful API with session support
-    Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
+    // Use 'web' middleware to support both guest and authenticated users
+    Route::prefix('chat')->middleware('web')->group(function () {
+        // Public routes - no auth required
         Route::get('current-user', [ChatController::class, 'getCurrentUser']);
         Route::get('rooms', [ChatController::class, 'getRooms']);
         Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
-        Route::post('rooms', [ChatController::class, 'store']);
-        Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
-        Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
         Route::get('users', [ChatController::class, 'getUsers']);
-        Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
-        Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
-        Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
-        Route::put('rooms/{roomId}', [ChatController::class, 'update']);
-        Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
-        Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
-        Route::post('set-user', [ChatController::class, 'setCurrentUser']);
+        
+        // Protected routes - require authentication
+        Route::middleware('auth:web')->group(function () {
+            Route::post('rooms', [ChatController::class, 'store']);
+            Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
+            Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
+            Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
+            Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
+            Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
+            Route::put('rooms/{roomId}', [ChatController::class, 'update']);
+            Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
+            Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
+        });
+        
+        // Legacy support
+        Route::post('set-user', [ChatController::class, 'setUser']);
     });
 });
