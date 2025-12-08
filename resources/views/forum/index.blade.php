@@ -1,5 +1,23 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+    }
+</style>
+@endpush
+
 @section('content')
 
 <div class="bg-gray-50 min-h-screen py-6">
@@ -416,6 +434,227 @@ document.addEventListener('keydown', function(e) {
         closeUserProfile();
     }
 });
+
+// Toggle Like Function with AJAX
+function toggleLike(questionId) {
+    fetch(`/forum/${questionId}/vote/up`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const btn = document.getElementById(`like-btn-${questionId}`);
+        const votesCount = document.querySelector(`.votes-count-${questionId}`);
+        const votesDisplay = document.querySelector(`.votes-display-${questionId}`);
+        
+        // Update vote count
+        votesCount.textContent = data.votes_sum;
+        
+        // Update button appearance based on vote status
+        if (data.my_vote === 1) {
+            // Liked state
+            btn.classList.add('bg-blue-50', 'text-blue-600');
+            btn.classList.remove('text-gray-600');
+            btn.querySelector('span').textContent = 'Liked';
+            btn.querySelector('svg').setAttribute('fill', 'currentColor');
+        } else {
+            // Unliked state
+            btn.classList.remove('bg-blue-50', 'text-blue-600');
+            btn.classList.add('text-gray-600');
+            btn.querySelector('span').textContent = 'Like';
+            btn.querySelector('svg').setAttribute('fill', 'none');
+        }
+        
+        // Update votes display with icon
+        if (data.votes_sum > 0) {
+            votesDisplay.innerHTML = `
+                <svg class="w-4 h-4 text-blue-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+                </svg>
+                <span class="votes-count-${questionId}">${data.votes_sum}</span>
+                <span class="ml-1">${Math.abs(data.votes_sum) === 1 ? 'Like' : 'Likes'}</span>
+            `;
+        } else {
+            votesDisplay.innerHTML = `
+                <span class="votes-count-${questionId}">0</span>
+                <span class="ml-1">Likes</span>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update like. Please try again.');
+    });
+}
+
+// Toggle Comment Form
+function toggleCommentForm(questionId) {
+    const form = document.getElementById(`comment-form-${questionId}`);
+    const commentsSection = document.getElementById(`comments-section-${questionId}`);
+    
+    // Show comments section if has comments
+    if (commentsSection && !commentsSection.classList.contains('hidden')) {
+        // Comments visible, just toggle form
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+            document.getElementById(`quick-comment-${questionId}`).focus();
+        } else {
+            form.classList.add('hidden');
+        }
+    } else {
+        // Show both comments and form
+        if (commentsSection) commentsSection.classList.remove('hidden');
+        form.classList.remove('hidden');
+        document.getElementById(`quick-comment-${questionId}`).focus();
+    }
+}
+
+// Cancel Comment
+function cancelComment(questionId) {
+    const form = document.getElementById(`comment-form-${questionId}`);
+    form.classList.add('hidden');
+    document.getElementById(`quick-comment-${questionId}`).value = '';
+}
+
+// Submit Quick Comment with AJAX
+function submitQuickComment(event, questionId) {
+    event.preventDefault();
+    const form = event.target;
+    const textarea = document.getElementById(`quick-comment-${questionId}`);
+    const content = textarea.value.trim();
+    
+    if (!content) {
+        alert('Please enter a comment');
+        return;
+    }
+    
+    const formData = new FormData(form);
+    
+    fetch(`/forum/${questionId}/answers`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                try {
+                    const json = JSON.parse(text);
+                    throw new Error(json.message || 'Failed to post comment');
+                } catch(e) {
+                    throw new Error('Failed to post comment. Please try again.');
+                }
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.ok) {
+            // Update comment count
+            const commentCount = document.querySelector(`.comments-count-${questionId}`);
+            commentCount.textContent = `${data.answers_count} ${data.answers_count === 1 ? 'Comment' : 'Comments'}`;
+            
+            // Add new comment to the list
+            const commentsList = document.getElementById(`comments-list-${questionId}`);
+            const commentsSection = document.getElementById(`comments-section-${questionId}`);
+            
+            if (commentsList && data.html) {
+                // Create comment element from response HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                const commentElement = tempDiv.firstElementChild;
+                
+                // Extract user info and create simple comment display
+                const userId = {{ auth()->id() }};
+                const userName = '{{ auth()->user()->name }}';
+                const newComment = document.createElement('div');
+                newComment.className = 'flex gap-2 animate-fadeIn';
+                newComment.innerHTML = `
+                    <img src="https://randomuser.me/api/portraits/${userId % 2 === 0 ? 'women' : 'men'}/${userId}.jpg" 
+                         alt="${userName}" 
+                         class="w-8 h-8 rounded-full shrink-0 object-cover">
+                    <div class="flex-1 bg-gray-50 rounded-lg px-3 py-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-semibold text-gray-900">${userName}</span>
+                            <span class="text-xs text-gray-500">Just now</span>
+                        </div>
+                        <p class="text-sm text-gray-700">${content}</p>
+                    </div>
+                `;
+                commentsList.insertBefore(newComment, commentsList.firstChild);
+            }
+            
+            // Show comments section
+            if (commentsSection) {
+                commentsSection.classList.remove('hidden');
+            }
+            
+            // Clear and hide form
+            textarea.value = '';
+            cancelComment(questionId);
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            successMsg.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Comment posted successfully!</span>
+                </div>
+            `;
+            document.body.appendChild(successMsg);
+            setTimeout(() => successMsg.remove(), 3000);
+        } else {
+            throw new Error('Failed to post comment');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message || 'Failed to post comment. Please try again.');
+    });
+}
+
+// Share Post Function
+function sharePost(questionId, title) {
+    const url = `${window.location.origin}/forum/${questionId}`;
+    
+    // Try to use Web Share API if available (mobile)
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: `Check out this post: ${title}`,
+            url: url
+        }).catch(err => console.log('Share cancelled'));
+    } else {
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(url).then(() => {
+            // Show success notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-purple-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
+            notification.innerHTML = `
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                </svg>
+                <span>Link copied to clipboard!</span>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }).catch(err => {
+            alert('Failed to copy link. Please try manually.');
+        });
+    }
+}
 </script>
 @endpush
 
