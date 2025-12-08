@@ -182,22 +182,59 @@
 
             <!-- Input Area -->
             <div class="border-t border-gray-200 px-4 py-3 bg-white">
+                <!-- File preview area -->
+                <div id="filePreviewArea" class="hidden mb-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div id="filePreviewIcon" class="w-10 h-10 rounded bg-blue-100 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p id="filePreviewName" class="text-sm font-medium text-gray-900"></p>
+                                <p id="filePreviewSize" class="text-xs text-gray-500"></p>
+                            </div>
+                        </div>
+                        <button onclick="clearFilePreview()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <img id="imagePreview" class="hidden mt-2 max-h-48 rounded-lg" />
+                </div>
+
                 <div class="flex items-center space-x-2">
-                    <button class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
-                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"/>
-                        </svg>
-                    </button>
-                    <button class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
+                    <!-- Emoji Picker Button -->
+                    <div class="relative">
+                        <button onclick="toggleEmojiPicker()" type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Emoji Picker Popup -->
+                        <div id="emojiPicker" class="hidden absolute bottom-12 left-0 bg-white border border-gray-200 rounded-xl shadow-2xl p-3 w-80 max-h-64 overflow-y-auto z-50">
+                            <div class="grid grid-cols-8 gap-1" id="emojiGrid"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Upload Button -->
+                    <button onclick="document.getElementById('imageInput').click()" type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
                         <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                         </svg>
                     </button>
-                    <button class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)" />
+                    
+                    <!-- File Upload Button -->
+                    <button onclick="document.getElementById('fileInput').click()" type="button" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                         </svg>
                     </button>
+                    <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(event)" />
                     
                     <div class="flex-1 relative">
                         <textarea 
@@ -547,6 +584,142 @@
 
         // ============================================
         // END UTILITY FUNCTIONS
+        // ============================================
+
+        // ============================================
+        // FILE & EMOJI HANDLING
+        // ============================================
+        
+        let selectedFile = null;
+        const emojis = ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','👍','👎','👏','🙌','👐','🤝','🙏','✌️','🤞','🤟','🤘','👌','🤏','👈','👉','👆','👇','☝️','✋','🤚','🖐️','🖖','✊','🤛','🤜','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💯','🔥','⭐','✨','💫','🎉','🎊','🎈'];
+        
+        function initializeEmojiPicker() {
+            const emojiGrid = document.getElementById('emojiGrid');
+            if (emojiGrid && !emojiGrid.hasChildNodes()) {
+                emojiGrid.innerHTML = emojis.map(emoji => 
+                    `<button type="button" onclick="insertEmoji('${emoji}')" class="text-2xl hover:bg-gray-100 rounded p-1">${emoji}</button>`
+                ).join('');
+            }
+        }
+        
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            if (picker.classList.contains('hidden')) {
+                initializeEmojiPicker();
+                picker.classList.remove('hidden');
+                // Close when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeEmojiPickerOutside);
+                }, 100);
+            } else {
+                picker.classList.add('hidden');
+                document.removeEventListener('click', closeEmojiPickerOutside);
+            }
+        }
+        
+        function closeEmojiPickerOutside(e) {
+            const picker = document.getElementById('emojiPicker');
+            const button = e.target.closest('button[onclick="toggleEmojiPicker()"]');
+            if (!picker.contains(e.target) && !button) {
+                picker.classList.add('hidden');
+                document.removeEventListener('click', closeEmojiPickerOutside);
+            }
+        }
+        
+        function insertEmoji(emoji) {
+            const input = document.getElementById('messageInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            input.value = text.substring(0, start) + emoji + text.substring(end);
+            input.selectionStart = input.selectionEnd = start + emoji.length;
+            input.focus();
+        }
+        
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showNotification('Vui lòng chọn file ảnh', 'error');
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                showNotification('Ảnh không được vượt quá 10MB', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            showFilePreview(file, true);
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 50 * 1024 * 1024) { // 50MB limit
+                showNotification('File không được vượt quá 50MB', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            showFilePreview(file, false);
+        }
+        
+        function showFilePreview(file, isImage) {
+            const previewArea = document.getElementById('filePreviewArea');
+            const fileNameEl = document.getElementById('filePreviewName');
+            const fileSizeEl = document.getElementById('filePreviewSize');
+            const imagePreview = document.getElementById('imagePreview');
+            const fileIcon = document.getElementById('filePreviewIcon');
+            
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatFileSize(file.size);
+            
+            if (isImage) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+                fileIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                    </svg>
+                `;
+            } else {
+                imagePreview.classList.add('hidden');
+                fileIcon.innerHTML = `
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                `;
+            }
+            
+            previewArea.classList.remove('hidden');
+        }
+        
+        function clearFilePreview() {
+            selectedFile = null;
+            document.getElementById('filePreviewArea').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('imageInput').value = '';
+            document.getElementById('fileInput').value = '';
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        // ============================================
+        // END FILE & EMOJI HANDLING
         // ============================================
 
         // Initialize Echo for Pusher
@@ -987,6 +1160,60 @@
             const isCurrentUser = parseInt(msg.user?.id) === parseInt(currentUser.id);
             const msgId = msg.id || msg.message_id; // Support both id and message_id
             
+            // Debug: log message data
+            if (msg.message_type !== 'text' || msg.file_url) {
+                console.log('📎 Rendering message with file:', {
+                    type: msg.message_type,
+                    file_url: msg.file_url,
+                    text: msg.message_text
+                });
+            }
+            
+            // Check if message has file attachment
+            let messageContent = '';
+            if (msg.message_type === 'image' && msg.file_url) {
+                // Check if message_text is just the filename (auto-generated) or actual caption
+                const isFilenameOnly = msg.message_text && (
+                    msg.message_text.match(/\.(jpg|jpeg|png|gif|webp)$/i) || 
+                    msg.message_text.includes('2025-') ||
+                    msg.message_text.match(/^\d{4}-\d{2}-\d{2}/)
+                );
+                
+                const hasCaption = !isFilenameOnly && msg.message_text;
+                
+                messageContent = `
+                    <div>
+                        <img src="${msg.file_url}" alt="Image" class="w-full max-w-md rounded-lg cursor-pointer shadow-lg hover:shadow-xl transition-shadow" onclick="window.open('${msg.file_url}', '_blank')" onerror="this.onerror=null; this.src=''; this.alt='Không thể tải ảnh';" />
+                    </div>
+                    ${hasCaption ? `<p class="text-sm mt-2 px-4 pb-2 ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'} whitespace-pre-wrap break-words">${escapeHtml(msg.message_text)}</p>` : ''}
+                `;
+            } else if (msg.message_type === 'file' && msg.file_url) {
+                const fileName = msg.message_text || 'File đính kèm';
+                const bgClass = isCurrentUser ? 'bg-white/20' : 'bg-gray-100';
+                const hoverClass = isCurrentUser ? 'hover:bg-white/30' : 'hover:bg-gray-200';
+                const iconColor = isCurrentUser ? 'text-white' : 'text-blue-600';
+                messageContent = `
+                    <a href="${msg.file_url}" target="_blank" download class="flex items-center space-x-2 p-3 ${bgClass} rounded-lg ${hoverClass} transition">
+                        <svg class="w-8 h-8 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'}">${escapeHtml(fileName)}</p>
+                            <p class="text-xs ${isCurrentUser && !isAI ? 'text-white/70' : 'text-gray-500'}">Click để tải xuống</p>
+                        </div>
+                    </a>
+                `;
+            } else {
+                messageContent = `
+                    <p class="text-sm ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'} whitespace-pre-wrap break-words">
+                        ${escapeHtml(msg.message_text)}
+                    </p>
+                `;
+            }
+            
+            // Determine padding based on message type - no padding for images
+            const bubblePadding = msg.message_type === 'image' ? 'p-0 overflow-hidden' : 'px-4 py-3';
+            
             return `
                 <div data-message-id="${msgId}" class="chat-message flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
                     <div class="flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2 max-w-2xl">
@@ -1002,14 +1229,12 @@
                                     ${formatTime(msg.created_at)}
                                 </span>
                             </div>
-                            <div class="px-4 py-3 rounded-2xl shadow-md ${
+                            <div class="${bubblePadding} rounded-2xl shadow-md ${
                                 isAI ? 'bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200' :
                                 isCurrentUser ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 
                                 'bg-white border border-gray-200'
                             }">
-                                <p class="text-sm ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'} whitespace-pre-wrap break-words">
-                                    ${escapeHtml(msg.message_text)}
-                                </p>
+                                ${messageContent}
                             </div>
                         </div>
                     </div>
@@ -1047,6 +1272,8 @@
                 message_id: msgId,
                 user: msgData.user,
                 message_text: msgData.message_text,
+                message_type: msgData.message_type || 'text',
+                file_url: msgData.file_url,
                 created_at: msgData.created_at
             };
 
@@ -1060,19 +1287,67 @@
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
 
-            if (!text || !currentRoom) {
-                console.log('Cannot send: missing text or room');
+            if ((!text && !selectedFile) || !currentRoom) {
+                console.log('Cannot send: missing text/file or room');
                 return;
             }
 
             try {
+                let messageText = text;
+                let messageType = 'text';
+                let fileUrl = null;
+
+                // Upload file first if selected
+                if (selectedFile) {
+                    showNotification('Đang upload file...', 'info');
+                    
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+                    formData.append('type', selectedFile.type.startsWith('image/') ? 'image' : 'file');
+                    
+                    const uploadResponse = await fetch(`${API_URL}/upload`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                        },
+                        credentials: 'include',
+                        body: formData
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        const errorData = await uploadResponse.json();
+                        showNotification(errorData.message || 'Lỗi khi upload file', 'error');
+                        return;
+                    }
+                    
+                    const uploadData = await uploadResponse.json();
+                    if (uploadData.success) {
+                        fileUrl = uploadData.file_url;
+                        messageType = selectedFile.type.startsWith('image/') ? 'image' : 'file';
+                        
+                        // For images: don't send text, just send file name or empty
+                        // For files: use text if provided, otherwise use filename
+                        if (messageType === 'image') {
+                            messageText = text || uploadData.file_name; // Keep text if user provided caption
+                        } else {
+                            messageText = text || uploadData.file_name;
+                        }
+                        
+                        showNotification('Upload thành công!', 'success');
+                    } else {
+                        showNotification('Upload thất bại', 'error');
+                        return;
+                    }
+                }
+
                 console.log('Sending message to room:', currentRoom.id);
                 
                 const response = await apiCall(`${API_URL}/rooms/${currentRoom.id}/messages`, {
                     method: 'POST',
                     body: JSON.stringify({ 
-                        message_text: text,
-                        message_type: 'text'
+                        message_text: messageText,
+                        message_type: messageType,
+                        file_url: fileUrl
                     })
                 });
 
@@ -1097,6 +1372,9 @@
                 if (data.success) {
                     input.value = '';
                     input.style.height = 'auto';
+                    
+                    // Clear file preview
+                    clearFilePreview();
                     
                     // In polling mode, add message immediately
                     if (!echoInstance && data.message) {

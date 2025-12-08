@@ -181,10 +181,18 @@ class ChatController extends Controller
             ]);
 
             $validated = $request->validate([
-                'message_text' => 'required|string|max:5000',
+                'message_text' => 'nullable|string|max:5000',
                 'message_type' => 'nullable|in:text,image,file',
                 'file_url' => 'nullable|string|max:500'
             ]);
+            
+            // Ensure at least message_text or file_url is provided
+            if (empty($validated['message_text']) && empty($validated['file_url'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng nhập tin nhắn hoặc đính kèm file'
+                ], 422);
+            }
 
             $room = ChatRoom::findOrFail($roomId);
 
@@ -640,6 +648,62 @@ class ChatController extends Controller
             'success' => true,
             'room' => $room
         ]);
+    }
+    
+    /**
+     * Upload file for chat (images, documents, etc.)
+     */
+    public function uploadFile(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'file' => 'required|file|max:51200', // 50MB max
+                'type' => 'required|in:image,file'
+            ]);
+
+            $file = $request->file('file');
+            $userId = Auth::id();
+            
+            // Validate file type
+            if ($validated['type'] === 'image') {
+                $request->validate([
+                    'file' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240' // 10MB for images
+                ]);
+            }
+            
+            // Create unique filename
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '_' . $userId . '.' . $extension;
+            
+            // Store in public/storage/chat_files
+            $path = $file->storeAs('chat_files', $filename, 'public');
+            
+            // Get full URL
+            $url = asset('storage/' . $path);
+            
+            return response()->json([
+                'success' => true,
+                'file_url' => $url,
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'file_type' => $file->getMimeType()
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error uploading file', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi upload file: ' . $e->getMessage()
+            ], 500);
+        }
     }
     
     /**
