@@ -57,7 +57,7 @@ class ExamController extends Controller
     public function show($id)
     {
         $student = Auth::user();
-        $exam = Exam::with(['subject', 'classRoom', 'submissions' => function($query) use ($student) {
+        $exam = Exam::with(['subject', 'classRoom', 'questions', 'submissions' => function($query) use ($student) {
             $query->where('student_id', $student->id)->orderBy('attempt_number', 'desc');
         }])->findOrFail($id);
         
@@ -271,12 +271,18 @@ class ExamController extends Controller
                 ->with('error', 'Kết quả chưa được công bố!');
         }
         
+        // Load questions with pivot data
+        $exam->load(['questions' => function($query) {
+            $query->withPivot(['order', 'points', 'custom_type', 'custom_content', 'custom_answers'])
+                  ->orderBy('exam_questions.order');
+        }, 'questions.answers']);
+        
         // Map answers
         $questions = $exam->questions->map(function($question) use ($submission) {
             $studentAnswer = $submission->answers[$question->id] ?? null;
             
             // Handle different answer types
-            if ($question->type === 'essay' || $question->type === 'fill_blank' || $question->type === 'true_false') {
+            if ($question->type === 'essay' || $question->type === 'fill_blank') {
                 // Check if answer is JSON (from auto-generated exams)
                 if (is_string($studentAnswer) && is_array(json_decode($studentAnswer, true))) {
                     $decoded = json_decode($studentAnswer, true);
@@ -292,6 +298,10 @@ class ExamController extends Controller
                 $correctAnswer = $question->answers->where('is_correct', true)->first();
                 $question->correct_answer_id = $correctAnswer ? $correctAnswer->id : null;
                 $question->is_correct = $studentAnswer == $question->correct_answer_id;
+            } elseif ($question->type === 'true_false') {
+                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                $question->correct_answer_id = $correctAnswer ? $correctAnswer->id : null;
+                $question->is_correct = $studentAnswer && ((int)$studentAnswer === $correctAnswer->id);
             }
             
             return $question;

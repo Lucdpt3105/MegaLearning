@@ -86,7 +86,7 @@ class GradeController extends Controller
             $studentAnswer = $submission->answers[$question->id] ?? null;
             
             // Handle different answer types
-            if ($question->type === 'essay' || $question->type === 'fill_blank' || $question->type === 'true_false') {
+            if ($question->type === 'essay' || $question->type === 'fill_blank') {
                 // Check if answer is JSON (from auto-generated exams)
                 if (is_string($studentAnswer) && is_array(json_decode($studentAnswer, true))) {
                     $decoded = json_decode($studentAnswer, true);
@@ -106,6 +106,10 @@ class GradeController extends Controller
                 // Get student's selected answer
                 $selectedAnswer = $question->answers->where('id', $studentAnswer)->first();
                 $question->selected_answer = $selectedAnswer;
+            } elseif ($question->type === 'true_false') {
+                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                $question->correct_answer_id = $correctAnswer ? $correctAnswer->id : null;
+                $question->is_correct = $studentAnswer == $question->correct_answer_id;
             }
             
             return $question;
@@ -116,7 +120,7 @@ class GradeController extends Controller
         $totalQuestions = 0;
         
         foreach ($questions as $question) {
-            if ($question->type === 'multiple_choice') {
+            if ($question->type === 'multiple_choice' || $question->type === 'true_false') {
                 $totalQuestions++;
                 if (isset($question->is_correct) && $question->is_correct) {
                     $correctCount++;

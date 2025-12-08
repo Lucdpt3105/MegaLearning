@@ -61,11 +61,11 @@
 
                         <div>
                             <label for="class_room_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                Lớp học
+                                Lớp học <span class="text-red-500">*</span>
                             </label>
-                            <select name="class_room_id" id="class_room_id"
+                            <select name="class_room_id" id="class_room_id" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Tất cả lớp</option>
+                                <option value="">Chọn lớp học</option>
                                 @foreach($classRooms as $classRoom)
                                     <option value="{{ $classRoom->id }}" {{ old('class_room_id') == $classRoom->id ? 'selected' : '' }}>
                                         {{ $classRoom->name }}

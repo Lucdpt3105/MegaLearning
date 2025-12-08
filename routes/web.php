@@ -144,6 +144,8 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Teacher\ExamController::class, 'createQuestion'])->name('exams.questions.create');
     Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Teacher\ExamController::class, 'removeQuestion'])->name('exams.questions.remove');
     Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Teacher\ExamController::class, 'reorderQuestions'])->name('exams.questions.reorder');
+    Route::put('/exams/{exam}/questions/{question}/points', [App\Http\Controllers\Teacher\ExamController::class, 'updateQuestionPoints'])->name('exams.questions.update-points');
+    Route::post('/exams/{exam}/questions/distribute-points', [App\Http\Controllers\Teacher\ExamController::class, 'distributePoints'])->name('exams.questions.distribute-points');
     Route::post('/exams/{exam}/publish', [App\Http\Controllers\Teacher\ExamController::class, 'publish'])->name('exams.publish');
     Route::post('/exams/{exam}/notify', [App\Http\Controllers\Teacher\ExamController::class, 'sendNotification'])->name('exams.notify');
     Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');

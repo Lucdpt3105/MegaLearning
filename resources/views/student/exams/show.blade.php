@@ -48,7 +48,7 @@
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
                 <div class="text-gray-500 text-sm mb-1">Tổng Số Câu</div>
-                <div class="font-semibold text-gray-900">{{ $exam->total_questions }} câu</div>
+                <div class="font-semibold text-gray-900">{{ $exam->questions->count() }} câu</div>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
                 <div class="text-gray-500 text-sm mb-1">Điểm Tối Đa</div>

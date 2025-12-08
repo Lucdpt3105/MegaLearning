@@ -193,6 +193,71 @@
                                 </div>
                             @endif
 
+                            <!-- True/False Answers -->
+                            @if($question->type === 'true_false')
+                                <div class="space-y-2 mb-3">
+                                    @php
+                                        $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                                        $allAnswers = $question->answers->sortBy('order');
+                                    @endphp
+                                    @foreach($allAnswers as $answer)
+                                        <div class="p-3 rounded-lg border-2 transition-all
+                                            {{ $answer->is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white' }}
+                                            {{ $question->student_answer == $answer->id && !$answer->is_correct ? 'border-red-500 bg-red-50' : '' }}">
+                                            <div class="flex items-center gap-3">
+                                                @if($answer->is_correct)
+                                                    <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </div>
+                                                @elseif($question->student_answer == $answer->id)
+                                                    <div class="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </div>
+                                                @else
+                                                    <div class="flex-shrink-0 w-8 h-8 border-2 border-gray-300 rounded-full"></div>
+                                                @endif
+                                                
+                                                <span class="flex-1 text-lg {{ $answer->is_correct ? 'font-semibold text-green-900' : ($question->student_answer == $answer->id ? 'font-semibold text-red-900' : 'text-gray-700') }}">
+                                                    {{ $answer->content }}
+                                                </span>
+                                                
+                                                @if($answer->is_correct)
+                                                    <span class="text-sm font-medium text-green-700">Đáp án đúng</span>
+                                                @elseif($question->student_answer == $answer->id)
+                                                    <span class="text-sm font-medium text-red-700">Bạn đã chọn</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                @if(!$question->student_answer)
+                                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <span class="text-sm text-yellow-800">⚠️ Bạn đã bỏ qua câu này</span>
+                                    </div>
+                                @endif
+                            @endif
+
+                            <!-- Fill in the Blank Answer -->
+                            @if($question->type === 'fill_blank')
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-700 mb-2">Câu trả lời của bạn:</div>
+                                        <div class="p-4 bg-white border border-gray-300 rounded-lg">
+                                            @if($question->student_answer)
+                                                <div class="text-gray-900">{{ $question->student_answer }}</div>
+                                            @else
+                                                <span class="text-gray-400 italic">Chưa trả lời</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <!-- Explanation -->
                             @if($question->explanation || $question->pivot->custom_explanation)
                                 <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
@@ -118,6 +119,27 @@
                         <p class="text-gray-600 mb-4">Hãy thêm câu hỏi từ ngân hàng hoặc tạo câu hỏi mới</p>
                     </div>
                 @else
+                    <!-- Points Summary and Distribute Button -->
+                    <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-sm font-medium text-gray-700">Tổng điểm hiện tại: </span>
+                                <span class="text-2xl font-bold text-blue-600" id="current-total-points">{{ $exam->questions->sum('pivot.points') }}</span>
+                                <span class="text-sm text-gray-600"> / {{ $exam->total_points }} điểm</span>
+                            </div>
+                            <button type="button" onclick="distributePointsEvenly()" 
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                                Phân đều điểm
+                            </button>
+                        </div>
+                        <div id="points-warning" class="hidden mt-2 text-sm text-red-600">
+                            ⚠️ Tổng điểm chưa khớp với điểm đề thi. Vui lòng điều chỉnh trước khi xuất bản.
+                        </div>
+                    </div>
+
                     <div class="space-y-4" id="questions-list">
                         @foreach($exam->questions->sortBy('pivot.order') as $index => $question)
                             <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors" 
@@ -141,9 +163,16 @@
                                                         {{ $question->topic->name }}
                                                     </span>
                                                     @endif
-                                                    <span class="text-sm font-semibold text-blue-600">
-                                                        {{ $question->pivot->points }} điểm
-                                                    </span>
+                                                    <div class="flex items-center gap-2">
+                                                        <input type="number" 
+                                                               step="0.1" 
+                                                               min="0" 
+                                                               value="{{ $question->pivot->points }}" 
+                                                               class="w-20 px-2 py-1 text-sm font-semibold text-blue-600 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                                                               onchange="updateQuestionPoints({{ $exam->id }}, {{ $question->id }}, this.value)"
+                                                               data-question-id="{{ $question->id }}">
+                                                        <span class="text-sm text-gray-600">điểm</span>
+                                                    </div>
                                                 </div>
                                                 <div class="text-gray-900 mb-2">{!! nl2br(e($question->content)) !!}</div>
                                                 
@@ -420,9 +449,104 @@ function updateCorrectAnswers(correctId) {
     }
 }
 
+// Update question points via AJAX
+function updateQuestionPoints(examId, questionId, points) {
+    points = parseFloat(points);
+    if (isNaN(points) || points < 0) {
+        alert('Điểm không hợp lệ!');
+        return;
+    }
+
+    fetch(`/teacher/exams/${examId}/questions/${questionId}/points`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ points: points })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateTotalPoints();
+        } else {
+            alert(data.message || 'Có lỗi xảy ra!');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi cập nhật điểm!');
+    });
+}
+
+// Distribute points evenly
+function distributePointsEvenly() {
+    const examId = {{ $exam->id }};
+    const totalPoints = {{ $exam->total_points }};
+    const questionCount = {{ $exam->questions->count() }};
+    
+    if (questionCount === 0) {
+        alert('Không có câu hỏi nào để phân điểm!');
+        return;
+    }
+    
+    if (!confirm(`Phân đều ${totalPoints} điểm cho ${questionCount} câu hỏi?`)) {
+        return;
+    }
+
+    fetch(`/teacher/exams/${examId}/questions/distribute-points`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update all input fields
+            data.points.forEach(item => {
+                const input = document.querySelector(`input[data-question-id="${item.question_id}"]`);
+                if (input) {
+                    input.value = item.points;
+                }
+            });
+            updateTotalPoints();
+            alert('Đã phân đều điểm thành công!');
+        } else {
+            alert(data.message || 'Có lỗi xảy ra!');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi phân điểm!');
+    });
+}
+
+// Update total points display
+function updateTotalPoints() {
+    let total = 0;
+    document.querySelectorAll('input[data-question-id]').forEach(input => {
+        total += parseFloat(input.value) || 0;
+    });
+    
+    total = Math.round(total * 10) / 10; // Round to 1 decimal
+    document.getElementById('current-total-points').textContent = total;
+    
+    const expectedTotal = {{ $exam->total_points }};
+    const warning = document.getElementById('points-warning');
+    
+    if (Math.abs(total - expectedTotal) > 0.01) {
+        warning.classList.remove('hidden');
+    } else {
+        warning.classList.add('hidden');
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     toggleAnswerFields();
+    updateTotalPoints();
 });
 </script>
 

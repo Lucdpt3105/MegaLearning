@@ -72,7 +72,7 @@ class ExamController extends Controller
     {
         $validated = $request->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'class_room_id' => 'nullable|exists:class_rooms,id',
+            'class_room_id' => 'required|exists:class_rooms,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:quiz,midterm,final,practice',
@@ -117,11 +117,11 @@ class ExamController extends Controller
             $totalByType = ($request->input('auto_gen_multiple_choice', 0) ?? 0) + 
                           ($request->input('auto_gen_essay', 0) ?? 0);
 
-            // Check if total questions by type exceeds total by level
-            if ($totalByType > $totalByLevel) {
+            // NEW: Check if totals are EXACTLY equal
+            if ($totalByType !== $totalByLevel) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\nTổng số câu theo loại: {$totalByType} câu\n(Trắc nghiệm: {$request->input('auto_gen_multiple_choice', 0)} + Tự luận: {$request->input('auto_gen_essay', 0)})\n\nTổng số câu theo mức độ: {$totalByLevel} câu\n(Mức 1: {$request->input('auto_gen_level_1', 0)} + Mức 2: {$request->input('auto_gen_level_2', 0)} + Mức 3: {$request->input('auto_gen_level_3', 0)} + Mức 4: {$request->input('auto_gen_level_4', 0)})\n\n❌ Số câu theo loại KHÔNG ĐƯỢC vượt quá số câu theo mức độ!\n\nVui lòng điều chỉnh lại số lượng.");
+                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\nTổng số câu theo loại: {$totalByType} câu\n(Trắc nghiệm: {$request->input('auto_gen_multiple_choice', 0)} + Tự luận: {$request->input('auto_gen_essay', 0)})\n\nTổng số câu theo mức độ: {$totalByLevel} câu\n(Mức 1: {$request->input('auto_gen_level_1', 0)} + Mức 2: {$request->input('auto_gen_level_2', 0)} + Mức 3: {$request->input('auto_gen_level_3', 0)} + Mức 4: {$request->input('auto_gen_level_4', 0)})\n\n❌ Tổng số câu theo loại PHẢI BẰNG tổng số câu theo mức độ!\n\nVui lòng điều chỉnh lại cho khớp.");
             }
 
             // Check if total is valid
@@ -146,7 +146,7 @@ class ExamController extends Controller
 
         $exam = Exam::create([
             'subject_id' => $validated['subject_id'],
-            'class_room_id' => $validated['class_room_id'] ?? null,
+            'class_room_id' => $validated['class_room_id'],
             'created_by' => Auth::id(),
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
@@ -176,7 +176,23 @@ class ExamController extends Controller
 
         // Auto-generate questions if requested
         if ($request->boolean('auto_generate')) {
-            $this->autoGenerateQuestions($exam, $request);
+            try {
+                $questionCount = $this->autoGenerateQuestions($exam, $request);
+                
+                // Check if no questions were added
+                if ($questionCount === 0) {
+                    $exam->delete();
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error_popup', 'Không thể tạo đề thi! Không có câu hỏi nào được chọn.\n\nVui lòng kiểm tra lại tiêu chí tự động tạo câu hỏi.');
+                }
+            } catch (\Exception $e) {
+                // Delete the exam if auto-generation fails
+                $exam->delete();
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error_popup', $e->getMessage());
+            }
         }
 
         return redirect()->route('teacher.exams.show', $exam)
@@ -408,6 +424,14 @@ class ExamController extends Controller
                 ->with('error', 'Không thể xuất bản đề thi chưa có câu hỏi!');
         }
 
+        // Check if total points match
+        $currentTotal = $exam->questions()->sum('exam_questions.points');
+        if (abs($currentTotal - $exam->total_points) > 0.01) {
+            return redirect()
+                ->route('teacher.exams.show', $exam)
+                ->with('error', "Tổng điểm các câu hỏi ({$currentTotal}) phải bằng tổng điểm đề thi ({$exam->total_points})!");
+        }
+
         $exam->update(['status' => 'published']);
 
         return redirect()
@@ -459,6 +483,77 @@ class ExamController extends Controller
     }
 
     /**
+     * Update points for a specific question in exam
+     */
+    public function updateQuestionPoints(Request $request, Exam $exam, $questionId)
+    {
+        $validated = $request->validate([
+            'points' => 'required|numeric|min:0',
+        ]);
+
+        $exam->questions()->updateExistingPivot($questionId, [
+            'points' => $validated['points'],
+            'updated_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã cập nhật điểm thành công!',
+        ]);
+    }
+
+    /**
+     * Distribute points evenly across all questions
+     */
+    public function distributePoints(Exam $exam)
+    {
+        $questions = $exam->questions()->orderBy('exam_questions.order')->get();
+        
+        if ($questions->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không có câu hỏi nào để phân điểm!',
+            ]);
+        }
+
+        $totalQuestions = $questions->count();
+        $totalPoints = $exam->total_points;
+        
+        // Calculate base points per question
+        $basePoints = floor(($totalPoints * 10) / $totalQuestions) / 10;
+        $remainder = round($totalPoints - ($basePoints * $totalQuestions), 1);
+        
+        // Distribute points
+        $pointsData = [];
+        foreach ($questions as $index => $question) {
+            $points = $basePoints;
+            
+            // Add 0.1 to first questions to account for remainder
+            if ($remainder > 0 && $index < ($remainder * 10)) {
+                $points += 0.1;
+            }
+            
+            $points = round($points, 1);
+            
+            $exam->questions()->updateExistingPivot($question->id, [
+                'points' => $points,
+                'updated_at' => now(),
+            ]);
+            
+            $pointsData[] = [
+                'question_id' => $question->id,
+                'points' => $points,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã phân đều điểm thành công!',
+            'points' => $pointsData,
+        ]);
+    }
+
+    /**
      * Auto-generate questions based on criteria
      */
     protected function autoGenerateQuestions(Exam $exam, Request $request)
@@ -486,7 +581,7 @@ class ExamController extends Controller
         
         $insufficientQuestions = [];
         
-        // 1. Select Multiple Choice questions distributed by level
+        // 1. Select Multiple Choice questions (multiple_choice + true_false) distributed by level
         if ($criteria['multiple_choice'] > 0) {
             $mcByLevel = $this->distributeQuestionsByLevel(
                 $criteria['multiple_choice'],
@@ -503,10 +598,11 @@ class ExamController extends Controller
             
             foreach ($mcByLevel as $bloomLevel => $count) {
                 if ($count > 0) {
+                    // NEW: Get questions from BOTH multiple_choice AND true_false
                     $questions = $this->getQuestionsForCriteria(
                         $exam->subject_id,
                         $bloomLevel,
-                        'multiple_choice',
+                        ['multiple_choice', 'true_false'], // Array of types
                         $criteria['topics'],
                         $count,
                         array_keys($selectedQuestions)
@@ -532,16 +628,14 @@ class ExamController extends Controller
                 }
             }
             
-            // If insufficient MC questions, show error
+            // If insufficient MC questions, throw error
             if ($mcCollected < $criteria['multiple_choice']) {
                 $details = implode("; ", $mcDetails);
-                return redirect()->back()
-                    ->with('error_popup', "Không đủ câu trắc nghiệm!\n\nCần: {$criteria['multiple_choice']} câu\nCó: $mcCollected câu\n\nChi tiết: $details")
-                    ->withInput();
+                throw new \Exception("Không đủ câu trắc nghiệm!\n\nCần: {$criteria['multiple_choice']} câu\nCó: $mcCollected câu\n\nChi tiết: $details");
             }
         }
 
-        // 2. Select Essay questions distributed by level
+        // 2. Select Essay questions (essay + fill_blank) distributed by level
         if ($criteria['essay'] > 0) {
             $essayByLevel = $this->distributeQuestionsByLevel(
                 $criteria['essay'],
@@ -556,10 +650,11 @@ class ExamController extends Controller
             
             foreach ($essayByLevel as $bloomLevel => $count) {
                 if ($count > 0) {
+                    // NEW: Get questions from BOTH essay AND fill_blank
                     $questions = $this->getQuestionsForCriteria(
                         $exam->subject_id,
                         $bloomLevel,
-                        'essay',
+                        ['essay', 'fill_blank'], // Array of types
                         $criteria['topics'],
                         $count,
                         array_keys($selectedQuestions)
@@ -568,6 +663,8 @@ class ExamController extends Controller
                     $found = $questions->count();
                     $essayCollected += $found;
                     $essayDetails[] = "Level $bloomLevel: cần $count, có $found";
+                    
+                    \Log::info("Essay Level $bloomLevel:", ['requested' => $count, 'found' => $found]);
                     
                     if ($found < $count) {
                         $insufficientQuestions[] = "Tự luận Level $bloomLevel: cần $count câu nhưng chỉ tìm thấy $found câu";
@@ -583,12 +680,10 @@ class ExamController extends Controller
                 }
             }
             
-            // If insufficient Essay questions, show error
+            // If insufficient Essay questions, throw error
             if ($essayCollected < $criteria['essay']) {
                 $details = implode("; ", $essayDetails);
-                return redirect()->back()
-                    ->with('error_popup', "Không đủ câu tự luận!\n\nCần: {$criteria['essay']} câu\nCó: $essayCollected câu\n\nChi tiết: $details")
-                    ->withInput();
+                throw new \Exception("Không đủ câu tự luận!\n\nCần: {$criteria['essay']} câu\nCó: $essayCollected câu\n\nChi tiết: $details");
             }
         }
 
@@ -634,6 +729,12 @@ class ExamController extends Controller
             
             // Attach questions to exam
             $exam->questions()->attach($finalQuestions);
+            
+            \Log::info('Total questions attached:', [
+                'exam_id' => $exam->id,
+                'count' => count($finalQuestions),
+                'total_points' => array_sum(array_column($finalQuestions, 'points'))
+            ]);
         }
 
         return count($selectedQuestions);
@@ -690,7 +791,6 @@ class ExamController extends Controller
         
         return $distribution;
     }
-
     /**
      * Get questions matching specific criteria
      */
@@ -710,8 +810,13 @@ class ExamController extends Controller
             }
         }
 
+        // NEW: Support array of types for multiple_choice+true_false or essay+fill_blank
         if ($type) {
-            $query->where('type', $type);
+            if (is_array($type)) {
+                $query->whereIn('type', $type);
+            } else {
+                $query->where('type', $type);
+            }
         }
 
         if (!empty($topics)) {

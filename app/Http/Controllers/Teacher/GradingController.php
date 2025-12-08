@@ -79,7 +79,7 @@ class GradingController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $submission->load(['exam.questions', 'student', 'grader']);
+        $submission->load(['exam.questions.answers', 'student', 'grader']);
 
         // Get exam questions with student answers
         $examQuestions = $submission->exam->questions()
@@ -89,7 +89,7 @@ class GradingController extends Controller
 
         $studentAnswers = $submission->answers ?? [];
 
-        // Calculate auto-gradeable score (multiple choice, true/false)
+        // Calculate auto-gradeable score (multiple choice, true/false, fill_blank)
         $autoScore = 0;
         $totalAutoPoints = 0;
         $manualQuestions = [];
@@ -99,18 +99,62 @@ class GradingController extends Controller
             $points = $question->pivot->points;
             $type = $question->pivot->custom_type ?? $question->type;
 
-            if (in_array($type, ['multiple_choice', 'true_false'])) {
+            if (in_array($type, ['multiple_choice', 'true_false', 'fill_blank'])) {
                 $totalAutoPoints += $points;
                 
                 if (isset($studentAnswers[$questionId])) {
-                    // Decode custom_answers if it's a JSON string
-                    $customAnswers = $question->pivot->custom_answers;
-                    if (is_string($customAnswers)) {
-                        $customAnswers = json_decode($customAnswers, true);
-                    }
-                    $correctAnswer = ($customAnswers['correct_answer'] ?? null) ?? $question->correct_answer;
+                    $studentAns = is_array($studentAnswers[$questionId]) 
+                        ? ($studentAnswers[$questionId]['answer'] ?? $studentAnswers[$questionId]) 
+                        : $studentAnswers[$questionId];
                     
-                    if ($studentAnswers[$questionId] == $correctAnswer) {
+                    $isCorrect = false;
+                    
+                    if ($type === 'multiple_choice') {
+                        // Lấy đáp án đúng từ database (is_correct = 1)
+                        $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                        
+                        if ($correctAnswerFromDB && $studentAns) {
+                            if (is_numeric($studentAns)) {
+                                // So sánh trực tiếp answer_id
+                                $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                            } else {
+                                // Tìm vị trí của đáp án đúng trong danh sách đã sort
+                                $allAnswersSorted = $question->answers->sortBy('order')->values();
+                                $correctLetter = null;
+                                
+                                foreach ($allAnswersSorted as $index => $ans) {
+                                    if ($ans->id === $correctAnswerFromDB->id) {
+                                        $correctLetter = chr(65 + $index); // A, B, C, D
+                                        break;
+                                    }
+                                }
+                                
+                                if ($correctLetter) {
+                                    $isCorrect = (strtoupper(trim($studentAns)) === $correctLetter);
+                                }
+                            }
+                        }
+                    } else {
+                        // true_false hoặc fill_blank
+                        if ($type === 'true_false') {
+                            // Lấy đáp án đúng từ database (is_correct = 1)
+                            $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                            if ($correctAnswerFromDB) {
+                                // So sánh answer_id (giống multiple_choice)
+                                $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                            }
+                        } else {
+                            // fill_blank
+                            $customAnswers = $question->pivot->custom_answers;
+                            if (is_string($customAnswers)) {
+                                $customAnswers = json_decode($customAnswers, true);
+                            }
+                            $correctAnswer = $customAnswers['correct_answer'] ?? $question->correct_answer ?? null;
+                            $isCorrect = $correctAnswer && strtolower(trim($studentAns)) === strtolower(trim($correctAnswer));
+                        }
+                    }
+                    
+                    if ($isCorrect) {
                         $autoScore += $points;
                     }
                 }
@@ -148,6 +192,7 @@ class GradingController extends Controller
 
         $examQuestions = $submission->exam->questions()
             ->withPivot(['order', 'points', 'custom_type', 'custom_content', 'custom_answers'])
+            ->with('answers')
             ->get();
 
         $studentAnswers = $submission->answers ?? [];
@@ -159,16 +204,60 @@ class GradingController extends Controller
             $points = $question->pivot->points;
             $type = $question->pivot->custom_type ?? $question->type;
 
-            if (in_array($type, ['multiple_choice', 'true_false'])) {
+            if (in_array($type, ['multiple_choice', 'true_false', 'fill_blank'])) {
                 if (isset($studentAnswers[$questionId])) {
-                    // Decode custom_answers if it's a JSON string
-                    $customAnswers = $question->pivot->custom_answers;
-                    if (is_string($customAnswers)) {
-                        $customAnswers = json_decode($customAnswers, true);
-                    }
-                    $correctAnswer = ($customAnswers['correct_answer'] ?? null) ?? $question->correct_answer;
+                    $studentAns = is_array($studentAnswers[$questionId]) 
+                        ? ($studentAnswers[$questionId]['answer'] ?? $studentAnswers[$questionId]) 
+                        : $studentAnswers[$questionId];
                     
-                    if ($studentAnswers[$questionId] == $correctAnswer) {
+                    $isCorrect = false;
+                    
+                    if ($type === 'multiple_choice') {
+                        // Lấy đáp án đúng từ database (is_correct = 1)
+                        $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                        
+                        if ($correctAnswerFromDB && $studentAns) {
+                            if (is_numeric($studentAns)) {
+                                // So sánh trực tiếp answer_id
+                                $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                            } else {
+                                // Tìm vị trí của đáp án đúng trong danh sách đã sort
+                                $allAnswersSorted = $question->answers->sortBy('order')->values();
+                                $correctLetter = null;
+                                
+                                foreach ($allAnswersSorted as $index => $ans) {
+                                    if ($ans->id === $correctAnswerFromDB->id) {
+                                        $correctLetter = chr(65 + $index); // A, B, C, D
+                                        break;
+                                    }
+                                }
+                                
+                                if ($correctLetter) {
+                                    $isCorrect = (strtoupper(trim($studentAns)) === $correctLetter);
+                                }
+                            }
+                        }
+                    } else {
+                        // true_false hoặc fill_blank
+                        if ($type === 'true_false') {
+                            // Lấy đáp án đúng từ database (is_correct = 1)
+                            $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                            if ($correctAnswerFromDB) {
+                                // So sánh answer_id (giống multiple_choice)
+                                $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                            }
+                        } else {
+                            // fill_blank
+                            $customAnswers = $question->pivot->custom_answers;
+                            if (is_string($customAnswers)) {
+                                $customAnswers = json_decode($customAnswers, true);
+                            }
+                            $correctAnswer = $customAnswers['correct_answer'] ?? $question->correct_answer ?? null;
+                            $isCorrect = $correctAnswer && strtolower(trim($studentAns)) === strtolower(trim($correctAnswer));
+                        }
+                    }
+                    
+                    if ($isCorrect) {
                         $totalScore += $points;
                     }
                 }
@@ -204,6 +293,13 @@ class GradingController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Prevent re-grading if already graded
+        if ($submission->grading_status === 'graded') {
+            return redirect()
+                ->back()
+                ->with('error', 'Bài thi này đã được chấm điểm. Không thể chấm lại!');
+        }
+
         $validated = $request->validate([
             'essay_scores' => 'nullable|array',
             'essay_scores.*' => 'nullable|numeric|min:0',
@@ -213,10 +309,69 @@ class GradingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Calculate total score
-            $autoScore = $submission->score ?? 0; // From auto-grading
+            // Calculate auto score from multiple_choice and true_false
+            $examQuestions = $submission->exam->questions()
+                ->withPivot(['custom_type', 'points'])
+                ->get();
+            
+            $studentAnswers = $submission->answers ?? [];
+            $autoScore = 0;
+            
+            foreach ($examQuestions as $question) {
+                $questionId = $question->id;
+                $type = $question->pivot->custom_type ?? $question->type;
+                $points = $question->pivot->points;
+                $studentAns = $studentAnswers[$questionId] ?? null;
+                
+                if (!$studentAns || !in_array($type, ['multiple_choice', 'true_false'])) {
+                    continue;
+                }
+                
+                $isCorrect = false;
+                
+                if ($type === 'multiple_choice') {
+                    $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                    if ($correctAnswerFromDB) {
+                        if (is_numeric($studentAns)) {
+                            $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                        } else {
+                            $allAnswersSorted = $question->answers->sortBy('order')->values();
+                            $correctLetter = null;
+                            foreach ($allAnswersSorted as $index => $ans) {
+                                if ($ans->id === $correctAnswerFromDB->id) {
+                                    $correctLetter = chr(65 + $index);
+                                    break;
+                                }
+                            }
+                            if ($correctLetter) {
+                                $isCorrect = (strtoupper(trim($studentAns)) === $correctLetter);
+                            }
+                        }
+                    }
+                } elseif ($type === 'true_false') {
+                    $correctAnswerFromDB = $question->answers->where('is_correct', 1)->first();
+                    if ($correctAnswerFromDB) {
+                        $isCorrect = ((int)$studentAns === $correctAnswerFromDB->id);
+                    }
+                }
+                
+                if ($isCorrect) {
+                    $autoScore += $points;
+                }
+            }
+            
+            // Calculate final score
             $essayScore = array_sum($validated['essay_scores'] ?? []);
             $finalScore = $validated['final_score'] ?? ($autoScore + $essayScore);
+            
+            // Validate: Final score must be >= auto score
+            if ($finalScore < $autoScore) {
+                DB::rollBack();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', "Điểm tổng ({$finalScore}) không được thấp hơn điểm tự động ({$autoScore})!");
+            }
 
             // Update submission
             $submission->update([
