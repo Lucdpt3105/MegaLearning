@@ -94,7 +94,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Tổng Khóa Học</p>
-                    <p class="text-5xl font-black text-gray-900">{{ $stats['total_courses'] }}</p>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['total_courses'] }}</p>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Bài Đã Làm</p>
-                    <p class="text-5xl font-black text-gray-900">{{ $stats['completed_exams'] }}</p>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['completed_exams'] }}</p>
                 </div>
             </div>
         </div>
@@ -128,7 +128,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Điểm TB</p>
-                    <p class="text-5xl font-black text-gray-900">{{ number_format($stats['average_score'], 1) }}</p>
+                    <p class="text-4xl font-black text-gray-900">{{ number_format($stats['average_score'], 1) }}</p>
                 </div>
             </div>
         </div>
@@ -145,7 +145,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Môn Học</p>
-                    <p class="text-5xl font-black text-gray-900">{{ $stats['total_subjects'] }}</p>
+                    <p class="text-4xl font-black text-gray-900">{{ $stats['total_subjects'] }}</p>
                 </div>
             </div>
         </div>
@@ -275,7 +275,7 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h4 class="font-extrabold text-gray-900 text-sm">{{ $submission->exam->title }}</h4>
-                                        <p class="text-xs text-gray-700 mt-1">{{ $submission->submitted_at->diffForHumans() }}</p>
+                                        <p class="text-xs text-gray-700 mt-1">{{ $submission->submitted_at ? $submission->submitted_at->diffForHumans() : 'N/A' }}</p>
                                     </div>
                                     <div class="text-right">
                                         <div class="text-lg font-extrabold {{ $submission->score >= $submission->exam->passing_score ? 'text-green-600' : 'text-red-600' }}">
