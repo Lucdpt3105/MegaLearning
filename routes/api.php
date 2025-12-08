@@ -125,6 +125,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:web')->group(function () {
             Route::post('rooms', [ChatController::class, 'store']);
             Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
+            Route::post('upload', [ChatController::class, 'uploadFile']);
             Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
             Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
             Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
