@@ -292,15 +292,17 @@ class ExamController extends Controller
             'question_ids' => 'required|array',
             'question_ids.*' => 'exists:questions,id',
             'points' => 'required|array',
-            'points.*' => 'numeric|min:0',
         ]);
 
         $maxOrder = $exam->questions()->max('exam_questions.order') ?? 0;
 
-        foreach ($validated['question_ids'] as $index => $questionId) {
+        foreach ($validated['question_ids'] as $questionId) {
+            // Get points for this specific question
+            $points = $request->input("points.{$questionId}", 1);
+            
             $exam->questions()->attach($questionId, [
                 'order' => ++$maxOrder,
-                'points' => $validated['points'][$index],
+                'points' => $points,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

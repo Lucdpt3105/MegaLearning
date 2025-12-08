@@ -79,10 +79,11 @@ class GradingController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $submission->load(['exam.questions', 'student', 'grader']);
+        $submission->load(['exam.questions.answers', 'student', 'grader']);
 
         // Get exam questions with student answers
         $examQuestions = $submission->exam->questions()
+            ->with('answers')
             ->withPivot(['order', 'points', 'custom_type', 'custom_content', 'custom_answers'])
             ->orderBy('exam_questions.order')
             ->get();
@@ -94,23 +95,26 @@ class GradingController extends Controller
         $totalAutoPoints = 0;
         $manualQuestions = [];
 
+        // Load answers for each question
+        foreach ($examQuestions as $question) {
+            $question->load('answers');
+        }
+        
         foreach ($examQuestions as $question) {
             $questionId = $question->id;
             $points = $question->pivot->points;
-            $type = $question->pivot->custom_type ?? $question->type;
+            $type = $question->type;
 
             if (in_array($type, ['multiple_choice', 'true_false'])) {
                 $totalAutoPoints += $points;
                 
                 if (isset($studentAnswers[$questionId])) {
-                    // Decode custom_answers if it's a JSON string
-                    $customAnswers = $question->pivot->custom_answers;
-                    if (is_string($customAnswers)) {
-                        $customAnswers = json_decode($customAnswers, true);
-                    }
-                    $correctAnswer = ($customAnswers['correct_answer'] ?? null) ?? $question->correct_answer;
+                    $studentAnswerId = $studentAnswers[$questionId];
                     
-                    if ($studentAnswers[$questionId] == $correctAnswer) {
+                    // Find the correct answer from question's answers
+                    $correctAnswer = $question->answers->where('is_correct', true)->first();
+                    
+                    if ($correctAnswer && (string)$studentAnswerId === (string)$correctAnswer->id) {
                         $autoScore += $points;
                     }
                 }
