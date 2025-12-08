@@ -36,6 +36,116 @@
         </nav>
     </div>
 
+    <!-- Weekly Timetable -->
+    <div class="mb-8">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Thời Khóa Biểu Hàng Tuần
+            </h2>
+            <p class="text-indigo-100 mt-2">Lịch học cố định theo tuần</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Timetable Grid -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-indigo-50 to-purple-50">
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 border-b-2 border-indigo-200">Thời Gian</th>
+                            @foreach(['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'] as $day)
+                                <th class="px-6 py-4 text-center text-sm font-bold text-gray-700 border-b-2 border-indigo-200">{{ $day }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $timeSlots = [
+                                '07:00 - 08:30',
+                                '08:45 - 10:15',
+                                '10:30 - 12:00',
+                                '13:00 - 14:30',
+                                '14:45 - 16:15',
+                                '16:30 - 18:00',
+                                '18:15 - 19:45',
+                                '20:00 - 21:30',
+                            ];
+                            
+                            // Sample schedule - Bạn có thể thay đổi logic này để load từ database
+                            $schedule = [
+                                1 => [ // Thứ 2
+                                    0 => ['subject' => $classRoom->subject->name, 'room' => 'Phòng A101', 'teacher' => $classRoom->teacher->name],
+                                    2 => ['subject' => $classRoom->subject->name, 'room' => 'Phòng A101', 'teacher' => $classRoom->teacher->name],
+                                ],
+                                3 => [ // Thứ 4
+                                    1 => ['subject' => $classRoom->subject->name, 'room' => 'Phòng B203', 'teacher' => $classRoom->teacher->name],
+                                    4 => ['subject' => $classRoom->subject->name, 'room' => 'Lab 1', 'teacher' => $classRoom->teacher->name],
+                                ],
+                                5 => [ // Thứ 6
+                                    3 => ['subject' => $classRoom->subject->name, 'room' => 'Phòng C305', 'teacher' => $classRoom->teacher->name],
+                                ],
+                            ];
+                        @endphp
+                        
+                        @foreach($timeSlots as $index => $timeSlot)
+                            <tr class="hover:bg-gray-50 transition-colors {{ $index % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}">
+                                <td class="px-6 py-4 border-b border-gray-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">{{ $timeSlot }}</span>
+                                    </div>
+                                </td>
+                                @for($day = 1; $day <= 7; $day++)
+                                    <td class="px-4 py-3 border-b border-gray-200 text-center">
+                                        @if(isset($schedule[$day][$index]))
+                                            @php $class = $schedule[$day][$index]; @endphp
+                                            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg p-3 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group">
+                                                <div class="font-bold text-sm mb-1">{{ $class['subject'] }}</div>
+                                                <div class="flex items-center justify-center text-xs opacity-90 mb-1">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    {{ $class['room'] }}
+                                                </div>
+                                                <div class="flex items-center justify-center text-xs opacity-90">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                    </svg>
+                                                    {{ $class['teacher'] }}
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="text-gray-300 text-xs py-6">-</div>
+                                        @endif
+                                    </td>
+                                @endfor
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-4 flex items-center justify-center space-x-6 text-sm">
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded mr-2"></div>
+                <span class="text-gray-600">Buổi học {{ $classRoom->subject->name }}</span>
+            </div>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-gray-600">Mỗi buổi học: 90 phút</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Video Calls Schedule -->
     @if($videoCalls->isEmpty())
         <div class="bg-white rounded-xl shadow-md p-12 text-center">
