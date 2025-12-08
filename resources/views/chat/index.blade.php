@@ -1083,10 +1083,6 @@
         // Check if user is logged in
         async function checkCurrentUser() {
             try {
-<<<<<<< HEAD
-=======
-                // Try authenticated endpoint first, fallback to session-based
->>>>>>> b124edea52cea2b6bb2e93bcce1b685ab5619d7b
                 const response = await apiCall(`${API_URL}/current-user`);
                 const data = await response.json();
                 
@@ -1116,6 +1112,7 @@
                 } else {
                     // No user found - redirect to login
                     console.error('❌ Not logged in - redirecting to login page');
+                    hideSelectUserModal();
                     showNotification('Vui lòng đăng nhập để sử dụng chat', 'error');
                     setTimeout(() => {
                         window.location.href = '/login';
@@ -1123,6 +1120,7 @@
                 }
             } catch (error) {
                 console.error('Error checking current user:', error);
+                hideSelectUserModal();
                 showNotification('Không thể kết nối đến server', 'error');
                 setTimeout(() => {
                     window.location.href = '/login';

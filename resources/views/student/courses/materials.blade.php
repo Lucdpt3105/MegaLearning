@@ -37,17 +37,24 @@
     </div>
 
     <!-- Documents Section -->
-    @if($documents && $documents->isNotEmpty())
-        <div class="mb-8">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg p-6 mb-4">
-                <h2 class="text-2xl font-bold text-white flex items-center">
-                    <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    Tài Liệu Tham Khảo
-                </h2>
-                <p class="text-blue-100 mt-2">{{ $documents->count() }} tài liệu có sẵn</p>
-            </div>
+    <div class="mb-8">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg p-6 mb-4">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <svg class="w-8 h-8 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Tài Liệu Tham Khảo
+            </h2>
+            <p class="text-blue-100 mt-2">
+                @if($documents && $documents->count() > 0)
+                    {{ $documents->count() }} tài liệu có sẵn
+                @else
+                    Chưa có tài liệu
+                @endif
+            </p>
+        </div>
+
+        @if($documents && $documents->isNotEmpty())
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($documents as $document)
@@ -112,20 +119,19 @@
                     </div>
                 @endforeach
             </div>
-        </div>
-    @endif
+        @else
+            <div class="bg-white rounded-xl shadow-md p-12 text-center">
+                <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có tài liệu</h3>
+                <p class="text-gray-600">Giảng viên chưa upload tài liệu học tập cho khóa học này.</p>
+                <p class="text-sm text-gray-500 mt-2">Tài liệu sẽ được hiển thị sau khi giảng viên upload và quản trị viên phê duyệt.</p>
+            </div>
+        @endif
+    </div>
 
     <!-- Topics List -->
-    @if($documents->isEmpty() && $topics->isEmpty())
-        <div class="bg-white rounded-xl shadow-md p-12 text-center">
-            <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có tài liệu</h3>
-            <p class="text-gray-600">Giảng viên chưa thêm tài liệu học tập cho khóa học này.</p>
-        </div>
-    @endif
-    
     @if($topics->isNotEmpty())
         <div class="mb-8">
             <div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg p-6 mb-4">

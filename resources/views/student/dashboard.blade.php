@@ -13,11 +13,11 @@
         <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/90 via-indigo-800/85 to-purple-900/80"></div>
         <div class="relative h-full flex items-center justify-between p-8">
             <div class="max-w-2xl">
-                <p class="text-sm font-semibold text-indigo-200 uppercase tracking-wider mb-2">Chào mừng trở lại!</p>
+                <p class="text-sm font-semibold text-white uppercase tracking-wider mb-2 drop-shadow-lg">Chào mừng trở lại!</p>
                 <h1 class="text-4xl font-extrabold mb-3 text-white drop-shadow-lg">
                     {{ Auth::user()->name }}
                 </h1>
-                <p class="text-lg text-indigo-100 mb-6">
+                <p class="text-lg text-white mb-6 drop-shadow-lg">
                     Sẵn sàng tiếp tục hành trình học tập của bạn chưa?
                 </p>
             </div>
