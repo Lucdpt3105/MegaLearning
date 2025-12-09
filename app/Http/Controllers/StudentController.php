@@ -129,12 +129,4 @@ class StudentController extends Controller
             'performanceBySubject'
         ));
     }
-    
-    /**
-     * Alias for dashboard (backward compatibility)
-     */
-    public function welcome()
-    {
-        return $this->dashboard();
-    }
 }

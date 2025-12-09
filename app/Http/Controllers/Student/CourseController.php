@@ -165,15 +165,15 @@ class CourseController extends Controller
      * Browse available courses to enroll
      * UC-STUDENT-005: Browse Available Courses
      */
-    public function browse()
+    public function browse(Request $request)
     {
         $student = Auth::user();
         
         // Get enrolled class IDs
         $enrolledClassIds = $student->enrolledClasses()->pluck('class_rooms.id');
 
-        // Get available classes that student is not enrolled in
-        $availableClasses = ClassRoom::with([
+        // Start query
+        $query = ClassRoom::with([
             'subject',
             'teacher'
         ])
@@ -187,14 +187,41 @@ class CourseController extends Controller
         ->where(function($query) {
             // Only show classes that are not full
             $query->whereRaw('(SELECT COUNT(*) FROM class_enrollments WHERE class_room_id = class_rooms.id AND status = "active") < max_students');
-        })
-        ->orderBy('start_date', 'desc')
-        ->get();
+        });
+
+        // Apply search filter
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhereHas('subject', function($subQ) use ($search) {
+                      $subQ->where('name', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('teacher', function($teacherQ) use ($search) {
+                      $teacherQ->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Apply subject filter
+        if ($request->has('subject_id') && $request->subject_id) {
+            $query->where('subject_id', $request->subject_id);
+        }
+
+        $availableClasses = $query->orderBy('start_date', 'desc')->get();
 
         // Group by subject
         $coursesBySubject = $availableClasses->groupBy('subject.name');
 
-        return view('student.courses.browse', compact('availableClasses', 'coursesBySubject'));
+        // Get all subjects for filter dropdown
+        $subjects = Subject::orderBy('name')->get();
+
+        return view('student.courses.browse', compact(
+            'availableClasses', 
+            'coursesBySubject', 
+            'subjects'
+        ));
     }
 
     /**
