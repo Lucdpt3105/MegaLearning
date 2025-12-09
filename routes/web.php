@@ -7,6 +7,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ForumQuestionController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // Authentication Routes
@@ -21,6 +22,12 @@ Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
+
+// Global Search Routes (UC-GLOBAL-004)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+    Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+});
 
 // Profile Routes (Manage Profile)
 Route::middleware(['auth'])->prefix('profile')->name('profile.')->group(function () {
@@ -123,8 +130,10 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::delete('/subjects/{subject}/chat-room/members/{userId}', [App\Http\Controllers\Teacher\SubjectController::class, 'removeChatMember'])->name('subjects.chat-room.remove-member');
     Route::post('/subjects/{subject}/chat-room/toggle', [App\Http\Controllers\Teacher\SubjectController::class, 'toggleChatStatus'])->name('subjects.chat-room.toggle');
     
-    // Topic Management
-    Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
+    // Topic Management (UC-GV-016 to UC-GV-019)
+    Route::resource('topics', App\Http\Controllers\Teacher\TopicController::class);
+    Route::post('/topics/reorder', [App\Http\Controllers\Teacher\TopicController::class, 'reorder'])->name('topics.reorder');
+    Route::post('/topics/bulk-delete', [App\Http\Controllers\Teacher\TopicController::class, 'bulkDelete'])->name('topics.bulk-delete');
     
     // Phase 2: Document Management (UC-GV-070 to UC-GV-074)
     Route::resource('documents', App\Http\Controllers\Teacher\DocumentController::class);
@@ -250,12 +259,12 @@ Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::cl
     |-------------------------------------------------------------------------- 
     */
     Route::prefix('user')->name('user.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('index');
-        Route::get('/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('update');
-        Route::delete('/{id}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('destroy');
+        Route::get('/', [App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\UserManagementController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('destroy');
     });
 
 
@@ -264,11 +273,12 @@ Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::cl
     | 📌 3. ADMIN → TESTER MANAGEMENT
     |--------------------------------------------------------------------------
     */
-    Route::prefix('tester')->name('tester.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Admin\TesterController::class, 'index'])->name('index');
-        Route::get('/create', [App\Http\Controllers\Admin\TesterController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\Admin\TesterController::class, 'store'])->name('store');
-    });
+    // TODO: Create TesterController before uncommenting
+    // Route::prefix('tester')->name('tester.')->group(function () {
+    //     Route::get('/', [App\Http\Controllers\Admin\TesterController::class, 'index'])->name('index');
+    //     Route::get('/create', [App\Http\Controllers\Admin\TesterController::class, 'create'])->name('create');
+    //     Route::post('/', [App\Http\Controllers\Admin\TesterController::class, 'store'])->name('store');
+    // });
 
 
     /*
@@ -423,80 +433,6 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'welcome'])->name('dashboard');
     Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
-});
-
-// Teacher Routes
-Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
-    Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
-    
-    // Phase 1: Subject Management (UC-GV-010 to UC-GV-015)
-    Route::resource('subjects', App\Http\Controllers\Teacher\SubjectController::class);
-    Route::post('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'createChatRoom'])->name('subjects.chat-room.create');
-    Route::get('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'manageChatRoom'])->name('subjects.chat-room.manage');
-    Route::post('/subjects/{subject}/chat-room/members', [App\Http\Controllers\Teacher\SubjectController::class, 'addChatMember'])->name('subjects.chat-room.add-member');
-    Route::delete('/subjects/{subject}/chat-room/members/{userId}', [App\Http\Controllers\Teacher\SubjectController::class, 'removeChatMember'])->name('subjects.chat-room.remove-member');
-    Route::post('/subjects/{subject}/chat-room/toggle', [App\Http\Controllers\Teacher\SubjectController::class, 'toggleChatStatus'])->name('subjects.chat-room.toggle');
-    
-    // Phase 2: Document Management (UC-GV-070 to UC-GV-074)
-    Route::resource('documents', App\Http\Controllers\Teacher\DocumentController::class);
-    Route::post('/documents/folder', [App\Http\Controllers\Teacher\DocumentController::class, 'createFolder'])->name('documents.folder.create');
-    Route::post('/documents/{document}/move', [App\Http\Controllers\Teacher\DocumentController::class, 'moveToFolder'])->name('documents.move');
-    Route::get('/documents/{document}/download', [App\Http\Controllers\Teacher\DocumentController::class, 'download'])->name('documents.download');
-    Route::post('/documents/{document}/approve', [App\Http\Controllers\Teacher\DocumentController::class, 'approve'])->name('documents.approve');
-    Route::post('/documents/{document}/reject', [App\Http\Controllers\Teacher\DocumentController::class, 'reject'])->name('documents.reject');
-    
-    // Phase 3: Student Management (UC-GV-050 to UC-GV-054)
-    Route::get('/students', [App\Http\Controllers\Teacher\StudentController::class, 'index'])->name('students.index');
-    Route::get('/students/{classRoom}', [App\Http\Controllers\Teacher\StudentController::class, 'show'])->name('students.show');
-    Route::post('/students/{classRoom}/add', [App\Http\Controllers\Teacher\StudentController::class, 'addStudents'])->name('students.add');
-    Route::delete('/students/{classRoom}/remove/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeStudent'])->name('students.remove');
-    
-    // Class Chat Room Management
-    Route::post('/students/{classRoom}/chat/members', [App\Http\Controllers\Teacher\StudentController::class, 'addChatMember'])->name('students.chat.add-member');
-    Route::delete('/students/{classRoom}/chat/members/{userId}', [App\Http\Controllers\Teacher\StudentController::class, 'removeChatMember'])->name('students.chat.remove-member');
-    Route::post('/students/{classRoom}/chat/toggle', [App\Http\Controllers\Teacher\StudentController::class, 'toggleChatStatus'])->name('students.chat.toggle');
-    Route::put('/students/{classRoom}/notes/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateNotes'])->name('students.update-notes');
-    Route::put('/students/{classRoom}/enrollment/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateEnrollment'])->name('students.update-enrollment');
-    Route::put('/students/{classRoom}/info/{studentId}', [App\Http\Controllers\Teacher\StudentController::class, 'updateStudentInfo'])->name('students.update-info');
-    
-    // Phase 4: Question Bank Management
-    Route::get('/questions/subjects/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'bySubject'])->name('questions.by-subject');
-    Route::get('/questions/export/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'export'])->name('questions.export');
-    Route::post('/questions/import/{subject}', [App\Http\Controllers\Teacher\QuestionController::class, 'import'])->name('questions.import');
-    Route::get('/questions/download-template', [App\Http\Controllers\Teacher\QuestionController::class, 'downloadTemplate'])->name('questions.download-template');
-    Route::resource('questions', App\Http\Controllers\Teacher\QuestionController::class);
-    
-    // Subjects API
-    Route::get('/subjects/{subject}/topics', [App\Http\Controllers\Teacher\SubjectController::class, 'getTopics'])->name('subjects.topics');
-    
-    // Phase 5: Exam Management (UC-GV-030 to UC-GV-037)
-    Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Teacher\ExamController::class, 'addQuestions'])->name('exams.questions.add');
-    Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Teacher\ExamController::class, 'createQuestion'])->name('exams.questions.create');
-    Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Teacher\ExamController::class, 'removeQuestion'])->name('exams.questions.remove');
-    Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Teacher\ExamController::class, 'reorderQuestions'])->name('exams.questions.reorder');
-    Route::post('/exams/{exam}/publish', [App\Http\Controllers\Teacher\ExamController::class, 'publish'])->name('exams.publish');
-    Route::post('/exams/{exam}/notify', [App\Http\Controllers\Teacher\ExamController::class, 'sendNotification'])->name('exams.notify');
-    Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');
-    Route::resource('exams', App\Http\Controllers\Teacher\ExamController::class);
-    
-    // Phase 6: Video Call Management (UC-GV-001 to UC-GV-004)
-    Route::post('/video-calls/{videoCall}/start', [App\Http\Controllers\Teacher\VideoCallController::class, 'start'])->name('video-calls.start');
-    Route::post('/video-calls/{videoCall}/end', [App\Http\Controllers\Teacher\VideoCallController::class, 'end'])->name('video-calls.end');
-    Route::get('/video-calls/{videoCall}/join', [App\Http\Controllers\Teacher\VideoCallController::class, 'join'])->name('video-calls.join');
-    Route::post('/video-calls/{videoCall}/invite', [App\Http\Controllers\Teacher\VideoCallController::class, 'invite'])->name('video-calls.invite');
-    Route::post('/video-calls/{videoCall}/toggle-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'toggleRecording'])->name('video-calls.toggle-recording');
-    Route::post('/video-calls/{videoCall}/save-recording', [App\Http\Controllers\Teacher\VideoCallController::class, 'saveRecording'])->name('video-calls.save-recording');
-    Route::resource('video-calls', App\Http\Controllers\Teacher\VideoCallController::class);
-    
-    // Phase 7: Grading (UC-GV-080 to UC-GV-084)
-    Route::get('/grading', [App\Http\Controllers\Teacher\GradingController::class, 'index'])->name('grading.index');
-    Route::get('/grading/{submission}', [App\Http\Controllers\Teacher\GradingController::class, 'show'])->name('grading.show');
-    Route::post('/grading/{submission}/auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'autoGrade'])->name('grading.auto-grade');
-    Route::post('/grading/{submission}/grade', [App\Http\Controllers\Teacher\GradingController::class, 'grade'])->name('grading.grade');
-    Route::post('/grading/bulk-auto-grade', [App\Http\Controllers\Teacher\GradingController::class, 'bulkAutoGrade'])->name('grading.bulk-auto-grade');
-    
-    // Legacy routes (to be refactored)
-    Route::get('/topics', [TeacherController::class, 'topics'])->name('topics');
 });
 
 // Admin Routes
