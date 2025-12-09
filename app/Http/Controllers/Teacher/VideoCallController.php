@@ -135,6 +135,10 @@ class VideoCallController extends Controller
             'settings' => $settings,
         ]);
 
+        // Notify students about new video call
+        $notificationService = app(\App\Services\VideoCallNotificationService::class);
+        $notificationService->notifyStudents($videoCall);
+
         return redirect()
             ->route('teacher.video-calls.show', $videoCall)
             ->with('success', 'Buổi học trực tuyến đã được tạo thành công! Mã phòng: ' . $roomCode);

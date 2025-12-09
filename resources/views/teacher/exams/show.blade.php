@@ -188,17 +188,27 @@
                 <form action="{{ route('teacher.exams.questions.add', $exam) }}" method="POST">
                     @csrf
                     
+                    <!-- Debug Info -->
+                    <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-sm text-blue-800">
+                            <strong>Debug:</strong> Tìm thấy {{ $availableQuestions->count() }} câu hỏi trong ngân hàng cho môn {{ $exam->subject->name ?? 'N/A' }}
+                        </p>
+                    </div>
+                    
                     @if($availableQuestions->isEmpty())
                         <div class="text-center py-12">
-                            <p class="text-gray-600">Không còn câu hỏi nào trong ngân hàng cho môn này</p>
+                            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p class="text-gray-900 font-medium mb-2">Không còn câu hỏi nào trong ngân hàng cho môn này</p>
+                            <p class="text-gray-600 text-sm">Hãy tạo câu hỏi mới trong Question Bank trước</p>
                         </div>
                     @else
                         <div class="space-y-4 mb-6">
                             @foreach($availableQuestions as $question)
                                 <label class="flex items-start gap-4 border border-gray-200 rounded-lg p-4 hover:border-blue-300 cursor-pointer">
                                     <input type="checkbox" name="question_ids[]" value="{{ $question->id }}" 
-                                           class="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                                           onchange="togglePointsInput(this, {{ $question->id }})">
+                                           class="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
                                     
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-2">
@@ -219,9 +229,10 @@
                                         </div>
                                         <div class="text-gray-900 mb-2">{!! nl2br(e($question->content)) !!}</div>
                                         
-                                        <div id="points-input-{{ $question->id }}" class="hidden mt-2">
+                                        <div class="mt-2">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Điểm cho câu này:</label>
-                                            <input type="number" name="points[]" step="0.1" min="0" value="1"
+                                            <input type="number" name="points[{{ $question->id }}]" step="0.1" min="0" value="1"
+                                                   id="points-{{ $question->id }}"
                                                    class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                                         </div>
                                     </div>
@@ -343,16 +354,6 @@ function switchTab(tabName) {
     const activeButton = document.getElementById('tab-' + tabName);
     activeButton.classList.add('active', 'border-blue-500', 'text-blue-600');
     activeButton.classList.remove('border-transparent', 'text-gray-600');
-}
-
-// Toggle points input
-function togglePointsInput(checkbox, questionId) {
-    const pointsInput = document.getElementById('points-input-' + questionId);
-    if (checkbox.checked) {
-        pointsInput.classList.remove('hidden');
-    } else {
-        pointsInput.classList.add('hidden');
-    }
 }
 
 // Notification modal

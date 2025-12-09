@@ -39,13 +39,32 @@ class ForumQuestionController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tags' => 'nullable|string',
         ]);
 
-        ForumQuestion::create([
+        $data = [
             'title' => $request->title,
             'content' => $request->content,
             'user_id' => auth()->id(),
-        ]);
+        ];
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/forum'), $imageName);
+            $data['image_path'] = 'images/forum/' . $imageName;
+        }
+
+        // Handle tags
+        if ($request->filled('tags')) {
+            $tags = array_map('trim', explode(',', $request->tags));
+            $tags = array_filter($tags); // Remove empty values
+            $data['tags'] = $tags;
+        }
+
+        ForumQuestion::create($data);
 
         return redirect()->route('forum.index', ['sort' => 'my_post'])->with('success', 'Successfully created!');
     }

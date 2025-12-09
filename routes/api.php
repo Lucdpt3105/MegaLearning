@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\ForumQuestionController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\Api\ChatApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,38 +112,27 @@ Route::prefix('v1')->group(function () {
     });
     */
     
-    // Chat API Routes - Authenticated users (requires auth:sanctum)
-    Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
+    // Chat API Routes - MOVED TO web.php for session support
+    // See routes/web.php for chat endpoints
+    /*
+    Route::prefix('chat')->group(function () {
         Route::get('current-user', [ChatController::class, 'getCurrentUser']);
-        Route::get('rooms', [ChatController::class, 'getRooms']);
-        Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
-        Route::post('rooms', [ChatController::class, 'store']);
-        Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
-        Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
-        Route::get('users', [ChatController::class, 'getUsers']);
-        Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
-        Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
-        Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
-        Route::put('rooms/{roomId}', [ChatController::class, 'update']);
-        Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
-        Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
-        Route::post('set-user', [ChatController::class, 'setCurrentUser']);
+        Route::middleware('auth')->group(function () {
+            Route::get('rooms', [ChatController::class, 'getRooms']);
+            Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
+            Route::get('users', [ChatController::class, 'getUsers']);
+            Route::post('rooms', [ChatController::class, 'store']);
+            Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
+            Route::post('upload', [ChatController::class, 'uploadFile']);
+            Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
+            Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
+            Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
+            Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
+            Route::put('rooms/{roomId}', [ChatController::class, 'update']);
+            Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
+            Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
+        });
+        Route::post('set-user', [ChatController::class, 'setUser']);
     });
-});
-
-// Chat API Routes (Public demo/session-based - using web middleware)
-Route::middleware(['web'])->prefix('chat')->name('chat.api.')->group(function () {
-    Route::post('/user/set', [ChatApiController::class, 'setCurrentUser'])->name('user.set');
-    Route::get('/user/current', [ChatApiController::class, 'getCurrentUser'])->name('user.current');
-    Route::get('/users', [ChatApiController::class, 'getUsers'])->name('users');
-    Route::get('/rooms', [ChatApiController::class, 'getRooms'])->name('rooms');
-    Route::post('/rooms', [ChatApiController::class, 'createRoom'])->name('rooms.create');
-    Route::post('/rooms/private', [ChatApiController::class, 'createPrivateRoom'])->name('rooms.private');
-    Route::get('/rooms/{roomId}', [ChatApiController::class, 'getRoom'])->name('rooms.show');
-    Route::delete('/rooms/{roomId}', [ChatApiController::class, 'deleteRoom'])->name('rooms.delete');
-    Route::get('/rooms/{roomId}/messages', [ChatApiController::class, 'getMessages'])->name('messages');
-    Route::post('/rooms/{roomId}/messages', [ChatApiController::class, 'sendMessage'])->name('messages.send');
-    Route::delete('/messages/{messageId}', [ChatApiController::class, 'deleteMessage'])->name('messages.delete');
-    Route::put('/messages/{messageId}', [ChatApiController::class, 'updateMessage'])->name('messages.update');
-    Route::post('/rooms/{roomId}/read', [ChatApiController::class, 'markRoomAsRead'])->name('rooms.read');
+    */
 });

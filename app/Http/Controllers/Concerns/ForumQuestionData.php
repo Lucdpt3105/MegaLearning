@@ -37,7 +37,9 @@ trait ForumQuestionData
     {
         $sort = $request->query('sort', 'latest');
         $query = ForumQuestion::query()
-            ->with('user:id,name')
+            ->with(['user:id,name', 'answers' => function($q) {
+                $q->with('user:id,name')->whereNull('parent_id')->latest()->take(3);
+            }])
             ->withSum(['votes as votes_sum' => function ($q) { $q->whereNull('forum_answer_id'); }], 'value')
             ->withCount('answers as answers_count');
         switch ($sort) {

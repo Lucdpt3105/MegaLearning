@@ -28,7 +28,7 @@
         <!-- Score Display -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
             <div class="bg-blue-50 p-6 rounded-lg text-center">
-                <div class="text-4xl font-bold text-blue-600 mb-2">{{ number_format($submission->score, 1) }}</div>
+                <div class="text-4xl font-bold text-blue-600 mb-2">{{ number_format($submission->score ?? 0, 1) }}</div>
                 <div class="text-sm text-gray-600">Điểm Của Bạn</div>
             </div>
             <div class="bg-gray-50 p-6 rounded-lg text-center">
@@ -36,7 +36,7 @@
                 <div class="text-sm text-gray-600">Điểm Tối Đa</div>
             </div>
             <div class="bg-purple-50 p-6 rounded-lg text-center">
-                <div class="text-4xl font-bold text-purple-600 mb-2">{{ number_format(($submission->score / $exam->total_points) * 100, 1) }}%</div>
+                <div class="text-4xl font-bold text-purple-600 mb-2">{{ $exam->total_points > 0 ? number_format((($submission->score ?? 0) / $exam->total_points) * 100, 1) : 0 }}%</div>
                 <div class="text-sm text-gray-600">Phần Trăm</div>
             </div>
             <div class="bg-green-50 p-6 rounded-lg text-center">
@@ -44,6 +44,27 @@
                 <div class="text-sm text-gray-600">Điểm Đạt</div>
             </div>
         </div>
+        
+        @php
+            $mcQuestions = $questions->where('type', 'multiple_choice');
+            $correctCount = $mcQuestions->where('is_correct', true)->count();
+            $totalMC = $mcQuestions->count();
+        @endphp
+        
+        @if($totalMC > 0)
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-1">📊 Thống Kê Trắc Nghiệm</h3>
+                        <p class="text-sm text-gray-600">Số câu trả lời đúng / Tổng số câu trắc nghiệm</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-blue-600">{{ $correctCount }}/{{ $totalMC }}</div>
+                        <div class="text-sm text-gray-600">{{ $totalMC > 0 ? number_format(($correctCount / $totalMC) * 100, 1) : 0 }}% đúng</div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Additional Info -->
         <div class="grid grid-cols-2 gap-4 text-sm">
@@ -82,11 +103,10 @@
     </div>
 
     <!-- Review Answers -->
-    @if($exam->allow_review)
-        <div class="bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Chi Tiết Bài Làm</h2>
-            
-            <div class="space-y-6">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Chi Tiết Bài Làm</h2>
+        
+        <div class="space-y-6">
                 @foreach($questions as $index => $question)
                     <div class="border-l-4 {{ isset($question->is_correct) ? ($question->is_correct ? 'border-green-500' : 'border-red-500') : 'border-gray-300' }} pl-6 py-4">
                         <div class="flex items-start gap-4">
@@ -98,12 +118,18 @@
                                     <p class="text-lg font-medium text-gray-900">
                                         {{ $question->pivot->custom_content ?? $question->content }}
                                     </p>
-                                    <div class="ml-4 text-sm">
+                                    <div class="ml-4 text-sm flex-shrink-0">
                                         @if(isset($question->is_correct))
                                             @if($question->is_correct)
-                                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">✓ Đúng</span>
+                                                <div class="text-right">
+                                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">✓ Đúng</span>
+                                                    <div class="mt-1 text-green-600 font-bold">+{{ $question->pivot->points ?? 1 }} điểm</div>
+                                                </div>
                                             @else
-                                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">✗ Sai</span>
+                                                <div class="text-right">
+                                                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">✗ Sai</span>
+                                                    <div class="mt-1 text-red-600 font-bold">0 điểm</div>
+                                                </div>
                                             @endif
                                         @else
                                             <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full">{{ $question->pivot->points ?? 1 }} điểm</span>
@@ -114,23 +140,32 @@
                                 @if($question->type === 'multiple_choice')
                                     <div class="space-y-2 mb-3">
                                         @foreach($question->answers as $answer)
+                                            @php
+                                                $isStudentAnswer = (string)($question->student_answer ?? '') === (string)$answer->id;
+                                            @endphp
                                             <div class="p-3 rounded-lg border-2 
                                                 {{ $answer->is_correct ? 'border-green-500 bg-green-50' : 'border-gray-200' }}
-                                                {{ $question->student_answer == $answer->id && !$answer->is_correct ? 'border-red-500 bg-red-50' : '' }}">
+                                                {{ $isStudentAnswer && !$answer->is_correct ? 'border-red-500 bg-red-50' : '' }}">
                                                 <div class="flex items-center">
                                                     @if($answer->is_correct)
                                                         <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                                         </svg>
-                                                    @elseif($question->student_answer == $answer->id)
+                                                    @elseif($isStudentAnswer)
                                                         <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                                                         </svg>
                                                     @else
                                                         <span class="w-5 h-5 mr-2"></span>
                                                     @endif
-                                                    <span class="{{ $answer->is_correct ? 'font-medium text-green-900' : ($question->student_answer == $answer->id ? 'font-medium text-red-900' : 'text-gray-700') }}">
+                                                    <span class="{{ $answer->is_correct ? 'font-medium text-green-900' : ($isStudentAnswer ? 'font-medium text-red-900' : 'text-gray-700') }}">
                                                         {{ $answer->content }}
+                                                        @if($answer->is_correct)
+                                                            <span class="ml-2 text-xs text-green-700">(Đáp án đúng)</span>
+                                                        @endif
+                                                        @if($isStudentAnswer && !$answer->is_correct)
+                                                            <span class="ml-2 text-xs text-red-700">(Bạn đã chọn)</span>
+                                                        @endif
                                                     </span>
                                                 </div>
                                             </div>
@@ -161,11 +196,7 @@
                 @endforeach
             </div>
         </div>
-    @else
-        <div class="bg-white rounded-lg shadow p-6 text-center">
-            <p class="text-gray-600">Giáo viên không cho phép xem lại chi tiết bài làm</p>
-        </div>
-    @endif
+    </div>
 
     <!-- Action Buttons -->
     <div class="mt-6 flex gap-4">
