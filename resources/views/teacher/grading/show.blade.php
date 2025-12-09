@@ -53,25 +53,19 @@
                 @foreach($examQuestions as $index => $question)
                     @php
                         $questionId = $question->id;
-                        $type = $question->pivot->custom_type ?? $question->type;
+                        $type = $question->type;
                         $points = $question->pivot->points;
-                        $content = $question->pivot->custom_content ?? $question->content;
+                        $content = $question->content;
                         
-                        // Decode custom_answers if it's a JSON string
-                        $answers = $question->pivot->custom_answers;
-                        if (is_string($answers)) {
-                            $answers = json_decode($answers, true);
-                        }
-                        if (!$answers) {
-                            $answers = json_decode($question->answers, true);
-                        }
+                        // Get correct answer from question's answers relationship
+                        $correctAnswerObj = $question->answers->where('is_correct', true)->first();
+                        $correctAnswerId = $correctAnswerObj ? $correctAnswerObj->id : null;
                         
-                        $correctAnswer = $answers['correct_answer'] ?? $question->correct_answer;
-                        $studentAnswer = $studentAnswers[$questionId] ?? null;
+                        $studentAnswerId = $studentAnswers[$questionId] ?? null;
                         $isCorrect = false;
                         
-                        if (in_array($type, ['multiple_choice', 'true_false'])) {
-                            $isCorrect = $studentAnswer == $correctAnswer;
+                        if ($type === 'multiple_choice') {
+                            $isCorrect = $correctAnswerId && $studentAnswerId && (string)$studentAnswerId === (string)$correctAnswerId;
                         }
                     @endphp
 
@@ -89,6 +83,15 @@
                                     <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
                                         {{ $points }} điểm
                                     </span>
+                                    @if($type === 'multiple_choice')
+                                        @if($isCorrect)
+                                            <span class="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-semibold">✅ Đúng</span>
+                                        @elseif($studentAnswerId)
+                                            <span class="px-3 py-1 bg-red-500 text-white rounded-full text-sm font-semibold">❌ Sai</span>
+                                        @else
+                                            <span class="px-3 py-1 bg-gray-400 text-white rounded-full text-sm font-semibold">⊘ Chưa trả lời</span>
+                                        @endif
+                                    @endif
                                 </div>
                                 <p class="text-gray-900 font-medium">{!! nl2br(e($content)) !!}</p>
                             </div>
@@ -97,25 +100,24 @@
                         @if($type === 'multiple_choice')
                             <!-- Multiple Choice -->
                             <div class="space-y-2 mt-4">
-                                @foreach(['A', 'B', 'C', 'D'] as $option)
-                                    @if(isset($answers['option_' . strtolower($option)]))
-                                        @php
-                                            $optionText = $answers['option_' . strtolower($option)];
-                                            $isSelected = $studentAnswer === $option;
-                                            $isCorrectOption = $correctAnswer === $option;
-                                        @endphp
-                                        <div class="flex items-center p-3 rounded-lg {{ $isCorrectOption ? 'bg-green-50 border-2 border-green-300' : ($isSelected ? 'bg-red-50 border-2 border-red-300' : 'bg-gray-50 border border-gray-200') }}">
-                                            <span class="w-8 h-8 rounded-full flex items-center justify-center font-bold {{ $isCorrectOption ? 'bg-green-500 text-white' : ($isSelected ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700') }}">
-                                                {{ $option }}
-                                            </span>
-                                            <span class="ml-3 flex-1">{{ $optionText }}</span>
-                                            @if($isSelected && !$isCorrectOption)
-                                                <span class="text-red-600 font-semibold">❌ Học sinh chọn</span>
-                                            @elseif($isCorrectOption)
-                                                <span class="text-green-600 font-semibold">✅ Đáp án đúng</span>
-                                            @endif
-                                        </div>
-                                    @endif
+                                @foreach($question->answers as $answer)
+                                    @php
+                                        $isSelected = $studentAnswerId && (string)$studentAnswerId === (string)$answer->id;
+                                        $isCorrectOption = $answer->is_correct;
+                                    @endphp
+                                    <div class="flex items-center p-3 rounded-lg {{ $isCorrectOption ? 'bg-green-50 border-2 border-green-300' : ($isSelected ? 'bg-red-50 border-2 border-red-300' : 'bg-gray-50 border border-gray-200') }}">
+                                        <span class="w-8 h-8 rounded-full flex items-center justify-center font-bold {{ $isCorrectOption ? 'bg-green-500 text-white' : ($isSelected ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700') }}">
+                                            {{ chr(65 + $loop->index) }}
+                                        </span>
+                                        <span class="ml-3 flex-1">{{ $answer->content }}</span>
+                                        @if($isSelected && !$isCorrectOption)
+                                            <span class="text-red-600 font-semibold text-sm">❌ Học sinh đã chọn</span>
+                                        @elseif($isSelected && $isCorrectOption)
+                                            <span class="text-green-600 font-semibold text-sm">✅ Học sinh chọn đúng</span>
+                                        @elseif($isCorrectOption)
+                                            <span class="text-green-600 font-semibold text-sm">✅ Đáp án đúng</span>
+                                        @endif
+                                    </div>
                                 @endforeach
                             </div>
 
@@ -198,11 +200,17 @@
                                name="final_score" 
                                min="0" 
                                max="{{ $submission->exam->total_points }}" 
-                               step="0.5"
-                               value="{{ $submission->score }}"
+                               step="0.1"
+                               value="{{ $submission->score ?? $autoScore }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-2xl font-bold"
-                               placeholder="Tổng điểm...">
-                        <p class="text-sm text-gray-500 mt-1">Để trống để tự động tính tổng từ các câu</p>
+                               placeholder="Nhập điểm từ 0 đến {{ $submission->exam->total_points }}..."
+                               required>
+                        <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-800">
+                                💡 <strong>Điểm tự động:</strong> {{ number_format($autoScore, 1) }}/{{ $totalAutoPoints }} (trắc nghiệm)
+                            </p>
+                            <p class="text-xs text-blue-600 mt-1">Giáo viên có thể nhập bất kỳ điểm nào từ 0 đến {{ $submission->exam->total_points }}</p>
+                        </div>
                     </div>
 
                     <div class="flex gap-3">

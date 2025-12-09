@@ -28,7 +28,7 @@
         @include('layouts.partials.sidebar')
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div id="mainContent" class="flex-1 flex flex-col overflow-hidden transition-all duration-500 ease-in-out" style="margin-left: 14rem;">
             <!-- Header -->
             @include('layouts.partials.header')
 
@@ -38,6 +38,27 @@
             </main>
         </div>
     </div>
+
+    <script>
+        // Adjust main content margin when sidebar toggles
+        window.addEventListener('sidebarToggle', function(event) {
+            const mainContent = document.getElementById('mainContent');
+            if (event.detail.collapsed) {
+                mainContent.style.marginLeft = '3.5rem';
+            } else {
+                mainContent.style.marginLeft = '14rem';
+            }
+        });
+        
+        // Set initial margin based on saved state
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            const mainContent = document.getElementById('mainContent');
+            if (savedState === 'true') {
+                mainContent.style.marginLeft = '3.5rem';
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

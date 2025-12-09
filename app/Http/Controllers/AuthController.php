@@ -31,6 +31,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
+            
+            // Update last login time
+            $user->update(['last_login_at' => now()]);
 
             // Redirect based on role
             if ($user->hasRole('admin')) {
