@@ -112,17 +112,15 @@ Route::prefix('v1')->group(function () {
     });
     */
     
-    // Chat API Routes - stateful API with session support
-    // Use 'web' middleware to support both guest and authenticated users
-    Route::prefix('chat')->middleware('web')->group(function () {
-        // Public routes - no auth required
+    // Chat API Routes - MOVED TO web.php for session support
+    // See routes/web.php for chat endpoints
+    /*
+    Route::prefix('chat')->group(function () {
         Route::get('current-user', [ChatController::class, 'getCurrentUser']);
-        Route::get('rooms', [ChatController::class, 'getRooms']);
-        Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
-        Route::get('users', [ChatController::class, 'getUsers']);
-        
-        // Protected routes - require authentication
-        Route::middleware('auth:web')->group(function () {
+        Route::middleware('auth')->group(function () {
+            Route::get('rooms', [ChatController::class, 'getRooms']);
+            Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
+            Route::get('users', [ChatController::class, 'getUsers']);
             Route::post('rooms', [ChatController::class, 'store']);
             Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
             Route::post('upload', [ChatController::class, 'uploadFile']);
@@ -134,8 +132,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
             Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
         });
-        
-        // Legacy support
         Route::post('set-user', [ChatController::class, 'setUser']);
     });
+    */
 });

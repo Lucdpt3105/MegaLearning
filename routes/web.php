@@ -38,6 +38,25 @@ Route::get('/', function () {
 // Chat route - Requires authentication
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    
+    // Chat API endpoints (use web session)
+    Route::prefix('api/v1/chat')->group(function () {
+        Route::get('current-user', [ChatController::class, 'getCurrentUser']);
+        Route::get('rooms', [ChatController::class, 'getRooms']);
+        Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
+        Route::get('users', [ChatController::class, 'getUsers']);
+        Route::post('rooms', [ChatController::class, 'store']);
+        Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
+        Route::post('upload', [ChatController::class, 'uploadFile']);
+        Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
+        Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
+        Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
+        Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
+        Route::put('rooms/{roomId}', [ChatController::class, 'update']);
+        Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
+        Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
+        Route::post('set-user', [ChatController::class, 'setUser']); // Legacy
+    });
 });
 
 // Universal Dashboard Route (redirects based on role)
