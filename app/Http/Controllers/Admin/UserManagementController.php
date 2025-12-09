@@ -247,4 +247,34 @@ class UserManagementController extends Controller
 
         return back()->with('success', 'Cập nhật quyền thành công!');
     }
+
+    /**
+ * Danh sách HỌC SINH
+ */
+public function students()
+{
+    $users = \App\Models\User::role('student')->paginate(20);
+
+    return view('admin.users.students', compact('users'));
+}
+
+/**
+ * Danh sách GIÁO VIÊN
+ */
+public function teachers()
+{
+    $users = \App\Models\User::role('teacher')->paginate(20);
+
+    return view('admin.users.teachers', compact('users'));
+}
+
+/**
+ * Danh sách QUẢN TRỊ VIÊN
+ */
+public function admins()
+{
+    $users = \App\Models\User::role('admin')->paginate(20);
+
+    return view('admin.users.admins', compact('users'));
+}
 }

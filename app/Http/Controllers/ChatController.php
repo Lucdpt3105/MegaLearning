@@ -23,11 +23,11 @@ class ChatController extends Controller
      */
     public function index()
     {
-        // Lấy userId nếu đã đăng nhập, nếu không thì lấy tất cả rooms public
+        // Only show rooms for authenticated users
         $userId = Auth::check() ? Auth::id() : null;
         
         if ($userId) {
-            // Get all rooms user is member of
+            // Get ONLY rooms where this specific user is a member
             $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -36,12 +36,8 @@ class ChatController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
         } else {
-            // Get all public rooms (group type)
-            $rooms = ChatRoom::where('is_active', true)
-                ->where('room_type', 'group')
-                ->with(['latestMessage.user', 'members'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
+            // Guest users: return empty collection (must login to see rooms)
+            $rooms = collect([]);
         }
 
         return view('chat.index', compact('rooms'));
@@ -185,10 +181,18 @@ class ChatController extends Controller
             ]);
 
             $validated = $request->validate([
-                'message_text' => 'required|string|max:5000',
+                'message_text' => 'nullable|string|max:5000',
                 'message_type' => 'nullable|in:text,image,file',
                 'file_url' => 'nullable|string|max:500'
             ]);
+            
+            // Ensure at least message_text or file_url is provided
+            if (empty($validated['message_text']) && empty($validated['file_url'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng nhập tin nhắn hoặc đính kèm file'
+                ], 422);
+            }
 
             $room = ChatRoom::findOrFail($roomId);
 
@@ -344,13 +348,14 @@ class ChatController extends Controller
     
     /**
      * Get all chat rooms (API)
+     * Only returns rooms where the authenticated user is a member
      */
     public function getRooms(Request $request)
     {
         $userId = Auth::check() ? Auth::id() : null;
         
         if ($userId) {
-            // Get all rooms user is member of
+            // Get ONLY rooms where this specific user is a member
             $rooms = ChatRoom::whereHas('members', function($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -363,17 +368,16 @@ class ChatController extends Controller
             $rooms->each(function($room) use ($userId) {
                 $room->unread_count = $this->getUnreadCount($room->id, $userId);
             });
+            
+            \Log::info('getRooms() - User authenticated', [
+                'user_id' => $userId,
+                'rooms_count' => $rooms->count()
+            ]);
         } else {
-            // Get all public rooms (group type)
-            $rooms = ChatRoom::where('is_active', true)
-                ->where('room_type', 'group')
-                ->with(['latestMessage.user', 'members'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-                
-            $rooms->each(function($room) {
-                $room->unread_count = 0;
-            });
+            // Guest users: return empty array (must login to see rooms)
+            $rooms = collect([]);
+            
+            \Log::info('getRooms() - Guest user, returning empty rooms');
         }
         
         return response()->json([
@@ -545,11 +549,18 @@ class ChatController extends Controller
             ]);
         }
         
-        // No user found - must login
+        // No user found - return guest status (not an error)
         return response()->json([
-            'success' => false,
-            'message' => 'Not authenticated. Please login first.'
-        ], 401);
+            'success' => true,
+            'data' => [
+                'id' => null,
+                'name' => 'Guest',
+                'email' => null,
+                'role' => 'guest',
+                'is_authenticated' => false,
+                'source' => 'guest'
+            ]
+        ]);
     }
     
     /**
@@ -637,6 +648,62 @@ class ChatController extends Controller
             'success' => true,
             'room' => $room
         ]);
+    }
+    
+    /**
+     * Upload file for chat (images, documents, etc.)
+     */
+    public function uploadFile(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'file' => 'required|file|max:51200', // 50MB max
+                'type' => 'required|in:image,file'
+            ]);
+
+            $file = $request->file('file');
+            $userId = Auth::id();
+            
+            // Validate file type
+            if ($validated['type'] === 'image') {
+                $request->validate([
+                    'file' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240' // 10MB for images
+                ]);
+            }
+            
+            // Create unique filename
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '_' . $userId . '.' . $extension;
+            
+            // Store in public/storage/chat_files
+            $path = $file->storeAs('chat_files', $filename, 'public');
+            
+            // Get full URL
+            $url = asset('storage/' . $path);
+            
+            return response()->json([
+                'success' => true,
+                'file_url' => $url,
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'file_type' => $file->getMimeType()
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error uploading file', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi upload file: ' . $e->getMessage()
+            ], 500);
+        }
     }
     
     /**

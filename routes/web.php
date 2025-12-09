@@ -38,6 +38,25 @@ Route::get('/', function () {
 // Chat route - Requires authentication
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    
+    // Chat API endpoints (use web session)
+    Route::prefix('api/v1/chat')->group(function () {
+        Route::get('current-user', [ChatController::class, 'getCurrentUser']);
+        Route::get('rooms', [ChatController::class, 'getRooms']);
+        Route::get('rooms/{roomId}/messages', [ChatController::class, 'getMessages']);
+        Route::get('users', [ChatController::class, 'getUsers']);
+        Route::post('rooms', [ChatController::class, 'store']);
+        Route::post('rooms/{roomId}/messages', [ChatController::class, 'sendMessage']);
+        Route::post('upload', [ChatController::class, 'uploadFile']);
+        Route::post('rooms/{roomId}/mark-read', [ChatController::class, 'markAsRead']);
+        Route::get('unread-count', [ChatController::class, 'getTotalUnreadCount']);
+        Route::post('rooms/{roomId}/members', [ChatController::class, 'addMember']);
+        Route::delete('rooms/{roomId}/members/{userId}', [ChatController::class, 'removeMember']);
+        Route::put('rooms/{roomId}', [ChatController::class, 'update']);
+        Route::delete('rooms/{roomId}', [ChatController::class, 'destroy']);
+        Route::post('rooms/private', [ChatController::class, 'createPrivateRoom']);
+        Route::post('set-user', [ChatController::class, 'setUser']); // Legacy
+    });
 });
 
 // Universal Dashboard Route (redirects based on role)
@@ -62,6 +81,34 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', [StudentController::class, 'welcome'])->name('dashboard');
     Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
+    
+    // Courses Management (UC-STUDENT-001 to UC-STUDENT-006)
+    Route::get('/courses', [App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/browse', [App\Http\Controllers\Student\CourseController::class, 'browse'])->name('courses.browse');
+    Route::get('/courses/{id}', [App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/materials', [App\Http\Controllers\Student\CourseController::class, 'materials'])->name('courses.materials');
+    Route::get('/courses/{id}/schedule', [App\Http\Controllers\Student\CourseController::class, 'schedule'])->name('courses.schedule');
+    Route::post('/courses/{id}/enroll', [App\Http\Controllers\Student\CourseController::class, 'enroll'])->name('courses.enroll');
+    
+    // Documents Download
+    Route::get('/documents/{documentId}/download', [App\Http\Controllers\Student\CourseController::class, 'downloadDocument'])->name('documents.download');
+    
+    // Video Calls Management
+    Route::get('/video-calls', [App\Http\Controllers\Student\VideoCallController::class, 'index'])->name('video-calls.index');
+    Route::get('/video-calls/{id}', [App\Http\Controllers\Student\VideoCallController::class, 'show'])->name('video-calls.show');
+    Route::get('/video-calls/{id}/join', [App\Http\Controllers\Student\VideoCallController::class, 'join'])->name('video-calls.join');
+    Route::post('/video-calls/{id}/leave', [App\Http\Controllers\Student\VideoCallController::class, 'leave'])->name('video-calls.leave');
+    
+    // Exams Management
+    Route::get('/exams', [App\Http\Controllers\Student\ExamController::class, 'index'])->name('exams.index');
+    Route::get('/exams/{id}', [App\Http\Controllers\Student\ExamController::class, 'show'])->name('exams.show');
+    Route::match(['get', 'post'], '/exams/{id}/take', [App\Http\Controllers\Student\ExamController::class, 'take'])->name('exams.take');
+    Route::post('/exams/{id}/submit', [App\Http\Controllers\Student\ExamController::class, 'submit'])->name('exams.submit');
+    Route::get('/exams/result/{submissionId}', [App\Http\Controllers\Student\ExamController::class, 'result'])->name('exams.result');
+    
+    // Grades Management
+    Route::get('/grades', [App\Http\Controllers\Student\GradeController::class, 'index'])->name('grades.index');
+    Route::get('/grades/{submissionId}', [App\Http\Controllers\Student\GradeController::class, 'show'])->name('grades.show');
 });
 
 // Teacher Routes
@@ -148,11 +195,113 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
 });
 
 // Admin Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    // Dashboard
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+
+    // ADMIN COURSES (THEO NEO UI)
+Route::prefix('admin/courses')->name('admin.courses.')->middleware(['auth','role:admin'])->group(function () {
+
+    Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
+        ->name('index');
+
+    Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
+        ->name('create');
+
+    Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
+        ->name('store');
+
+    Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
+        ->name('edit');
+
+    Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
+        ->name('update');
+
+    Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
+        ->name('destroy');
+});
+
+// ======================
+//  ADMIN PROFILE ROUTES
+// ======================
+Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])
+    ->name('profile');
+
+Route::put('/profile/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])
+    ->name('profile.update');
+
+Route::put('/profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])
+    ->name('profile.password');
+Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::class, 'updateAvatar'])
+    ->name('profile.avatar');
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 1. DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/', fn() => view('admin.dashboard'))->name('dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 2. ADMIN → USER MANAGEMENT (tự viết)
+    |-------------------------------------------------------------------------- 
+    */
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('destroy');
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 3. ADMIN → TESTER MANAGEMENT
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('tester')->name('tester.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\TesterController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\TesterController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\TesterController::class, 'store'])->name('store');
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 4. ADMIN → VIEW USERS BY ROLE
+    |--------------------------------------------------------------------------
+    */
+ Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])
+    ->name('students.index');
+
+Route::get('/teachers', [App\Http\Controllers\Admin\UserManagementController::class, 'teachers'])
+    ->name('teachers.index');
+
+Route::get('/admins', [App\Http\Controllers\Admin\UserManagementController::class, 'admins'])
+    ->name('admins.index');
+
+    Route::get('/profile', function () {
+    return view('admin.profile');
+})->name('profile');
+
+Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])
+    ->name('settings');
+Route::post('/settings/update-general', [App\Http\Controllers\Admin\SettingsController::class, 'updateGeneral'])
+    ->name('settings.update.general');
+
+Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsController::class, 'updateSecurity'])
+    ->name('settings.update.security');
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 5. SYSTEM ROUTES (GIỮ NGUYÊN)
+    |--------------------------------------------------------------------------
+    */
 
     // Statistics Dashboard
     Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
@@ -162,66 +311,34 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/statistics/rankings', [App\Http\Controllers\Admin\StatisticsController::class, 'rankings'])->name('statistics.rankings');
     Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
 
-    // User Management (UC-ADM-010 to UC-ADM-015)
+
+    // User Management (resource)
     Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
     Route::post('users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
     Route::post('users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
 
-    // Subjects Management
-    Route::get('/subjects', function () {
-        return view('admin.subjects.index');
-    })->name('subjects.index');
 
-    Route::get('/subjects/create', function () {
-        return view('admin.subjects.create');
-    })->name('subjects.create');
+    // Subjects
+    Route::get('/subjects', fn() => view('admin.subjects.index'))->name('subjects.index');
+    Route::get('/subjects/create', fn() => view('admin.subjects.create'))->name('subjects.create');
+    Route::get('/subjects/{id}', fn($id) => view('admin.subjects.show', ['id' => $id]))->name('subjects.show');
+    Route::get('/subjects/{id}/edit', fn($id) => view('admin.subjects.edit', ['id' => $id]))->name('subjects.edit');
 
-    Route::get('/subjects/{id}', function ($id) {
-        return view('admin.subjects.show', ['id' => $id]);
-    })->name('subjects.show');
+    // Topics
+    Route::get('/topics', fn() => view('admin.topics.index'))->name('topics.index');
+    Route::get('/topics/create', fn() => view('admin.topics.create'))->name('topics.create');
+    Route::get('/topics/{id}/edit', fn($id) => view('admin.topics.edit', ['id' => $id]))->name('topics.edit');
 
-    Route::get('/subjects/{id}/edit', function ($id) {
-        return view('admin.subjects.edit', ['id' => $id]);
-    })->name('subjects.edit');
+    // Questions
+    Route::get('/questions', fn() => view('admin.questions.index'))->name('questions.index');
+    Route::get('/questions/create', fn() => view('admin.questions.create'))->name('questions.create');
+    Route::get('/questions/{id}/edit', fn($id) => view('admin.questions.edit', ['id' => $id]))->name('questions.edit');
 
-    // Topics Management
-    Route::get('/topics', function () {
-        return view('admin.topics.index');
-    })->name('topics.index');
+    // Exams
+    Route::get('/exams', fn() => view('admin.exams.index'))->name('exams.index');
+    Route::get('/exams/create', fn() => view('admin.exams.create'))->name('exams.create');
+    Route::get('/exams/{id}/edit', fn($id) => view('admin.exams.edit', ['id' => $id]))->name('exams.edit');
 
-    Route::get('/topics/create', function () {
-        return view('admin.topics.create');
-    })->name('topics.create');
-
-    Route::get('/topics/{id}/edit', function ($id) {
-        return view('admin.topics.edit', ['id' => $id]);
-    })->name('topics.edit');
-
-    // Questions Management
-    Route::get('/questions', function () {
-        return view('admin.questions.index');
-    })->name('questions.index');
-
-    Route::get('/questions/create', function () {
-        return view('admin.questions.create');
-    })->name('questions.create');
-
-    Route::get('/questions/{id}/edit', function ($id) {
-        return view('admin.questions.edit', ['id' => $id]);
-    })->name('questions.edit');
-
-    // Exams Management
-    Route::get('/exams', function () {
-        return view('admin.exams.index');
-    })->name('exams.index');
-
-    Route::get('/exams/create', function () {
-        return view('admin.exams.create');
-    })->name('exams.create');
-
-    Route::get('/exams/{id}/edit', function ($id) {
-        return view('admin.exams.edit', ['id' => $id]);
-    })->name('exams.edit');
 });
 
 // forum routes

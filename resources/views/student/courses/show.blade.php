@@ -35,19 +35,19 @@
                 </div>
             </div>
             <div class="text-right">
-                <div class="bg-white bg-opacity-20 rounded-lg p-4">
-                    <p class="text-sm text-indigo-100 mb-1">Tiến Độ Học Tập</p>
-                    <p class="text-4xl font-bold">{{ $progressPercentage }}%</p>
+                <div class="bg-white rounded-lg p-4 shadow-md">
+                    <p class="text-sm text-gray-600 font-semibold mb-2">Tiến Độ Học Tập</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $progressPercentage }}%</p>
                 </div>
             </div>
         </div>
 
         <!-- Enrollment Info -->
         <div class="mt-6 pt-6 border-t border-indigo-400">
-            <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center justify-between text-sm text-white">
                 <span>Ngày đăng ký: {{ $enrollment->enrolled_at->format('d/m/Y H:i') }}</span>
-                <span class="px-3 py-1 bg-white bg-opacity-20 rounded-full">
-                    Trạng thái: {{ $enrollment->status === 'active' ? 'Đang Học' : ucfirst($enrollment->status) }}
+                <span class="px-3 py-1 rounded-full font-medium {{ $enrollment->status === 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
+                    Trạng thái: {{ $enrollment->status === 'active' ? 'Đang Học' : 'Không Học' }}
                 </span>
             </div>
         </div>
