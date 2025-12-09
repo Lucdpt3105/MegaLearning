@@ -20,6 +20,95 @@
         </a>
     </div>
 
+    <!-- Search and Filter Bar -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <form action="{{ route('student.courses.browse') }}" method="GET" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Search Box -->
+                <div class="md:col-span-2">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                        🔍 Tìm kiếm khóa học
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            id="search"
+                            value="{{ request('search') }}"
+                            placeholder="Tìm theo tên khóa học, môn học, giáo viên..."
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        >
+                        <svg class="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Subject Filter -->
+                <div>
+                    <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        📚 Môn học
+                    </label>
+                    <select 
+                        name="subject_id" 
+                        id="subject_id"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                        <option value="">Tất cả môn học</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
+                                {{ $subject->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-3">
+                <button 
+                    type="submit"
+                    class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all duration-200"
+                >
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Tìm kiếm
+                </button>
+                
+                @if(request('search') || request('subject_id'))
+                    <a 
+                        href="{{ route('student.courses.browse') }}"
+                        class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-all duration-200"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Xóa bộ lọc
+                    </a>
+                @endif
+            </div>
+
+            <!-- Search Results Info -->
+            @if(request('search') || request('subject_id'))
+                <div class="flex items-center space-x-2 text-sm text-gray-600 pt-2 border-t">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>
+                        Tìm thấy <strong class="text-indigo-600">{{ $availableClasses->count() }}</strong> khóa học
+                        @if(request('search'))
+                            với từ khóa "<strong>{{ request('search') }}</strong>"
+                        @endif
+                        @if(request('subject_id'))
+                            trong môn <strong>{{ $subjects->find(request('subject_id'))->name ?? '' }}</strong>
+                        @endif
+                    </span>
+                </div>
+            @endif
+        </form>
+    </div>
+
     <!-- Available Courses -->
     @if($availableClasses->isEmpty())
         <div class="bg-white rounded-xl shadow-md p-12 text-center">

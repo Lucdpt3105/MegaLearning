@@ -40,6 +40,19 @@ trait ForumQuestionData
             ->with('user:id,name')
             ->withSum(['votes as votes_sum' => function ($q) { $q->whereNull('forum_answer_id'); }], 'value')
             ->withCount('answers as answers_count');
+        
+        // Apply search filter
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                  ->orWhere('content', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($userQ) use ($search) {
+                      $userQ->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+        
         switch ($sort) {
             case 'votes':
                 $query->orderByDesc('votes_sum')->orderByDesc('created_at');
