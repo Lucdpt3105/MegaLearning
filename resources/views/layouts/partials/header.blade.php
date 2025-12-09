@@ -1,16 +1,87 @@
 <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
     <!-- Search Bar -->
-    <div class="flex-1 max-w-2xl">
-        <div class="relative">
+    <div class="flex-1 max-w-2xl" x-data="globalSearch()" @click.away="showSuggestions = false">
+        <form action="{{ route('search.index') }}" method="GET" class="relative">
             <input 
                 type="text" 
-                placeholder="Search for quizzes, courses, or topics..."
-                class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
+                name="q"
+                x-model="searchQuery"
+                @input.debounce.300ms="fetchSuggestions()"
+                @focus="showSuggestions = true"
+                @keydown.escape="showSuggestions = false"
+                placeholder="Tìm kiếm khóa học, tài liệu, diễn đàn..."
+                class="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                autocomplete="off"
             >
-            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-        </div>
+            
+            <!-- Clear button -->
+            <button 
+                type="button"
+                x-show="searchQuery.length > 0"
+                @click="searchQuery = ''; suggestions = []; showSuggestions = false"
+                class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <!-- Suggestions Dropdown -->
+            <div 
+                x-show="showSuggestions && (suggestions.length > 0 || loading)"
+                x-transition
+                class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50"
+            >
+                <!-- Loading State -->
+                <template x-if="loading">
+                    <div class="p-4 text-center text-gray-500">
+                        <svg class="animate-spin h-5 w-5 mx-auto text-indigo-600" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-sm mt-2">Đang tìm kiếm...</p>
+                    </div>
+                </template>
+
+                <!-- Suggestions List -->
+                <template x-if="!loading && suggestions.length > 0">
+                    <ul>
+                        <template x-for="(item, index) in suggestions" :key="index">
+                            <li>
+                                <a 
+                                    :href="item.url"
+                                    class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                                >
+                                    <span class="text-2xl" x-text="item.icon"></span>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-gray-900 truncate" x-text="item.title"></p>
+                                        <p class="text-xs text-gray-500" x-text="item.subtitle"></p>
+                                    </div>
+                                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                        </template>
+                        <!-- View All Results -->
+                        <li>
+                            <button 
+                                type="submit"
+                                class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                                <span>Xem tất cả kết quả</span>
+                            </button>
+                        </li>
+                    </ul>
+                </template>
+            </div>
+        </form>
     </div>
 
     <!-- Right Section -->

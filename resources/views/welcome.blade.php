@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MegaLearning - Nền tảng học tập hiện đại</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/favicon.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -65,11 +66,8 @@
     <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 hero-gradient rounded-lg flex items-center justify-center">
-                        <i class="fas fa-graduation-cap text-white text-xl"></i>
-                    </div>
-                    <span class="text-2xl font-bold gradient-text">MegaLearning</span>
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning Logo" class="h-12 w-auto">
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
