@@ -200,41 +200,21 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-    // ADMIN COURSES (THEO NEO UI)
-Route::prefix('admin/courses')->name('admin.courses.')->middleware(['auth','role:admin'])->group(function () {
+    // ADMIN COURSES
+    Route::prefix('courses')->name('courses.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])->name('update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
-        ->name('index');
-
-    Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
-        ->name('create');
-
-    Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
-        ->name('store');
-
-    Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
-        ->name('edit');
-
-    Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
-        ->name('update');
-
-    Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
-        ->name('destroy');
-});
-
-// ======================
-//  ADMIN PROFILE ROUTES
-// ======================
-Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])
-    ->name('profile');
-
-Route::put('/profile/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])
-    ->name('profile.update');
-
-Route::put('/profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])
-    ->name('profile.password');
-Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::class, 'updateAvatar'])
-    ->name('profile.avatar');
+    // ADMIN PROFILE ROUTES
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::class, 'updateAvatar'])->name('profile.avatar');
 
     /*
     |--------------------------------------------------------------------------
