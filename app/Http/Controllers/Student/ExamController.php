@@ -229,7 +229,12 @@ class ExamController extends Controller
         $score = null;
         $gradingStatus = 'pending';
         
-        if ($exam->type === 'multiple_choice' || $exam->type === 'mixed') {
+        // Check if exam has any multiple choice questions
+        $hasMC = $exam->questions->contains(function($q) {
+            return $q->type === 'multiple_choice';
+        });
+        
+        if ($hasMC) {
             $score = $this->calculateScore($exam, $answers);
             $gradingStatus = 'auto_graded';
         }
@@ -244,9 +249,10 @@ class ExamController extends Controller
             'grading_status' => $gradingStatus
         ]);
         
-        if ($exam->show_results_immediately && $gradingStatus === 'auto_graded') {
+        // Always show results for auto-graded exams (including partial auto-grade)
+        if ($gradingStatus === 'auto_graded' || $hasMC) {
             return redirect()->route('student.exams.result', $submission->id)
-                ->with('success', 'Đã nộp bài thành công!');
+                ->with('success', 'Đã nộp bài thành công! Dưới đây là kết quả của bạn.');
         }
         
         return redirect()->route('student.exams.index')
@@ -266,9 +272,10 @@ class ExamController extends Controller
         
         $exam = $submission->exam;
         
-        if (!$exam->show_results_immediately && $submission->grading_status !== 'graded') {
+        // Allow viewing results for auto-graded or graded submissions
+        if ($submission->grading_status === 'pending') {
             return redirect()->route('student.exams.index')
-                ->with('error', 'Kết quả chưa được công bố!');
+                ->with('info', 'Bài thi của bạn đang được chấm. Kết quả sẽ được công bố sớm!');
         }
         
         // Map answers
@@ -291,7 +298,7 @@ class ExamController extends Controller
             if ($question->type === 'multiple_choice') {
                 $correctAnswer = $question->answers->where('is_correct', true)->first();
                 $question->correct_answer_id = $correctAnswer ? $correctAnswer->id : null;
-                $question->is_correct = $studentAnswer == $question->correct_answer_id;
+                $question->is_correct = $correctAnswer && $studentAnswer && (string)$studentAnswer === (string)$correctAnswer->id;
             }
             
             return $question;
@@ -309,23 +316,32 @@ class ExamController extends Controller
         $earnedPoints = 0;
         
         foreach ($exam->questions as $question) {
+            // Get points from pivot table (exam_questions)
             $points = $question->pivot->points ?? 1;
-            $totalPoints += $points;
             
+            // Only count multiple choice questions towards total for auto-grading
             if ($question->type === 'multiple_choice') {
-                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                $totalPoints += $points;
+                
+                // Get student's answer for this question
                 $studentAnswer = $answers[$question->id] ?? null;
                 
-                if ($correctAnswer && $studentAnswer == $correctAnswer->id) {
+                // Find the correct answer
+                $correctAnswer = $question->answers->where('is_correct', true)->first();
+                
+                // Check if student answered correctly (use loose comparison to handle string/int mismatch)
+                if ($correctAnswer && $studentAnswer && (string)$studentAnswer === (string)$correctAnswer->id) {
                     $earnedPoints += $points;
                 }
             }
         }
         
+        // If no multiple choice questions, return 0
         if ($totalPoints == 0) {
             return 0;
         }
         
-        return ($earnedPoints / $totalPoints) * $exam->total_points;
+        // Return earned points directly
+        return round($earnedPoints, 2);
     }
 }

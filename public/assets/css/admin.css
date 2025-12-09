@@ -1,0 +1,421 @@
+:root {
+    --ml-primary: #4f46e5;          /* indigo-600 */
+    --ml-primary-alt: #7c3aed;      /* purple-600 */
+    --ml-bg: #f9fafb;               /* gray-50 */
+    --ml-header-bg: #ffffff;
+    --ml-dark: #1f2937;             /* gray-800 */
+    --ml-dark-light: #374151;       /* gray-700 */
+    --ml-border: #e5e7eb;           /* gray-200 */
+    --ml-text: #111827;             /* gray-900 */
+    --ml-text-light: #6b7280;       /* gray-500 */
+}
+
+body {
+    background-color: var(--ml-bg);
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ======================= SIDEBAR ======================= */
+
+.page-sidebar {
+    background: linear-gradient(180deg, var(--ml-primary), var(--ml-primary-alt));
+    color: #fff;
+}
+
+.page-sidebar .logo {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s ease;
+    text-decoration: none;
+    border-radius: 8px;
+    margin: 8px 12px;
+}
+
+.page-sidebar .logo:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.page-sidebar .logo img {
+    filter: brightness(0) invert(1);
+    object-fit: contain;
+}
+
+.page-sidebar .accordion-menu {
+    margin-top: 8px;
+}
+
+.page-sidebar .accordion-menu > li {
+    margin: 4px 8px;
+    border-radius: 16px;
+}
+
+.page-sidebar .accordion-menu > li > a {
+    color: #e0e7ff;
+    font-weight: 500;
+    padding: 12px 18px;
+    transition: 0.25s ease;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-sidebar .accordion-menu > li > a i[data-feather],
+.page-sidebar .accordion-menu > li > a i.fa,
+.page-sidebar .accordion-menu > li > a i.fas {
+    margin-right: 10px;
+}
+
+.page-sidebar .accordion-menu > li > a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+.page-sidebar .accordion-menu > li.active-page > a,
+.page-sidebar .accordion-menu > li > a.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+}
+
+/* ======================= HEADER ======================= */
+
+.page-header {
+    background-color: var(--ml-header-bg);
+    border-bottom: 1px solid var(--ml-border);
+}
+
+.page-header .navbar {
+    box-shadow: none;
+    background: var(--ml-header-bg);
+    padding: 14px 28px;
+}
+
+.header-title h5 {
+    color: var(--ml-text);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+/* ======================= SEARCH BAR ======================= */
+.ml-header-search-wrapper {
+    flex: 0 0 420px;
+    max-width: 420px;
+}
+
+.ml-search-bar {
+    background-color: var(--ml-dark);
+    border-radius: 999px;
+    padding: 9px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s ease;
+}
+
+.ml-search-bar:hover {
+    background-color: var(--ml-dark-light);
+}
+
+.ml-search-icon {
+    color: #9ca3af;
+    font-size: 15px;
+}
+
+.ml-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #f3f4f6;
+    width: 100%;
+    font-size: 14px;
+}
+
+.ml-search-input::placeholder {
+    color: #9ca3af;
+}
+
+/* ======================= NOTIFICATION BUTTON ======================= */
+
+.ml-notify-btn {
+    border: none;
+    outline: none;
+    background-color: var(--ml-dark);
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s ease;
+}
+
+.ml-notify-btn:hover {
+    background-color: var(--ml-dark-light);
+}
+
+.ml-notify-icon {
+    width: 20px;
+    height: 20px;
+    color: #e5e7eb;
+}
+
+.ml-notify-badge {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fee2e2; /* red-100 */
+    color: #b91c1c;           /* red-700 */
+    font-size: 11px;
+    padding: 0 6px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* ======================= AVATAR ======================= */
+
+.ml-avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background-color: #f3f4f6;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ml-avatar-name {
+    font-size: 13px;
+    color: var(--ml-text-light);
+    margin-top: 4px;
+}
+
+/* ======================= PAGE CONTENT ======================= */
+
+.page-content {
+    background-color: var(--ml-bg);
+    min-height: 100vh;
+}
+
+.main-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 16px 40px;
+}
+
+.main-wrapper-page-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ml-text);
+    margin-bottom: 24px;
+}
+
+/* ===== STATS CARDS (dashboard) ===== */
+.stats-card {
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.stats-card .card-body {
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #f3f4f6;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stats-card .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--ml-text);
+}
+
+.stats-card .stats-text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ml-text-light);
+}
+
+.stats-change {
+    font-size: 13px;
+    border-radius: 999px;
+    padding: 3px 8px;
+    margin-left: 6px;
+}
+
+.stats-change-success {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.stats-change-danger {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.stats-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.change-success {
+    background-color: #ecfdf5;
+    color: #16a34a;
+}
+
+.change-danger {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+/* ===== CHART + LỊCH HỌP (dashboard) ===== */
+
+.main-chart-card {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+}
+
+.main-chart-card .card-body {
+    padding: 20px 22px 24px;
+    background: #ffffff;
+}
+
+.main-chart-card .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ml-text);
+    margin-bottom: 10px;
+}
+
+.ml-meeting-card {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.ml-meeting-card .card-body {
+    background: #111827;
+    color: #f9fafb;
+    padding: 20px 22px 22px;
+}
+
+.ml-meeting-card .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.ml-meeting-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+}
+
+.ml-meeting-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.ml-meeting-icon.video {
+    background: #38bdf8; /* sky-400 */
+}
+
+.ml-meeting-icon.users {
+    background: #fbbf24; /* amber-400 */
+}
+
+.ml-meeting-text h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.ml-meeting-text p {
+    font-size: 13px;
+    margin: 0;
+    color: #e5e7eb;
+}
+
+.ml-meeting-card .btn {
+    margin-top: 18px;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ======================= STATISTICS PAGE (sử dụng trong admin.statistics.index) ======================= */
+
+/* card lớn tổng quan */
+.stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+    transform: translateY(-2px);
+}
+
+/* icon bên phải trong stat-card */
+.stat-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: #ffffff;
+}
+
+/* box chung (log đăng nhập, widget link, ranking box...) */
+.widget-container {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+/* container cho chart.js */
+.chart-container {
+    position: relative;
+    height: 300px;
+}

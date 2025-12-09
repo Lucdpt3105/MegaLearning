@@ -31,120 +31,99 @@
     </div>
     @endif
 
-    <!-- Class Info -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <p class="text-gray-600 text-sm">Môn học</p>
-            <p class="text-lg font-bold text-gray-900 mt-1">{{ $classRoom->subject->name }}</p>
-            <p class="text-xs text-gray-500">{{ $classRoom->subject->code }}</p>
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <p class="text-gray-600 text-sm">Số học sinh</p>
-            <p class="text-3xl font-bold text-blue-600 mt-1">{{ $classRoom->students->count() }}</p>
-            @if($classRoom->max_students)
-            <p class="text-xs text-gray-500">Tối đa: {{ $classRoom->max_students }}</p>
-            @endif
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <p class="text-gray-600 text-sm">Trạng thái</p>
-            <p class="text-sm font-bold mt-1 {{ $classRoom->status === 'active' ? 'text-green-600' : 'text-gray-600' }}">
-                {{ $classRoom->status === 'active' ? '✅ Hoạt động' : '❌ Đã đóng' }}
-            </p>
-        </div>
-
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <p class="text-gray-600 text-sm">Thời gian</p>
-            <p class="text-sm font-medium text-gray-900 mt-1">
-                {{ $classRoom->start_date ? $classRoom->start_date->format('d/m/Y') : 'N/A' }}
-            </p>
+    <!-- Class Info Bar - Compact -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-6 text-sm">
+            <div class="flex items-center space-x-2">
+                <span class="text-gray-500 font-medium">Môn học:</span>
+                <span class="font-semibold text-gray-900">{{ $classRoom->subject->name }}</span>
+                <span class="text-xs text-gray-400">({{ $classRoom->subject->code }})</span>
+            </div>
+            <div class="h-4 w-px bg-gray-300"></div>
+            <div class="flex items-center space-x-2">
+                <span class="text-gray-500 font-medium">Học sinh:</span>
+                <span class="font-bold text-blue-600">{{ $classRoom->students->count() }}</span>
+                @if($classRoom->max_students)
+                <span class="text-gray-400">/ {{ $classRoom->max_students }}</span>
+                @endif
+            </div>
+            <div class="h-4 w-px bg-gray-300"></div>
+            <div class="flex items-center space-x-2">
+                <span class="text-gray-500 font-medium">Trạng thái:</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $classRoom->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
+                    {{ $classRoom->status === 'active' ? '✓ Hoạt động' : '✕ Đã đóng' }}
+                </span>
+            </div>
+            <div class="h-4 w-px bg-gray-300"></div>
+            <div class="flex items-center space-x-2">
+                <span class="text-gray-500 font-medium">Bắt đầu:</span>
+                <span class="text-gray-900">{{ $classRoom->start_date ? $classRoom->start_date->format('d/m/Y') : 'N/A' }}</span>
+            </div>
         </div>
     </div>
 
-    <!-- Quick Actions Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <a href="{{ route('teacher.documents.create', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-indigo-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-indigo-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Thêm tài liệu</h3>
-                    <p class="text-sm text-gray-600">UC-GV-071</p>
-                </div>
-            </div>
-        </a>
+    <!-- Action Toolbar - Compact Button Style -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <!-- Primary Actions -->
+            <a href="{{ route('teacher.documents.create', ['subject_id' => $classRoom->subject_id]) }}" 
+               class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Thêm tài liệu
+            </a>
 
-        <a href="{{ route('teacher.exams.create', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-purple-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-purple-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Tạo đề thi</h3>
-                    <p class="text-sm text-gray-600">UC-GV-032</p>
-                </div>
-            </div>
-        </a>
+            <a href="{{ route('teacher.exams.create', ['subject_id' => $classRoom->subject_id]) }}" 
+               class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Tạo đề thi
+            </a>
 
-        <a href="{{ route('teacher.exams.index', ['subject_id' => $classRoom->subject_id]) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-green-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-green-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Xem đề thi</h3>
-                    <p class="text-sm text-gray-600">UC-GV-030</p>
-                </div>
-            </div>
-        </a>
+            <a href="{{ route('teacher.exams.index', ['subject_id' => $classRoom->subject_id]) }}" 
+               class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                Xem đề thi
+            </a>
 
-        <a href="{{ route('teacher.questions.by-subject', $classRoom->subject) }}" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-orange-500">
-            <div class="flex items-center space-x-4">
-                <div class="bg-orange-100 p-3 rounded-xl">
-                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900">Ngân hàng câu hỏi</h3>
-                    <p class="text-sm text-gray-600">UC-GV-020</p>
-                </div>
-            </div>
-        </a>
-    </div>
+            <a href="{{ route('teacher.questions.by-subject', $classRoom->subject) }}" 
+               class="inline-flex items-center px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Ngân hàng câu hỏi
+            </a>
 
-    <!-- Secondary Actions -->
-    <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Thao tác khác</h2>
-        <div class="flex flex-wrap gap-3">
-            <button onclick="openAddStudentModal()" class="inline-flex items-center space-x-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="h-6 w-px bg-gray-300 mx-1"></div>
+
+            <!-- Secondary Actions -->
+            <button onclick="openAddStudentModal()" 
+                    class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
-                <span>Thêm học sinh (UC-GV-051)</span>
+                Thêm học sinh
             </button>
 
-            <a href="{{ route('teacher.subjects.show', $classRoom->subject) }}" class="inline-flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ route('teacher.subjects.show', $classRoom->subject) }}" 
+               class="inline-flex items-center px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <span>Xem môn học</span>
+                Xem môn học
             </a>
 
             @if($chatRoom)
-            <a href="{{ url('/chat') }}?room={{ $chatRoom->id }}" target="_blank" class="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{{ url('/chat') }}?room={{ $chatRoom->id }}" target="_blank" 
+               class="inline-flex items-center px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
-                <span>Mở Chat Room</span>
+                Chat Room
             </a>
             @endif
         </div>
@@ -208,52 +187,52 @@
 
         @if($classRoom->students->count() > 0)
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Học sinh</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã HS</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email / SĐT</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giới tính</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ghi chú</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+            <table class="min-w-full">
+                <thead>
+                    <tr class="border-b border-gray-200 bg-gray-50">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Học sinh</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mã HS</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Liên hệ</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Giới tính</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạng thái</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ghi chú</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Thao tác</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200" id="studentTableBody">
+                <tbody class="bg-white" id="studentTableBody">
                     @foreach($classRoom->students as $student)
-                    <tr class="hover:bg-gray-50 student-row" 
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors student-row" 
                         data-name="{{ strtolower($student->name) }}" 
                         data-email="{{ strtolower($student->email) }}" 
                         data-student-id="{{ strtolower($student->student_id ?? '') }}"
                         data-gender="{{ $student->gender ?? '' }}">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-3">
                             <div class="flex items-center">
                                 @if($student->avatar)
-                                <img src="{{ asset('storage/' . $student->avatar) }}" alt="{{ $student->name }}" class="shrink-0 h-10 w-10 rounded-full object-cover">
+                                <img src="{{ asset('storage/' . $student->avatar) }}" alt="{{ $student->name }}" class="shrink-0 h-9 w-9 rounded-full object-cover">
                                 @else
-                                <div class="shrink-0 h-10 w-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
+                                <div class="shrink-0 h-9 w-9 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                     {{ substr($student->name, 0, 1) }}
                                 </div>
                                 @endif
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-semibold text-gray-900">{{ $student->name }}</div>
                                     @if($student->date_of_birth)
                                     <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($student->date_of_birth)->format('d/m/Y') }}</div>
                                     @endif
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $student->student_id ?? 'N/A' }}</div>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-700 font-mono">{{ $student->student_id ?? 'N/A' }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-3">
                             <div class="text-sm text-gray-900">{{ $student->email }}</div>
                             @if($student->phone)
-                            <div class="text-xs text-gray-500">{{ $student->phone }}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">{{ $student->phone }}</div>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-3 text-center">
                             @if($student->gender === 'male')
                             <span class="text-sm text-gray-700">👨 Nam</span>
                             @elseif($student->gender === 'female')
@@ -261,33 +240,39 @@
                             @elseif($student->gender === 'other')
                             <span class="text-sm text-gray-700">⚧ Khác</span>
                             @else
-                            <span class="text-sm text-gray-400">N/A</span>
+                            <span class="text-sm text-gray-400">—</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-700">
                                 ✓ Đang học
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm text-gray-500 max-w-xs truncate">
-                                {{ $student->pivot->notes ?? 'Chưa có ghi chú' }}
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-600 max-w-xs truncate">
+                                {{ $student->pivot->notes ?? '—' }}
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex justify-end space-x-2">
-                                <button onclick='openEditStudentModal(@json($student))' class="text-blue-600 hover:text-blue-900" title="Cập nhật thông tin học sinh">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <td class="px-4 py-3">
+                            <div class="flex justify-center items-center space-x-2">
+                                <button onclick='openEditStudentModal(@json($student))' 
+                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors" 
+                                        title="Cập nhật thông tin">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
                                 </button>
-                                <button onclick="openEditNotesModal({{ $student->id }}, '{{ addslashes($student->name) }}', '{{ addslashes($student->pivot->notes ?? '') }}')" class="text-indigo-600 hover:text-indigo-900" title="Sửa ghi chú (UC-GV-053)">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button onclick="openEditNotesModal({{ $student->id }}, '{{ addslashes($student->name) }}', '{{ addslashes($student->pivot->notes ?? '') }}')" 
+                                        class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" 
+                                        title="Sửa ghi chú">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </button>
-                                <button onclick="removeStudent({{ $student->id }})" class="text-red-600 hover:text-red-900" title="Xóa khỏi lớp (UC-GV-052)">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button onclick="removeStudent({{ $student->id }})" 
+                                        class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors" 
+                                        title="Xóa khỏi lớp">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
@@ -318,74 +303,55 @@
     <!-- Tab Content: Chat Management -->
     @if($chatRoom)
     <div id="content-chat" class="tab-content hidden">
-    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
-        <!-- Chat Room Stats -->
-        <div class="p-6 border-b border-gray-200">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-blue-100 p-3 rounded-xl">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+        <!-- Compact Summary Bar + Toolbar -->
+        <div class="p-4 border-b border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <!-- Left: Stats Summary -->
+                <div class="flex flex-wrap items-center gap-4 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500">👥 Thành viên:</span>
+                        <span class="font-bold text-gray-900">{{ $chatRoom->members->count() }}</span>
                     </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Thành viên</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $chatRoom->members->count() }}</p>
+                    <div class="h-4 w-px bg-gray-300"></div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500">💬 Tin nhắn:</span>
+                        <span class="font-bold text-gray-900">{{ $chatRoom->messages->count() }}</span>
                     </div>
-                </div>
-
-                <div class="flex items-center space-x-3">
-                    <div class="bg-green-100 p-3 rounded-xl">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Tin nhắn</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $chatRoom->messages->count() }}</p>
+                    <div class="h-4 w-px bg-gray-300"></div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-500">Trạng thái:</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold {{ $chatRoom->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                            {{ $chatRoom->is_active ? '🟢 Hoạt động' : '🔴 Đã đóng' }}
+                        </span>
                     </div>
                 </div>
-
-                <div class="flex items-center space-x-3">
-                    <div class="bg-purple-100 p-3 rounded-xl">
-                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                
+                <!-- Right: Action Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openAddChatMemberModal()" 
+                            class="inline-flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                         </svg>
-                    </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Trạng thái</p>
-                        <p class="text-sm font-bold {{ $chatRoom->is_active ? 'text-green-600' : 'text-red-600' }}">
-                            {{ $chatRoom->is_active ? '✅ Hoạt động' : '❌ Đã đóng' }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Actions -->
-        <div class="p-6 border-b border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Thao tác</h3>
-            <div class="flex flex-wrap gap-3">
-                <button onclick="openAddChatMemberModal()" class="inline-flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                    </svg>
-                    <span>Thêm thành viên chat</span>
-                </button>
-
-                <form action="{{ route('teacher.students.chat.toggle', $classRoom) }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center space-x-2 {{ $chatRoom->is_active ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600' }} text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            @if($chatRoom->is_active)
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            @else
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
-                            @endif
-                        </svg>
-                        <span>{{ $chatRoom->is_active ? 'Đóng phòng chat' : 'Mở phòng chat' }}</span>
+                        Thêm thành viên
                     </button>
-                </form>
+
+                    <form action="{{ route('teacher.students.chat.toggle', $classRoom) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="inline-flex items-center px-3 py-2 {{ $chatRoom->is_active ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-600 hover:bg-green-700' }} text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @if($chatRoom->is_active)
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                @else
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                @endif
+                            </svg>
+                            {{ $chatRoom->is_active ? 'Đóng phòng' : 'Mở phòng' }}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -395,56 +361,63 @@
             
             @if($chatRoom->members->count() > 0)
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thành viên</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vai trò</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tham gia</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Thành viên</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Vai trò</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Tham gia</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white">
                         @foreach($chatRoom->members as $member)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3">
                                 <div class="flex items-center">
                                     @if($member->avatar)
-                                    <img src="{{ asset('storage/' . $member->avatar) }}" alt="{{ $member->name }}" class="shrink-0 h-10 w-10 rounded-full object-cover">
+                                    <img src="{{ asset('storage/' . $member->avatar) }}" alt="{{ $member->name }}" class="shrink-0 h-9 w-9 rounded-full object-cover">
                                     @else
-                                    <div class="shrink-0 h-10 w-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                                    <div class="shrink-0 h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                         {{ substr($member->name, 0, 1) }}
                                     </div>
                                     @endif
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ $member->name }}</div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-semibold text-gray-900">{{ $member->name }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3">
                                 <div class="text-sm text-gray-900">{{ $member->email }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {{ $member->pivot->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                            <td class="px-4 py-3 text-center">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+                                    {{ $member->pivot->role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700' }}">
                                     {{ $member->pivot->role === 'admin' ? '👑 Admin' : '👤 Member' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td class="px-4 py-3 text-center text-sm text-gray-600">
                                 {{ \Carbon\Carbon::parse($member->pivot->joined_at)->format('d/m/Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                @if($member->pivot->role !== 'admin')
-                                <button onclick="removeChatMember({{ $member->id }})" class="text-red-600 hover:text-red-900 font-medium">
-                                    <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                    Xóa
-                                </button>
-                                @else
-                                <span class="text-gray-400 text-sm">Quản trị viên</span>
-                                @endif
+                            <td class="px-4 py-3">
+                                <div class="flex justify-center items-center">
+                                    @if($member->pivot->role !== 'admin')
+                                    <button onclick="removeChatMember({{ $member->id }})" 
+                                            class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors" 
+                                            title="Xóa khỏi phòng chat">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                    @else
+                                    <span class="p-1.5 text-gray-300" title="Không thể xóa quản trị viên">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                        </svg>
+                                    </span>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @endforeach

@@ -4,8 +4,76 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "feb469a7751729f5b407b129ef2b13c6",
+    "content-hash": "5d19a45176a164f0aaafc11d7f81e9e7",
     "packages": [
+        {
+            "name": "akaunting/setting",
+            "version": "1.2.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/akaunting/laravel-setting.git",
+                "reference": "97e42cd18b6595169c3a5b8082d20f9585c9c512"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/akaunting/laravel-setting/zipball/97e42cd18b6595169c3a5b8082d20f9585c9c512",
+                "reference": "97e42cd18b6595169c3a5b8082d20f9585c9c512",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=5.3",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "laravel/framework": ">=5.3",
+                "mockery/mockery": "0.9.*",
+                "phpunit/phpunit": ">=4.8"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Akaunting\\Setting\\Provider"
+                    ],
+                    "aliases": {
+                        "Setting": "Akaunting\\Setting\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Akaunting\\Setting\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Denis Duliçi",
+                    "email": "info@akaunting.com",
+                    "homepage": "https://akaunting.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Persistent settings package for Laravel",
+            "keywords": [
+                "Settings",
+                "config",
+                "laravel",
+                "persistent"
+            ],
+            "support": {
+                "issues": "https://github.com/akaunting/laravel-setting/issues",
+                "source": "https://github.com/akaunting/laravel-setting/tree/1.2.9"
+            },
+            "abandoned": "akaunting/laravel-setting",
+            "time": "2023-11-02T08:32:45+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.14.0",
@@ -1912,16 +1980,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v5.15.0",
+            "version": "v5.15.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "cbdd61b025dddeccaffefc3b54d327c4e0a410b6"
+                "reference": "45e38e057343a94c570c5daad3273e9e29819738"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/cbdd61b025dddeccaffefc3b54d327c4e0a410b6",
-                "reference": "cbdd61b025dddeccaffefc3b54d327c4e0a410b6",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/45e38e057343a94c570c5daad3273e9e29819738",
+                "reference": "45e38e057343a94c570c5daad3273e9e29819738",
                 "shasum": ""
             },
             "require": {
@@ -1934,10 +2002,9 @@
             "require-dev": {
                 "ext-gd": "*",
                 "guzzlehttp/guzzle": "^6.0|^7.0",
-                "laravel/octane": "^1.4|^2.0|dev-develop",
-                "orchestra/testbench": "^6.40|^7.37|^8.17|^9.0|^10.0",
-                "phpstan/phpstan": "^1.10",
-                "phpunit/phpunit": "^9.0|^10.5|^11.5"
+                "laravel/octane": "^1.4|^2.0",
+                "orchestra/testbench": "^6.47.1|^7.55|^8.36|^9.15|^10.8",
+                "phpstan/phpstan": "^1.10"
             },
             "type": "library",
             "extra": {
@@ -1975,9 +2042,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v5.15.0"
+                "source": "https://github.com/laravel/telescope/tree/v5.15.1"
             },
-            "time": "2025-10-23T15:19:35+00:00"
+            "time": "2025-11-25T14:45:17+00:00"
         },
         {
             "name": "laravel/tinker",
