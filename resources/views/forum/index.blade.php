@@ -26,36 +26,36 @@
             <!-- Left Sidebar -->
             <aside class="col-span-3 space-y-4">
                 <!-- Trending Topics -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                <div class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-md border border-blue-100 p-5">
+                    <h3 class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
-                        Trending Topics
+                        Chủ Đề Nổi Bật
                     </h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-sm text-gray-600 hover:text-indigo-600 flex items-center">
-                            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                        <li><a href="#" class="text-sm text-gray-700 hover:text-blue-600 flex items-center font-medium transition">
+                            <span class="w-2 h-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-full mr-2"></span>
                             Laravel Best Practices
                         </a></li>
-                        <li><a href="#" class="text-sm text-gray-600 hover:text-indigo-600 flex items-center">
-                            <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        <li><a href="#" class="text-sm text-gray-700 hover:text-blue-600 flex items-center font-medium transition">
+                            <span class="w-2 h-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full mr-2"></span>
                             Vue.js 3 Tips
                         </a></li>
-                        <li><a href="#" class="text-sm text-gray-600 hover:text-indigo-600 flex items-center">
-                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                            Database Optimization
+                        <li><a href="#" class="text-sm text-gray-700 hover:text-blue-600 flex items-center font-medium transition">
+                            <span class="w-2 h-2 bg-gradient-to-r from-yellow-500 to-green-500 rounded-full mr-2"></span>
+                            Tối Ưu Database
                         </a></li>
-                        <li><a href="#" class="text-sm text-gray-600 hover:text-indigo-600 flex items-center">
-                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                            API Development
+                        <li><a href="#" class="text-sm text-gray-700 hover:text-blue-600 flex items-center font-medium transition">
+                            <span class="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mr-2"></span>
+                            Phát Triển API
                         </a></li>
                     </ul>
                 </div>
 
                 <!-- Popular Tags -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 class="font-bold text-gray-900 mb-4">Popular Tags</h3>
+                <div class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-md border border-purple-100 p-5">
+                    <h3 class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">Thẻ Phổ Biến</h3>
                     <div class="flex flex-wrap gap-2">
                         <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full hover:bg-indigo-100 cursor-pointer">Laravel</span>
                         <span class="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full hover:bg-green-100 cursor-pointer">PHP</span>
@@ -67,8 +67,8 @@
                 </div>
 
                 <!-- I'm Following -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 class="font-bold text-gray-900 mb-4">I'm Following 
+                <div class="bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-md border border-indigo-100 p-5">
+                    <h3 class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 mb-4">Đang Theo Dõi 
                         <span class="text-sm font-normal text-gray-500">16</span>
                     </h3>
                     <div class="grid grid-cols-5 gap-2">
@@ -100,24 +100,24 @@
                         <img src="https://randomuser.me/api/portraits/{{ $currentUserId % 2 == 0 ? 'women' : 'men' }}/{{ $currentUserId }}.jpg" 
                              alt="{{ $currentUserName }}" 
                              class="w-10 h-10 rounded-full shrink-0 ring-2 ring-gray-100 object-cover">
-                        <a href="{{ route('forum.create') }}" class="flex-1 bg-gray-50 hover:bg-gray-100 rounded-full px-5 py-3 text-gray-500 cursor-pointer transition">
-                            Share what's on your mind, {{ $currentUserName }}...
+                        <a href="{{ route('forum.create') }}" class="flex-1 bg-gradient-to-r from-gray-50 to-blue-50 hover:from-gray-100 hover:to-blue-100 rounded-full px-5 py-3 text-gray-600 cursor-pointer transition">
+                            Bạn đang nghĩ gì, {{ $currentUserName }}...
                         </a>
                     </div>
                     <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                        <a href="{{ route('forum.create') }}" class="flex items-center gap-2 text-gray-600 hover:text-indigo-600 text-sm font-medium">
+                        <a href="{{ route('forum.create') }}" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                             </svg>
-                            Write Article
+                            Viết Bài
                         </a>
-                        <button class="flex items-center gap-2 text-gray-600 hover:text-green-600 text-sm font-medium">
+                        <button class="flex items-center gap-2 text-gray-600 hover:text-emerald-600 text-sm font-medium transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            Photo
+                            Ảnh
                         </button>
-                        <button class="flex items-center gap-2 text-gray-600 hover:text-red-600 text-sm font-medium">
+                        <button class="flex items-center gap-2 text-gray-600 hover:text-rose-600 text-sm font-medium transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -129,21 +129,21 @@
                 @endcan
 
                 <!-- Filter Tabs -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-4">
+                <div class="bg-white rounded-xl shadow-md border border-gray-200 mb-4">
                     <div class="flex items-center justify-between p-4 border-b border-gray-100">
                         <div class="flex gap-6">
-                            <button class="text-sm font-semibold {{ request('sort', 'latest') === 'latest' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('latest')">
-                                All Updates
+                            <button class="text-sm font-semibold {{ request('sort', 'latest') === 'latest' ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('latest')">
+                                Tất Cả Bài Viết
                             </button>
-                            <button class="text-sm font-semibold {{ request('sort') === 'votes' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('votes')">
-                                Most Voted
+                            <button class="text-sm font-semibold {{ request('sort') === 'votes' ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('votes')">
+                                Nhiều Lượt Thích
                             </button>
-                            <button class="text-sm font-semibold {{ request('sort') === 'my_post' ? 'text-indigo-600 border-b-2 border-indigo-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('my_post')">
-                                My Posts
+                            <button class="text-sm font-semibold {{ request('sort') === 'my_post' ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 border-b-2 border-blue-600 pb-1' : 'text-gray-600 hover:text-gray-900' }}" onclick="changeSort('my_post')">
+                                Bài Của Tôi
                             </button>
                         </div>
                         <div class="flex items-center gap-2">
-                            <input type="text" placeholder="Search Feed..." class="px-4 py-1.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <input type="text" placeholder="Tìm kiếm bài viết..." class="px-4 py-1.5 text-sm border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
                 </div>
@@ -163,8 +163,8 @@
             <!-- Right Sidebar -->
             <aside class="col-span-3 space-y-4">
                 <!-- Active Members -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                    <h3 class="font-bold text-gray-900 mb-4">Recently Active Members</h3>
+                <div class="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-md border border-green-100 p-5">
+                    <h3 class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600 mb-4">Thành Viên Hoạt Động</h3>
                     <div class="space-y-3">
                         @php
                             $recentUsers = \App\Models\User::latest('updated_at')->take(6)->get();
@@ -197,33 +197,35 @@
                 </div>
 
                 <!-- Stats Widget -->
-                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-5 text-white">
-                    <h3 class="font-bold mb-4 flex items-center">
+                <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl shadow-xl p-5 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+                    <h3 class="font-bold mb-4 flex items-center relative z-10">
                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
                         </svg>
-                        Community Stats
+                        Thống Kê Cộng Đồng
                     </h3>
-                    <div class="space-y-3">
+                    <div class="space-y-3 relative z-10">
                         <div>
-                            <p class="text-2xl font-bold">{{ $questions->total() }}</p>
-                            <p class="text-sm text-indigo-100">Total Posts</p>
+                            <p class="text-3xl font-bold">{{ $questions->total() }}</p>
+                            <p class="text-sm text-blue-100">Tổng Bài Viết</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold">{{ \App\Models\User::count() }}</p>
-                            <p class="text-sm text-indigo-100">Active Members</p>
+                            <p class="text-3xl font-bold">{{ \App\Models\User::count() }}</p>
+                            <p class="text-sm text-purple-100">Thành Viên</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold">{{ \App\Models\ForumAnswer::count() }}</p>
-                            <p class="text-sm text-indigo-100">Total Replies</p>
+                            <p class="text-3xl font-bold">{{ \App\Models\ForumAnswer::count() }}</p>
+                            <p class="text-sm text-pink-100">Bình Luận</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Following Grid -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="bg-gradient-to-br from-white to-pink-50 rounded-xl shadow-md border border-pink-100 p-5">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-bold text-gray-900">Following</h3>
+                        <h3 class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600">Đang Theo Dõi</h3>
                         <span class="text-sm text-gray-500">{{ $recentUsers->count() }}</span>
                     </div>
                     <div class="grid grid-cols-4 gap-2">
@@ -245,23 +247,22 @@
 </div>
 
 <!-- User Profile Modal -->
-<div id="userProfileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeUserProfile(event)">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden" onclick="event.stopPropagation()">
-        <!-- Cover Image -->
-        <div class="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
-            <button onclick="closeUserProfile()" class="absolute top-4 right-4 w-8 h-8 bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
+<div id="userProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 opacity-0" onclick="closeUserProfile(event)" style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-visible relative transform transition-all duration-300 scale-95" onclick="event.stopPropagation()">
+        <!-- Close Button -->
+        <button onclick="closeUserProfile()" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-900 transition z-10">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <!-- Avatar (positioned at top, overlapping) -->
+        <div class="flex justify-center pt-8 mb-4">
+            <img id="modalUserAvatar" src="" alt="" class="w-32 h-32 rounded-full ring-4 ring-white object-cover shadow-xl">
         </div>
 
         <!-- Profile Content -->
         <div class="px-6 pb-6">
-            <!-- Avatar -->
-            <div class="flex justify-center -mt-16 mb-4">
-                <img id="modalUserAvatar" src="" alt="" class="w-32 h-32 rounded-full ring-4 ring-white object-cover shadow-lg">
-            </div>
 
             <!-- User Info -->
             <div class="text-center mb-6">
@@ -271,16 +272,16 @@
                 <!-- Stats -->
                 <div class="flex justify-center gap-6 mb-4">
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-gray-900" id="modalUserPosts">24</p>
-                        <p class="text-xs text-gray-500">Posts</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" id="modalUserPosts">24</p>
+                        <p class="text-xs text-gray-500">Bài viết</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-gray-900" id="modalUserFollowers">1.2K</p>
-                        <p class="text-xs text-gray-500">Followers</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600" id="modalUserFollowers">1.2K</p>
+                        <p class="text-xs text-gray-500">Người theo dõi</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-gray-900" id="modalUserFollowing">328</p>
-                        <p class="text-xs text-gray-500">Following</p>
+                        <p class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600" id="modalUserFollowing">328</p>
+                        <p class="text-xs text-gray-500">Đang theo dõi</p>
                     </div>
                 </div>
 
@@ -297,37 +298,37 @@
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <span id="modalUserRole">Student</span>
+                        <span id="modalUserRole">Học viên</span>
                     </div>
                     <div class="flex items-center gap-3 text-sm text-gray-600">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span id="modalUserLocation">Vietnam</span>
+                        <span id="modalUserLocation">Việt Nam</span>
                     </div>
                     <div class="flex items-center gap-3 text-sm text-gray-600">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span id="modalUserJoined">Joined November 2024</span>
+                        <span id="modalUserJoined">Tham gia Tháng 11 năm 2024</span>
                     </div>
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex gap-3">
-                <button class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                <button class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
-                    Follow
+                    Theo Dõi
                 </button>
-                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                <button class="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
-                    Message
+                    Nhắn Tin
                 </button>
             </div>
         </div>
@@ -410,7 +411,13 @@ function showUserProfile(userId, userName, userEmail) {
             
             // Show modal with animation
             modal.classList.remove('hidden');
-            setTimeout(() => modal.querySelector('div > div').classList.add('scale-100'), 10);
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                const modalContent = modal.querySelector('.bg-white');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
         })
         .catch(err => {
             console.error('Error fetching user data:', err);
@@ -425,7 +432,14 @@ function showUserProfile(userId, userName, userEmail) {
 function closeUserProfile(event) {
     if (event && event.target.id !== 'userProfileModal') return;
     const modal = document.getElementById('userProfileModal');
-    modal.classList.add('hidden');
+    const modalContent = modal.querySelector('.bg-white');
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
 }
 
 // Close modal on ESC key
