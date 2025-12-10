@@ -12,7 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // MySQL doesn't support altering enum directly, so we need to use raw SQL
+        // Skip for SQLite (testing)
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+        
+        // Update ENUM to add new value
         DB::statement("ALTER TABLE exam_submissions MODIFY COLUMN grading_status ENUM('pending', 'partially_graded', 'graded', 'auto_graded') DEFAULT 'pending'");
     }
 

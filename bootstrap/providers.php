@@ -1,6 +1,12 @@
 <?php
 
-return [
+$providers = [
     App\Providers\AppServiceProvider::class,
-    App\Providers\TelescopeServiceProvider::class,
 ];
+
+// Don't load Telescope in testing environment
+if (!app()->environment('testing')) {
+    $providers[] = App\Providers\TelescopeServiceProvider::class;
+}
+
+return $providers;

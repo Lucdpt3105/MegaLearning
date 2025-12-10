@@ -12,10 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('exams', function (Blueprint $table) {
-            // Change type column from question types to exam types
+        // Skip for SQLite (testing)
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+        
+        // Update type column to use new ENUM values
+        if (Schema::hasColumn('exams', 'type')) {
             DB::statement("ALTER TABLE exams MODIFY COLUMN type ENUM('quiz', 'midterm', 'final', 'practice') NOT NULL DEFAULT 'quiz'");
-        });
+        }
     }
 
     /**
