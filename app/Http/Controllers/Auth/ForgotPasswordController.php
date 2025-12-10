@@ -30,9 +30,11 @@ class ForgotPasswordController extends Controller
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withErrors(['email' => __($status)]);
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with('status', 'Chúng tôi đã gửi link đặt lại mật khẩu qua email của bạn!');
+        }
+
+        return back()->withErrors(['email' => 'Không tìm thấy người dùng với địa chỉ email này.']);
     }
 
     /**
@@ -55,6 +57,12 @@ class ForgotPasswordController extends Controller
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
+        ], [
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không hợp lệ.',
         ]);
 
         $status = Password::reset(
@@ -70,8 +78,10 @@ class ForgotPasswordController extends Controller
             }
         );
 
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+        if ($status === Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('status', 'Mật khẩu của bạn đã được đặt lại thành công!');
+        }
+
+        return back()->withErrors(['email' => 'Mã đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.']);
     }
 }

@@ -95,7 +95,7 @@ class ProfileController extends Controller
             'password' => Hash::make($validated['password'])
         ]);
 
-        return redirect()->route('profile.edit')->with('success', 'Password changed successfully!');
+        return redirect()->route('profile.edit')->with('success', 'Đổi mật khẩu thành công!');
     }
 
     /**
