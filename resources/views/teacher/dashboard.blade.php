@@ -169,7 +169,7 @@
             </div>
         </a>
 
-        <a href="{{ route('teacher.topics') }}" class="group relative overflow-hidden rounded-2xl shadow-lg bg-white border border-gray-200 p-6 hover:shadow-xl hover:border-green-300 transition">
+        <a href="{{ route('teacher.topics.index') }}" class="group relative overflow-hidden rounded-2xl shadow-lg bg-white border border-gray-200 p-6 hover:shadow-xl hover:border-green-300 transition">
             <div class="flex flex-col items-center text-center">
                 <div class="bg-green-100 rounded-xl p-4 mb-4 group-hover:bg-green-200 transition">
                     <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
