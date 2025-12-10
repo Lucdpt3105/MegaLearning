@@ -25,17 +25,62 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Test route - no auth needed
+Route::get('/test', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'API is working!',
+        'timestamp' => now()
+    ]);
+});
 
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::get('/forum/questions', [ForumQuestionController::class, 'index']);
-//     Route::get('/forum/questions/{id}', [ForumQuestionController::class, 'show']);
-//     Route::post('/forum/questions', [ForumQuestionController::class, 'store']);
-//     Route::put('/forum/questions/{id}', [ForumQuestionController::class, 'update']);
-//     Route::delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
-// });
-// Route::middleware(['auth:sanctum', 'role:admin'])->delete('/forum/questions/{id}', [ForumQuestionController::class, 'destroy']);
-
-
+// Quick token generator for testing (REMOVE IN PRODUCTION!)
+Route::post('/dev-token', function (Request $request) {
+    try {
+        if (!app()->environment('local')) {
+            return response()->json(['error' => 'Only available in local environment'], 403);
+        }
+        
+        $email = $request->input('email', 'admin@megalearning.com');
+        $user = \App\Models\User::where('email', $email)->first();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+                'email_tried' => $email
+            ], 404);
+        }
+        
+        // Delete old tokens
+        $user->tokens()->delete();
+        
+        // Create new token
+        $token = $user->createToken('dev-token')->plainTextToken;
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Development token generated',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->getRoleNames()
+            ],
+            'usage' => 'Add to headers -> Authorization: Bearer ' . substr($token, 0, 20) . '...'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error generating token',
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
 
 // Authentication Routes (Public)
 Route::post('/login', [AuthApiController::class, 'login']);
@@ -46,6 +91,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // API Version 1
 Route::prefix('v1')->group(function () {
+    
+    // Categories API - Public GET, Protected Create/Update/Delete
+    Route::get('categories', [App\Http\Controllers\Admin\CategoryController::class, 'index']);
+    Route::get('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'show']);
+    
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+        Route::post('categories', [App\Http\Controllers\Admin\CategoryController::class, 'store']);
+        Route::put('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'update']);
+        Route::patch('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'update']);
+        Route::delete('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'destroy']);
+    });
     
     // Public routes - No authentication needed
     Route::get('subjects', [SubjectController::class, 'index']);
