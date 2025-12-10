@@ -29,376 +29,180 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-['Poppins',system-ui,sans-serif] text-slate-800 antialiased">
 
+    {{-- TOGGLE BUTTON (Hamburger) --}}
+    <button id="sidebarToggle" class="fixed top-4 left-4 z-[100] text-gray-400 hover:text-white focus:outline-none p-2 rounded-md transition-colors duration-200">
+        <div class="hamburger-icon">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </div>
+    </button>
+
     <div class="min-h-screen flex">
 
-        {{-- SIDEBAR DESKTOP --}}
-        <aside class="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-indigo-600 to-purple-600 text-white">
+        {{-- SIDEBAR MODERN DESIGN (matching teacher/student style) --}}
+        <aside id="sidebar" class="sidebar-container bg-gray-900 border-r border-gray-800 shrink-0 overflow-hidden flex flex-col">
             {{-- Logo --}}
-            <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center gap-3 px-5 py-4 hover:bg-white/10 transition">
-                <img src="{{ asset('images/logo.svg') }}" alt="MegaLearning Logo"
-                     class="h-9 w-auto filter brightness-0 invert">
-                <span class="text-lg font-semibold tracking-tight">MegaLearning</span>
+            <a href="{{ route('admin.dashboard') }}" class="block p-4 mt-12 hover:bg-transparent">
+                <div class="logo-container">
+                    <div class="w-10 h-10 flex items-center justify-center shrink-0">
+                        <img src="{{ asset('images/logo.svg') }}" alt="Logo" class="w-full h-full object-contain">
+                    </div>
+                    <div class="logo-text">
+                        <h1 class="text-base font-semibold text-white whitespace-nowrap">MegaLearning</h1>
+                        <p class="text-xs text-gray-400 whitespace-nowrap">Admin Panel</p>
+                    </div>
+                </div>
             </a>
 
             {{-- Menu --}}
-            <nav class="flex-1 mt-4 px-2 space-y-2 text-sm">
-
+            <nav class="nav-container px-3 py-4 space-y-1 overflow-y-auto flex-1">
                 {{-- Dashboard --}}
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center gap-2 px-3 py-2 rounded-xl font-medium
-                          {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 shadow-md' : 'hover:bg-white/10' }}">
-                    <i data-feather="home" class="w-4 h-4"></i>
-                    <span>Bảng điều khiển</span>
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-nav-item {{ request()->is('admin') || request()->is('admin/dashboard*') ? 'active' : '' }}">
+                    <i data-feather="home" class="w-5 h-5"></i>
+                    <span class="nav-text">Tổng quan</span>
                 </a>
 
-                {{-- Người dùng --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="users">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="users" class="w-4 h-4"></i>
-                            <span>Người dùng</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="users"></i>
-                    </button>
+                {{-- Divider --}}
+                <div class="sidebar-divider">Người dùng</div>
+                
+                <a href="{{ route('admin.students.index') }}" class="sidebar-nav-item {{ request()->is('admin/students*') ? 'active' : '' }}">
+                    <i data-feather="users" class="w-5 h-5"></i>
+                    <span class="nav-text">Học sinh</span>
+                </a>
+                
+                <a href="{{ route('admin.teachers.index') }}" class="sidebar-nav-item {{ request()->is('admin/teachers*') ? 'active' : '' }}">
+                    <i data-feather="user-check" class="w-5 h-5"></i>
+                    <span class="nav-text">Giáo viên</span>
+                </a>
+                
+                <a href="{{ route('admin.admins.index') }}" class="sidebar-nav-item {{ request()->is('admin/admins*') ? 'active' : '' }}">
+                    <i data-feather="shield" class="w-5 h-5"></i>
+                    <span class="nav-text">Quản trị viên</span>
+                </a>
 
-                   <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-     data-sidebar-body="users">
+                {{-- Divider --}}
+                <div class="sidebar-divider">Khóa học</div>
+                
+                <a href="{{ route('admin.courses.index') }}" class="sidebar-nav-item {{ request()->is('admin/courses*') && !request()->is('admin/courses/create') ? 'active' : '' }}">
+                    <i data-feather="book" class="w-5 h-5"></i>
+                    <span class="nav-text">Danh sách khóa học</span>
+                </a>
+                
+                <a href="{{ route('admin.courses.create') }}" class="sidebar-nav-item {{ request()->is('admin/courses/create') ? 'active' : '' }}">
+                    <i data-feather="plus-circle" class="w-5 h-5"></i>
+                    <span class="nav-text">Thêm khóa học</span>
+                </a>
+                
+                <a href="{{ route('admin.categories.index') }}" class="sidebar-nav-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
+                    <i data-feather="folder" class="w-5 h-5"></i>
+                    <span class="nav-text">Danh mục</span>
+                </a>
+                
+                <a href="{{ route('admin.subjects.index') }}" class="sidebar-nav-item {{ request()->is('admin/subjects*') ? 'active' : '' }}">
+                    <i data-feather="layers" class="w-5 h-5"></i>
+                    <span class="nav-text">Môn học</span>
+                </a>
+                
+                <a href="{{ route('admin.lessons.index') }}" class="sidebar-nav-item {{ request()->is('admin/lessons*') ? 'active' : '' }}">
+                    <i data-feather="book-open" class="w-5 h-5"></i>
+                    <span class="nav-text">Bài học</span>
+                </a>
 
-    {{-- Học sinh --}}
-    <a href="{{ route('admin.students.index') }}"
-       class="flex items-center gap-2 py-1.5 rounded-lg
-              {{ request()->routeIs('admin.students.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-        <span>Học sinh</span>
-    </a>
+                {{-- Divider --}}
+                <div class="sidebar-divider">Bài thi & Câu hỏi</div>
+                
+                <a href="{{ route('admin.exams.index') }}" class="sidebar-nav-item {{ request()->is('admin/exams*') && !request()->is('admin/exams/create') ? 'active' : '' }}">
+                    <i data-feather="file-text" class="w-5 h-5"></i>
+                    <span class="nav-text">Danh sách bài thi</span>
+                </a>
+                
+                <a href="{{ route('admin.questions.index') }}" class="sidebar-nav-item {{ request()->is('admin/questions*') ? 'active' : '' }}">
+                    <i data-feather="help-circle" class="w-5 h-5"></i>
+                    <span class="nav-text">Ngân hàng câu hỏi</span>
+                </a>
+                
+                <a href="{{ route('admin.exam-results.index') }}" class="sidebar-nav-item {{ request()->is('admin/exam-results*') ? 'active' : '' }}">
+                    <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+                    <span class="nav-text">Kết quả thi</span>
+                </a>
 
-    {{-- Giáo viên --}}
-    <a href="{{ route('admin.teachers.index') }}"
-       class="flex items-center gap-2 py-1.5 rounded-lg
-              {{ request()->routeIs('admin.teachers.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-        <span>Giáo viên</span>
-    </a>
+                {{-- Divider --}}
+                <div class="sidebar-divider">Báo cáo</div>
+                
+                <a href="{{ route('admin.reports.students') }}" class="sidebar-nav-item {{ request()->is('admin/reports/students*') ? 'active' : '' }}">
+                    <i data-feather="users" class="w-5 h-5"></i>
+                    <span class="nav-text">Thống kê học sinh</span>
+                </a>
+                
+                <a href="{{ route('admin.reports.courses') }}" class="sidebar-nav-item {{ request()->is('admin/reports/courses*') ? 'active' : '' }}">
+                    <i data-feather="book-open" class="w-5 h-5"></i>
+                    <span class="nav-text">Thống kê khóa học</span>
+                </a>
+                
+                <a href="{{ route('admin.statistics.index') }}" class="sidebar-nav-item {{ request()->is('admin/statistics*') ? 'active' : '' }}">
+                    <i data-feather="pie-chart" class="w-5 h-5"></i>
+                    <span class="nav-text">Thống kê chi tiết</span>
+                </a>
 
-    {{-- Quản trị viên --}}
-    <a href="{{ route('admin.admins.index') }}"
-       class="flex items-center gap-2 py-1.5 rounded-lg
-              {{ request()->routeIs('admin.admins.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-        <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-        <span>Quản trị viên</span>
-    </a>
-    
-</div>
-                </div>
+                {{-- Divider --}}
+                <div class="sidebar-divider">Quản lý khác</div>
+                
+                <a href="{{ route('admin.meetings.rooms') }}" class="sidebar-nav-item {{ request()->is('admin/meetings/rooms*') ? 'active' : '' }}">
+                    <i data-feather="video" class="w-5 h-5"></i>
+                    <span class="nav-text">Phòng họp</span>
+                </a>
+                
+                <a href="{{ route('admin.meetings.history') }}" class="sidebar-nav-item {{ request()->is('admin/meetings/history*') ? 'active' : '' }}">
+                    <i data-feather="clock" class="w-5 h-5"></i>
+                    <span class="nav-text">Lịch sử họp</span>
+                </a>
+                
+                <a href="{{ route('admin.forums.topics') }}" class="sidebar-nav-item {{ request()->is('admin/forums/topics*') ? 'active' : '' }}">
+                    <i data-feather="message-square" class="w-5 h-5"></i>
+                    <span class="nav-text">Diễn đàn</span>
+                </a>
+                
+                <a href="{{ route('admin.files.index') }}" class="sidebar-nav-item {{ request()->is('admin/files*') ? 'active' : '' }}">
+                    <i data-feather="file" class="w-5 h-5"></i>
+                    <span class="nav-text">Quản lý tệp</span>
+                </a>
 
-                {{-- Khóa học --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="courses">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="book-open" class="w-4 h-4"></i>
-                            <span>Khóa học</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="courses"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="courses">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Danh sách khóa học</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.courses.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thêm khóa học</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Danh mục</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.lessons.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Bài học</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Hệ thống Thi --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="exams">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="edit-3" class="w-4 h-4"></i>
-                            <span>Hệ thống thi</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="exams"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="exams">
-                        <a href="{{ route('admin.exams.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.exams.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Danh sách bài thi</span>
-                        </a>
-                        <a href="{{ route('admin.exams.create') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.exams.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Tạo bài thi</span>
-                        </a>
-                        <a href="{{ route('admin.questions.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.questions.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Ngân hàng câu hỏi</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Kết quả thi</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Diễn đàn --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="forum">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="message-circle" class="w-4 h-4"></i>
-                            <span>Diễn đàn</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="forum"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="forum">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Chủ đề thảo luận</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Bài viết</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Kiểm duyệt</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Họp nhóm --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="meetings">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="video" class="w-4 h-4"></i>
-                            <span>Họp nhóm</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="meetings"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="meetings">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Phòng họp</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Lịch họp</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*y') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Lịch sử họp</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Tài liệu --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="files">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="file-text" class="w-4 h-4"></i>
-                            <span>Tài liệu</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="files"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="files">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Quản lý file</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Tải lên</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Báo cáo --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="reports">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="bar-chart-2" class="w-4 h-4"></i>
-                            <span>Báo cáo</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="reports"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="reports">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thống kê học sinh</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thống kê khóa học</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thống kê bài thi</span>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Cài đặt --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="settings">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="settings" class="w-4 h-4"></i>
-                            <span>Cài đặt</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="settings"></i>
-                    </button>
-
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="settings">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Cài đặt chung</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Email</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thanh toán</span>
-                        </a>
-                    </div>
-                </div>
-
+                {{-- Divider --}}
+                <div class="sidebar-divider">Hệ thống</div>
+                
+                <a href="{{ route('admin.settings') }}" class="sidebar-nav-item {{ request()->is('admin/settings*') ? 'active' : '' }}">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                    <span class="nav-text">Cài đặt</span>
+                </a>
             </nav>
 
-            {{-- Footer sidebar --}}
-            <div class="px-4 py-3 text-[11px] text-indigo-100/80 border-t border-white/10">
-                <span>MegaLearning Admin</span>
+            {{-- Profile --}}
+            <div class="profile-section border-t border-gray-800 p-4">
+                <button id="profileToggle" class="profile-toggle w-full flex items-center gap-3 hover:bg-gray-800 p-2 rounded-lg transition-colors">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin" class="profile-avatar w-8 h-8 rounded-full">
+                    <div class="profile-details text-left">
+                        <p class="profile-name text-sm font-medium text-white">Admin</p>
+                        <p class="profile-link text-xs text-gray-400">Xem hồ sơ</p>
+                    </div>
+                </button>
+                
+                {{-- Profile Menu --}}
+                <div id="profileMenu" class="profile-menu hidden absolute bottom-16 left-4 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-50">
+                    <a href="{{ route('admin.profile') }}" class="profile-menu-item block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <i data-feather="user" class="inline-block w-4 h-4 mr-2"></i> Hồ sơ
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="block">
+                        @csrf
+                        <button type="submit" class="profile-menu-item w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300">
+                            <i data-feather="log-out" class="inline-block w-4 h-4 mr-2"></i> Đăng xuất
+                        </button>
+                    </form>
+                </div>
             </div>
         </aside>
 
-        {{-- MOBILE SIDEBAR (simple icon bar) --}}
-        <aside class="md:hidden w-16 flex flex-col items-center bg-gradient-to-b from-indigo-600 to-purple-600 text-white py-4 space-y-4">
-            <a href="{{ route('admin.dashboard') }}"
-               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.dashboard') ? 'bg-white/20' : '' }}">
-                <i data-feather="home" class="w-5 h-5"></i>
-            </a>
-            <a href="{{ route('admin.users.index') }}"
-               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.users.*') ? 'bg-white/20' : '' }}">
-                <i data-feather="users" class="w-5 h-5"></i>
-            </a>
-            <a href="{{ route('admin.users.index') }}"
-               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('admin.courses.*') ? 'bg-white/20' : '' }}">
-                <i data-feather="book-open" class="w-5 h-5"></i>
-            </a>
-            <a href="{{ route('forum.index') }}"
-               class="p-2 rounded-lg hover:bg-white/10 {{ request()->routeIs('forum.*') ? 'bg-white/20' : '' }}">
-                <i data-feather="message-circle" class="w-5 h-5"></i>
-            </a>
-        </aside>
-
         {{-- MAIN CONTENT --}}
-        <div class="flex-1 flex flex-col min-h-screen">
+        <div id="main-content" class="flex-1 flex flex-col min-h-screen transition-all duration-500 ease-in-out ml-56">
 
             {{-- HEADER --}}
             <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8">

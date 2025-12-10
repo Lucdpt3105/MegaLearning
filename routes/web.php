@@ -210,26 +210,25 @@ Route::prefix('admin')
     ->group(function () {
 
     // ADMIN COURSES (THEO NEO UI)
-Route::prefix('admin/courses')->name('admin.courses.')->middleware(['auth','role:admin'])->group(function () {
+    Route::prefix('courses')->name('courses.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
+            ->name('index');
 
-    Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
-        ->name('index');
+        Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
+            ->name('create');
 
-    Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
-        ->name('create');
+        Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
+            ->name('store');
 
-    Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
-        ->name('store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
+            ->name('edit');
 
-    Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
-        ->name('edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
+            ->name('update');
 
-    Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
-        ->name('update');
-
-    Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
-        ->name('destroy');
-});
+        Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
+            ->name('destroy');
+    });
 
 // ======================
 //  ADMIN PROFILE ROUTES
@@ -334,6 +333,14 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/subjects/{id}', fn($id) => view('admin.subjects.show', ['id' => $id]))->name('subjects.show');
     Route::get('/subjects/{id}/edit', fn($id) => view('admin.subjects.edit', ['id' => $id]))->name('subjects.edit');
 
+    // Categories
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+
+    // Lessons
+    Route::get('/lessons', fn() => view('admin.lessons.index'))->name('lessons.index');
+    Route::get('/lessons/create', fn() => view('admin.lessons.create'))->name('lessons.create');
+    Route::post('/lessons', fn() => redirect()->route('admin.lessons.index'))->name('lessons.store');
+
     // Topics
     Route::get('/topics', fn() => view('admin.topics.index'))->name('topics.index');
     Route::get('/topics/create', fn() => view('admin.topics.create'))->name('topics.create');
@@ -342,12 +349,58 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     // Questions
     Route::get('/questions', fn() => view('admin.questions.index'))->name('questions.index');
     Route::get('/questions/create', fn() => view('admin.questions.create'))->name('questions.create');
+    Route::post('/questions', fn() => redirect()->route('admin.questions.index'))->name('questions.store');
     Route::get('/questions/{id}/edit', fn($id) => view('admin.questions.edit', ['id' => $id]))->name('questions.edit');
 
     // Exams
     Route::get('/exams', fn() => view('admin.exams.index'))->name('exams.index');
     Route::get('/exams/create', fn() => view('admin.exams.create'))->name('exams.create');
+    Route::post('/exams', fn() => redirect()->route('admin.exams.index'))->name('exams.store');
     Route::get('/exams/{id}/edit', fn($id) => view('admin.exams.edit', ['id' => $id]))->name('exams.edit');
+
+    // Exam Results
+    Route::get('/exam-results', fn() => view('admin.exam-results.index'))->name('exam-results.index');
+
+    // Forums
+    Route::get('/forums/topics', fn() => view('admin.forums.topics'))->name('forums.topics');
+    Route::post('/forums/topics', fn() => redirect()->route('admin.forums.topics'))->name('forums.topics.create');
+    Route::get('/forums/posts', fn() => view('admin.forums.posts'))->name('forums.posts');
+    Route::get('/forums/moderation', fn() => view('admin.forums.moderation'))->name('forums.moderation');
+
+    // Meetings
+    Route::get('/meetings/rooms', fn() => view('admin.meetings.rooms'))->name('meetings.rooms');
+    Route::post('/meetings/rooms', fn() => redirect()->route('admin.meetings.rooms'))->name('meetings.rooms.create');
+    Route::get('/meetings/schedule', fn() => view('admin.meetings.schedule'))->name('meetings.schedule');
+    Route::post('/meetings/schedule', fn() => redirect()->route('admin.meetings.schedule'))->name('meetings.schedule.create');
+    Route::get('/meetings/history', fn() => view('admin.meetings.history'))->name('meetings.history');
+
+    // Files
+    Route::get('/files', fn() => view('admin.files.index'))->name('files.index');
+    Route::get('/files/upload', fn() => view('admin.files.upload'))->name('files.upload');
+    Route::post('/files', fn() => redirect()->route('admin.files.index'))->name('files.store');
+
+    // Reports
+    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
+    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
+    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
+
+    // Reports
+    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
+    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
+    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
+
+    // Statistics (detailed analytics)
+    Route::get('/statistics', fn() => view('admin.statistics.index'))->name('statistics.index');
+    Route::get('/statistics/activity-logs', fn() => view('admin.statistics.activity-logs'))->name('statistics.activity-logs');
+    Route::get('/statistics/usage-duration', fn() => view('admin.statistics.usage-duration'))->name('statistics.usage-duration');
+    Route::get('/statistics/participation', fn() => view('admin.statistics.participation'))->name('statistics.participation');
+    Route::get('/statistics/rankings', fn() => view('admin.statistics.rankings'))->name('statistics.rankings');
+
+    // Settings
+    Route::get('/settings/email', fn() => view('admin.settings.email'))->name('settings.email');
+    Route::put('/settings/email', fn() => redirect()->route('admin.settings.email'))->name('settings.email.update');
+    Route::get('/settings/payment', fn() => view('admin.settings.payment'))->name('settings.payment');
+    Route::put('/settings/payment', fn() => redirect()->route('admin.settings.payment'))->name('settings.payment.update');
 
 });
 
@@ -435,74 +488,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/welcome', [StudentController::class, 'welcome'])->name('welcome'); // Keep for backward compatibility
 });
 
-// Admin Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    // Dashboard
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
-
-    // User Management (UC-ADM-010 to UC-ADM-015)
-    Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
-    Route::post('users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
-    Route::post('users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
-
-    // Subjects Management
-    Route::get('/subjects', function () {
-        return view('admin.subjects.index');
-    })->name('subjects.index');
-
-    Route::get('/subjects/create', function () {
-        return view('admin.subjects.create');
-    })->name('subjects.create');
-
-    Route::get('/subjects/{id}', function ($id) {
-        return view('admin.subjects.show', ['id' => $id]);
-    })->name('subjects.show');
-
-    Route::get('/subjects/{id}/edit', function ($id) {
-        return view('admin.subjects.edit', ['id' => $id]);
-    })->name('subjects.edit');
-
-    // Topics Management
-    Route::get('/topics', function () {
-        return view('admin.topics.index');
-    })->name('topics.index');
-
-    Route::get('/topics/create', function () {
-        return view('admin.topics.create');
-    })->name('topics.create');
-
-    Route::get('/topics/{id}/edit', function ($id) {
-        return view('admin.topics.edit', ['id' => $id]);
-    })->name('topics.edit');
-
-    // Questions Management
-    Route::get('/questions', function () {
-        return view('admin.questions.index');
-    })->name('questions.index');
-
-    Route::get('/questions/create', function () {
-        return view('admin.questions.create');
-    })->name('questions.create');
-
-    Route::get('/questions/{id}/edit', function ($id) {
-        return view('admin.questions.edit', ['id' => $id]);
-    })->name('questions.edit');
-
-    // Exams Management
-    Route::get('/exams', function () {
-        return view('admin.exams.index');
-    })->name('exams.index');
-
-    Route::get('/exams/create', function () {
-        return view('admin.exams.create');
-    })->name('exams.create');
-
-    Route::get('/exams/{id}/edit', function ($id) {
-        return view('admin.exams.edit', ['id' => $id]);
-    })->name('exams.edit');
-});
+// ⚠️ Duplicate admin routes removed - all admin routes are defined above in the main admin group (lines 206-351)
 
 // forum routes
 
