@@ -27,6 +27,13 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name
 Route::middleware(['auth'])->group(function () {
     Route::get('/search', [SearchController::class, 'index'])->name('search.index');
     Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+    
+    // Notifications Routes
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Profile Routes (Manage Profile)
@@ -176,6 +183,9 @@ Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])
     Route::post('/exams/{exam}/notify', [App\Http\Controllers\Teacher\ExamController::class, 'sendNotification'])->name('exams.notify');
     Route::post('/exams/import', [App\Http\Controllers\Teacher\ExamController::class, 'importFromExcel'])->name('exams.import');
     Route::resource('exams', App\Http\Controllers\Teacher\ExamController::class);
+    
+    // Notifications - Teacher sending to students
+    Route::post('/notifications/send-to-students', [App\Http\Controllers\NotificationController::class, 'sendToStudents'])->name('notifications.send-to-students');
     
     // Phase 6: Video Call Management (UC-GV-001 to UC-GV-004)
     Route::post('/video-calls/{videoCall}/start', [App\Http\Controllers\Teacher\VideoCallController::class, 'start'])->name('video-calls.start');
