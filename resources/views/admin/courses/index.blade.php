@@ -1,5 +1,9 @@
 @extends('admin.layout')
 
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 @section('title', 'Khóa học')
 @section('page-title', 'Quản lý Khóa học')
 @section('page-description', 'Xem, lọc và quản lý toàn bộ khóa học trong hệ thống.')
@@ -78,8 +82,8 @@
                         class="w-full rounded-xl border border-slate-200 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="">Tất cả</option>
                     <option value="active" @selected(request('status') === 'active')>Đang hoạt động</option>
-                    <option value="pending" @selected(request('status') === 'pending')>Chờ duyệt</option>
-                    <option value="hidden" @selected(request('status') === 'hidden')>Tạm ẩn</option>
+                    <option value="draft" @selected(request('status') === 'draft')>Nháp / Chờ duyệt</option>
+                    <option value="closed" @selected(request('status') === 'closed')>Tạm ẩn</option>
                 </select>
             </div>
 
@@ -127,32 +131,37 @@
                 {{-- Ảnh cover --}}
                 <div class="relative">
                     <img src="{{ $course->thumbnail_url ?? 'https://via.placeholder.com/400x200?text=Course' }}"
-                         alt="{{ $course->title }}"
+                         alt="{{ $course->name }}"
                          class="w-full h-40 object-cover">
+
                     @if($course->status === 'active')
                         <span class="absolute top-2 right-2 inline-flex items-center rounded-full bg-emerald-500 text-white text-[11px] px-2.5 py-1 font-semibold">
                             Hoạt động
                         </span>
-                    @elseif($course->status === 'pending')
+                    @elseif($course->status === 'draft')
                         <span class="absolute top-2 right-2 inline-flex items-center rounded-full bg-amber-400 text-[11px] px-2.5 py-1 font-semibold">
                             Chờ duyệt
                         </span>
-                    @else
+                    @elseif($course->status === 'closed')
                         <span class="absolute top-2 right-2 inline-flex items-center rounded-full bg-slate-500 text-white text-[11px] px-2.5 py-1 font-semibold">
                             Tạm ẩn
+                        </span>
+                    @else
+                        <span class="absolute top-2 right-2 inline-flex items-center rounded-full bg-slate-400 text-white text-[11px] px-2.5 py-1 font-semibold">
+                            {{ $course->status ?? 'Khác' }}
                         </span>
                     @endif
                 </div>
 
                 <div class="flex-1 p-4 flex flex-col">
                     <div class="flex items-start justify-between gap-2 mb-2">
-                        @if($course->category)
+                        @if($course->subject)
                             <span class="inline-flex items-center rounded-full bg-indigo-50 text-indigo-600 text-[11px] font-semibold px-2 py-1">
-                                {{ $course->category->name }}
+                                {{ $course->subject->name }}
                             </span>
                         @else
                             <span class="text-[11px] text-slate-400 italic">Chưa có danh mục</span>
-                        @endif>
+                        @endif
 
                         <span class="text-[11px] text-amber-500 flex items-center gap-1">
                             <i class="ri-star-fill"></i> {{ number_format($course->rating ?? 0, 1) }}
@@ -160,15 +169,20 @@
                     </div>
 
                     <h3 class="text-sm font-semibold text-slate-900 mb-1 line-clamp-2">
-                        {{ $course->title }}
+                        {{ $course->name }}
                     </h3>
+
                     <p class="text-xs text-slate-500 mb-3 line-clamp-3">
-                        {{ $course->short_description ?? 'Chưa có mô tả ngắn.' }}
+                        {{ $course->description ? Str::limit($course->description, 100) : 'Chưa có mô tả.' }}
                     </p>
 
                     <div class="flex items-center justify-between text-[11px] text-slate-500 mb-3">
-                        <span><i class="ri-user-line mr-1"></i>{{ $course->students_count ?? 0 }} học viên</span>
-                        <span><i class="ri-book-2-line mr-1"></i>{{ $course->lessons_count ?? 0 }} bài học</span>
+                        <span>
+                            <i class="ri-user-line mr-1"></i>{{ $course->enrollments_count ?? 0 }} học viên
+                        </span>
+                        <span>
+                            <i class="ri-book-2-line mr-1"></i>{{ $course->lessons_count ?? 0 }} bài học
+                        </span>
                     </div>
 
                     <div class="flex items-center mb-4">
@@ -186,15 +200,16 @@
                             {{ $course->price_label ?? 'Miễn phí' }}
                         </div>
                         <div class="flex gap-2">
-                            <a href="{{ route('admin.courses.show', $course) }}"
+                            {{-- Xem / chỉnh sửa: tạm dùng luôn route edit --}}
+                            <a href="{{ route('admin.courses.edit', $course->id) }}"
                                class="inline-flex items-center justify-center w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-50">
                                 <i class="ri-eye-line text-slate-500 text-lg"></i>
                             </a>
-                            <a href="{{ route('admin.courses.edit', $course) }}"
+                            <a href="{{ route('admin.courses.edit', $course->id) }}"
                                class="inline-flex items-center justify-center w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-50">
                                 <i class="ri-edit-line text-amber-500 text-lg"></i>
                             </a>
-                            <form action="{{ route('admin.courses.destroy', $course) }}"
+                            <form action="{{ route('admin.courses.destroy', $course->id) }}"
                                   method="POST"
                                   onsubmit="return confirm('Xóa khóa học này?');">
                                 @csrf
@@ -210,7 +225,10 @@
             </div>
         @empty
             <p class="text-sm text-slate-500 col-span-full">
-                Chưa có khóa học nào. <a href="{{ route('admin.courses.create') }}" class="text-indigo-600 font-medium">Tạo khóa học đầu tiên?</a>
+                Chưa có khóa học nào.
+                <a href="{{ route('admin.courses.create') }}" class="text-indigo-600 font-medium">
+                    Tạo khóa học đầu tiên?
+                </a>
             </p>
         @endforelse
     </div>
