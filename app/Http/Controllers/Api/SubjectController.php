@@ -16,9 +16,21 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        $subjects = Subject::withCount('topics')
-            ->with('topics')
-            ->get();
+        $subjects = Subject::withCount(['topics', 'exams'])
+            ->get()
+            ->map(function ($subject) {
+                return [
+                    'subject_id' => $subject->id,
+                    'subject_name' => $subject->name,
+                    'code' => $subject->code,
+                    'description' => $subject->description,
+                    'topics_count' => $subject->topics_count,
+                    'exams_count' => $subject->exams_count,
+                    'status' => $subject->status,
+                    'created_at' => $subject->created_at,
+                    'updated_at' => $subject->updated_at,
+                ];
+            });
 
         return response()->json([
             'success' => true,
