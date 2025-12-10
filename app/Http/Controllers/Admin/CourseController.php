@@ -34,13 +34,15 @@ class CourseController extends Controller
     }
 
     /** CREATE COURSE */
-    public function create()
-    {
-        $subjects = Subject::all();
-        $teachers = User::role('teacher')->get();
+    public function create(Request $request)
+{
+    $subjects = Subject::all();
+    $teachers = User::role('teacher')->get();
 
-        return view('admin.courses.create', compact('subjects', 'teachers'));
-    }
+    $selectedSubjectId = $request->get('subject_id'); // lấy từ query
+
+    return view('admin.courses.create', compact('subjects', 'teachers', 'selectedSubjectId'));
+}
 
     /** STORE COURSE */
     public function store(Request $request)

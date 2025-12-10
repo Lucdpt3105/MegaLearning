@@ -97,49 +97,59 @@
 </div>
                 </div>
 
-                {{-- Khóa học --}}
-                <div class="space-y-1">
-                    <button type="button"
-                            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
-                                       text-indigo-100/80 hover:bg-white/10 transition"
-                            data-sidebar-toggle="courses">
-                        <span class="flex items-center gap-2">
-                            <i data-feather="book-open" class="w-4 h-4"></i>
-                            <span>Khóa học</span>
-                        </span>
-                        <i data-feather="chevron-right"
-                           class="w-3 h-3 ml-1 transition-transform duration-200"
-                           data-sidebar-chevron="courses"></i>
-                    </button>
+               {{-- Khóa học --}}
+<div class="space-y-1">
+    <button type="button"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-wide
+                   text-indigo-100/80 hover:bg-white/10 transition"
+            data-sidebar-toggle="courses">
+        <span class="flex items-center gap-2">
+            <i data-feather="book-open" class="w-4 h-4"></i>
+            <span>Khóa học</span>
+        </span>
+        <i data-feather="chevron-right"
+           class="w-3 h-3 ml-1 transition-transform duration-200"
+           data-sidebar-chevron="courses"></i>
+    </button>
 
-                    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
-                         data-sidebar-body="courses">
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Danh sách khóa học</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.courses.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Thêm khóa học</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Danh mục</span>
-                        </a>
-                        <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center gap-2 py-1.5 rounded-lg
-                                  {{ request()->routeIs('admin.lessons.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
-                            <span>Bài học</span>
-                        </a>
-                    </div>
-                </div>
+    <div class="space-y-0.5 pl-8 text-xs text-indigo-100/90 hidden"
+         data-sidebar-body="courses">
+
+        {{-- Danh sách khóa học --}}
+        <a href="{{ route('admin.courses.index') }}"
+           class="flex items-center gap-2 py-1.5 rounded-lg
+                  {{ request()->routeIs('admin.courses.index') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+            <span>Danh sách khóa học</span>
+        </a>
+
+        {{-- Thêm khóa học --}}
+        <a href="{{ route('admin.courses.create') }}"
+           class="flex items-center gap-2 py-1.5 rounded-lg
+                  {{ request()->routeIs('admin.courses.create') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+            <span>Thêm khóa học</span>
+        </a>
+
+        {{-- Danh mục khóa học --}}
+        <a href="{{ route('admin.course-categories.index') }}"
+           class="flex items-center gap-2 py-1.5 rounded-lg
+                  {{ request()->routeIs('admin.course-categories.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+            <span>Danh mục khóa học</span>
+        </a>
+
+        {{-- Bài học --}}
+        <a href="{{ route('admin.lessons.index') }}"
+           class="flex items-center gap-2 py-1.5 rounded-lg
+                  {{ request()->routeIs('admin.lessons.*') ? 'bg-white/20 font-semibold' : 'hover:bg-white/10' }}">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-200"></span>
+            <span>Bài học</span>
+        </a>
+
+    </div>
+</div>
+
 
                 {{-- Hệ thống Thi --}}
                 <div class="space-y-1">

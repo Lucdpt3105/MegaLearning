@@ -8,6 +8,9 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ForumQuestionController;
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\CourseCategoryController;
+use App\Http\Controllers\Admin\LessonController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -172,33 +175,95 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-    // ADMIN COURSES (THEO NEO UI)
-Route::prefix('admin/courses')->name('admin.courses.')->middleware(['auth','role:admin'])->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 1. DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
 
-    Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
+    /*
+    |--------------------------------------------------------------------------
+    | 📌 COURSES (THEO NEO UI)
+    |   URL:  /admin/courses/...
+    |   Name: admin.courses.index, admin.courses.create, ...
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('courses')->name('courses.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
+            ->name('index');
+
+        Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
+            ->name('create');
+
+        Route::get('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'show'])->name('show');
+
+
+        Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
+            ->name('destroy');
+    });
+
+    /*
+|--------------------------------------------------------------------------
+| 📌 KHÓA HỌC → BÀI HỌC
+|   URL:  /admin/lessons
+|   NAME: admin.lessons.index
+|--------------------------------------------------------------------------
+*/
+Route::prefix('course-categories')->name('course-categories.')->group(function () {
+
+    Route::get('/', [App\Http\Controllers\Admin\CourseCategoryController::class, 'index'])
         ->name('index');
 
-    Route::get('/create', [App\Http\Controllers\Admin\CourseController::class, 'create'])
+    Route::get('/create', [App\Http\Controllers\Admin\CourseCategoryController::class, 'create'])
         ->name('create');
 
-    Route::post('/', [App\Http\Controllers\Admin\CourseController::class, 'store'])
+    Route::post('/', [App\Http\Controllers\Admin\CourseCategoryController::class, 'store'])
         ->name('store');
 
-    Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseController::class, 'edit'])
+    Route::get('/{id}/edit', [App\Http\Controllers\Admin\CourseCategoryController::class, 'edit'])
         ->name('edit');
 
-    Route::put('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'update'])
+    Route::put('/{id}', [App\Http\Controllers\Admin\CourseCategoryController::class, 'update'])
         ->name('update');
 
-    Route::delete('/{id}', [App\Http\Controllers\Admin\CourseController::class, 'destroy'])
+    Route::delete('/{id}', [App\Http\Controllers\Admin\CourseCategoryController::class, 'destroy'])
         ->name('destroy');
 });
 
-// ======================
-//  ADMIN PROFILE ROUTES
-// ======================
-Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])
-    ->name('profile');
+Route::prefix('lessons')->name('lessons.')->group(function () {
+
+    Route::get('/', [App\Http\Controllers\Admin\LessonController::class, 'index'])
+        ->name('index');
+
+    Route::get('/create', [App\Http\Controllers\Admin\LessonController::class, 'create'])
+        ->name('create');
+
+    Route::post('/', [App\Http\Controllers\Admin\LessonController::class, 'store'])
+        ->name('store');
+
+    Route::get('/{id}/edit', [App\Http\Controllers\Admin\LessonController::class, 'edit'])
+        ->name('edit');
+
+    Route::put('/{id}', [App\Http\Controllers\Admin\LessonController::class, 'update'])
+        ->name('update');
+
+    Route::delete('/{id}', [App\Http\Controllers\Admin\LessonController::class, 'destroy'])
+        ->name('destroy');
+});
+
+    // ===== PROFILE, USER, TESTER... giữ nguyên phía dưới =====
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])
+        ->name('profile');
 
 Route::put('/profile/update', [App\Http\Controllers\Admin\ProfileController::class, 'update'])
     ->name('profile.update');
