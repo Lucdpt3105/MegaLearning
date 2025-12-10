@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip for SQLite (testing)
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+        
         // Cập nhật ENUM để thêm giá trị 'class'
         DB::statement("ALTER TABLE chat_rooms MODIFY COLUMN room_type ENUM('group', 'private', 'subject', 'class') NOT NULL");
     }

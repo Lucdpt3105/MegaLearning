@@ -12,6 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip for SQLite (testing)
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+        
         DB::statement("ALTER TABLE questions MODIFY COLUMN type ENUM('multiple_choice', 'true_false', 'essay', 'fill_blank') NOT NULL DEFAULT 'multiple_choice'");
     }
 
