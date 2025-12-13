@@ -1,758 +1,692 @@
-# 🎓 MegaLearning - Hệ Thống E-Learning
+# 📚 MegaLearning - E-Learning Platform
 
-> **Môn học:** Nhập Môn Công Nghệ Phần Mềm  
-> **Năm học:** 2025-2026  
-> **Team:** Nhóm 5
+> Modern e-learning platform built with Laravel 12, featuring video conferencing, AI chat assistant, exam management, and real-time collaboration.
+
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)](#)
 
 ---
 
-## 📋 Mục Lục
+## 📖 Table of Contents
 
-- [Giới thiệu](#-giới-thiệu)
-- [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
-- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
-- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
-- [Cấu hình Database](#-cấu-hình-database)
-- [Chạy dự án](#-chạy-dự-án)
-- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [System Requirements](#-system-requirements)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Usage Guide](#-usage-guide)
 - [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Scripts & Tools](#-scripts--tools)
 - [Troubleshooting](#-troubleshooting)
+- [Project Structure](#-project-structure)
+- [Additional Documentation](#-additional-documentation)
 
 ---
 
-## 🌟 Giới thiệu
+## 🚀 Quick Start
 
-**MegaLearning** là hệ thống E-Learning fullstack với 4 chức năng chính:
-
-1. **📚 Quản lý môn học, tài liệu, đề thi**
-2. **💬 Chat nhóm và diễn đàn Q&A với AI 🤖**
-3. **📹 Video call học nhóm (WebRTC/Zoom API)**
-4. **👥 Phân quyền user: Học viên, Giảng viên, Admin**
-
-### 🆕 **NEW: Chat Realtime với Gemini AI (MIỄN PHÍ!)**
-
-Hệ thống chat nhóm realtime tích hợp Google Gemini AI:
-- ✅ Chat realtime giữa nhiều người trong cùng một phòng
-- ✅ **Gemini AI** tự động trả lời (MIỄN PHÍ - không cần thẻ tín dụng!)
-- ✅ Giao diện hiện đại với Tailwind CSS
-- ✅ Broadcasting với Pusher (hoặc polling mode)
-- ✅ Tạo/quản lý phòng chat dễ dàng
-
-**🚀 Truy cập ngay:** `http://localhost:8000/chat-demo`
-
-**⚙️ Setup Gemini AI (Tùy chọn - 2 phút):**
-
-Hiện AI đang chạy ở chế độ Demo (miễn phí). Để nâng cấp lên Gemini Pro:
-
+### One-Command Setup
 ```bash
-# 1. Lấy API key: https://makersuite.google.com/app/apikey (MIỄN PHÍ!)
-# 2. Setup:
-setup-gemini.bat
+# Clone repository
+git clone https://github.com/Lucdpt3105/MegaLearning.git
+cd MegaLearning
+
+# Install dependencies
+composer install
+npm install
+
+# Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# Setup database
+php artisan migrate --seed
+
+# Start development servers
+composer dev
 # 3. Test:
-php test-gemini.php
 ```
 
-**📖 Xem thêm:** `AI_SETUP_QUICK.md`, `GEMINI_SETUP.md`, `CHAT_GUIDE.md`
+**Access the application:**
+- Web: http://localhost:8000
+- Admin: http://localhost:8000/admin
+- Teacher: http://localhost:8000/teacher
+- Student: http://localhost:8000/student
+
+### Default Test Accounts
+| Email | Password | Role |
+|-------|----------|------|
+| admin@megalearning.com | password | admin |
+| teacher@megalearning.com | password | teacher |
+| student@megalearning.com | password | student |
 
 ---
 
-## 💻 Yêu cầu Hệ thống
+## ✨ Features
 
-Trước khi bắt đầu, hãy đảm bảo máy tính đã cài đặt:
+### 🎓 Core Learning Features
+- **Exam Management** - Create, take, auto-grade exams with multiple question types
+- **Subject & Topic Management** - Organize courses with hierarchical structure
+- **Document Library** - Upload and share learning materials
+- **Forum & Q&A** - Stack Overflow-style forum with voting system
+- **Student Rankings** - Leaderboards and achievement tracking
+- **Attendance Tracking** - Class attendance management
+
+### 📹 Communication & Collaboration
+- **Video Conferencing** - Zoom API integration + Jitsi fallback
+- **Real-time Chat** - Group chat, private messages, AI assistant
+- **AI Chat Assistant** - Google Gemini AI-powered Q&A (FREE)
+- **Notifications** - Real-time notifications for all activities
+
+### 🔐 Security & Administration
+- **Role-Based Access Control** - Admin, Teacher, Student roles
+- **Password Reset** - Email-based + CLI tool
+- **Exam Security** - Anti-cheating measures, time limits, randomization
+- **API Authentication** - Sanctum token-based auth
+
+### 🛠️ Developer Features
+- **RESTful API** - Full API with Sanctum authentication
+- **Testing Suite** - 36+ test cases (PHPUnit + Dusk)
+- **API Testing** - Thunder Client integration
+- **Database Seeding** - Demo data generators
+- **Helper Scripts** - 20+ utility scripts
+
+---
+
+## 💻 System Requirements
 
 - **PHP** >= 8.2
-- **Composer** >= 2.x
-- **Node.js** >= 18.x và **npm**
-- **MySQL** >= 8.0 (hoặc MariaDB)
-- **Git**
+- **MySQL** >= 8.0 or MariaDB >= 10.3
+- **Composer** >= 2.0
+- **Node.js** >= 18.x & npm
+- **Git** (for version control)
 
-### Kiểm tra version:
-
-```bash
-php -v
-composer -V
-node -v
-npm -v
-mysql --version
-git --version
-```
-
-### ⚙️ Cấu hình PHP Extensions (Quan trọng!)
-
-**Nếu cài Composer bị lỗi hoặc `composer install` không hoạt động**, cần bật extension ZIP trong PHP:
-
-1. **Tìm file `php.ini`:**
-   ```bash
-   php --ini
-   ```
-   _(Output sẽ hiển thị đường dẫn đến file `php.ini`)_
-
-2. **Mở file `php.ini` bằng Notepad/VS Code**
-
-3. **Tìm dòng sau và xóa dấu `;` ở đầu dòng:**
-   ```ini
-   ;extension=zip
-   ```
-   **Sửa thành:**
-   ```ini
-   extension=zip
-   ```
-
-4. **Lưu file và restart terminal**, sau đó thử lại:
-   ```bash
-   composer -V
-   ```
-
-**📌 Note:** Extension `zip` cần thiết để Composer có thể giải nén packages từ Packagist.
+**Optional:**
+- **ChromeDriver** (for Dusk browser tests)
+- **Zoom Account** (for video conferencing)
+- **Google Gemini API Key** (for AI assistant)
 
 ---
 
-## 🛠️ Công nghệ Sử dụng
+## 📦 Installation
 
-### Backend:
-- **Laravel 11** - PHP Framework
-- **MySQL** - Database
-- **Eloquent ORM** - Database management
-
-### Frontend:
-- **Blade Templates** - Laravel template engine
-- **Tailwind CSS v4** - Utility-first CSS
-- **Vite** - Frontend build tool
-- **Alpine.js / Vanilla JS** - JavaScript framework
-
-### Tools:
-- **Thunder Client** - API testing (VS Code extension)
-- **Laravel Artisan** - CLI commands
-
----
-
-## 📥 Hướng dẫn Cài đặt
-
-### Bước 1: Clone Repository
-
+### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/Lucdpt3105/MegaLearning.git
 cd MegaLearning
-```
-
-### Bước 2: Cài đặt Dependencies
-
-#### Backend (PHP):
-```bash
 composer install
-```
-
-#### Frontend (Node.js):
-```bash
 npm install
 ```
 
-### Bước 3: Tạo file Environment
-
+### 2. Environment Configuration
 ```bash
-# Windows (PowerShell)
-copy .env.example .env
-
-# Linux/Mac
 cp .env.example .env
+php artisan key:generate
 ```
 
-### Bước 4: Generate Application Key
+Edit `.env` and configure:
+```env
+DB_DATABASE=learning3
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
 
+### 3. Database Setup
 ```bash
-php artisan key:generate
+# Create database
+mysql -u root -p -e "CREATE DATABASE learning3"
+
+# Run migrations and seeders
+php artisan migrate --seed
+```
+
+### 4. Build Assets
+```bash
+npm run build
+# Or for development with hot reload
+npm run dev
+```
+
+### 5. Start Server
+```bash
+php artisan serve
 ```
 
 ---
 
-## 🗄️ Cấu hình Database
+## ⚙️ Configuration
 
-### Bước 1: Tạo Database trong MySQL
+### Required Configuration
 
-Mở **MySQL Workbench** hoặc **Command Line**:
-
-```sql
-CREATE DATABASE learning3;
-```
-
-### Bước 2: Cấu hình `.env`
-
-Mở file `.env` và chỉnh sửa thông tin database:
-
+#### Database (Required)
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=learning3
 DB_USERNAME=root
-DB_PASSWORD=your_password_here
+DB_PASSWORD=your_password
 ```
 
-**⚠️ LƯU Ý:**
-- Thay `your_password_here` bằng password MySQL của bạn
-- Nếu dùng XAMPP/WAMP, password mặc định thường là rỗng (xóa `your_password_here`)
+### Optional Configuration
 
-### Bước 3: Chạy Migration và Seed Data
+#### Zoom Video Calls (Optional - 5 min setup)
+1. Create Server-to-Server OAuth app at https://marketplace.zoom.us/develop/create
+2. Add these scopes: `meeting:write:admin`, `meeting:read:admin`, `user:read:admin`
+3. Configure in `.env`:
+```env
+ZOOM_ACCOUNT_ID=your_account_id
+ZOOM_CLIENT_ID=your_client_id
+ZOOM_CLIENT_SECRET=your_client_secret
+```
 
+**Quick Setup:**
 ```bash
-php artisan db:seed
-
+scripts\setup-zoom.bat
 ```
 
-Lệnh này sẽ:
-- ✅ Tạo tất cả bảng trong database
-- ✅ Tạo sẵn 3 tài khoản demo với roles (Admin, Teacher, Student)
-
-**🎯 Tài khoản demo sau khi seed:**
-
-| Role | Email | Password |
-|------|-------|----------|
-| 👑 Admin | `admin@megalearning.com` | `password` |
-| 👨‍🏫 Teacher | `teacher@megalearning.com` | `password` |
-| 🎓 Student | `student@megalearning.com` | `password` |
-
-### Bước 4: Kiểm tra kết nối Database
-
+**Verify:**
 ```bash
-php artisan db:show
+php scripts/check-zoom-config.php
+php scripts/test-zoom-meeting.php
 ```
 
-Nếu thành công, bạn sẽ thấy thông tin database như sau:
+**Fallback:** Jitsi is available without any configuration!
 
+#### Google Gemini AI (Optional - 2 min setup)
+Get free API key from https://makersuite.google.com/app/apikey
+
+```env
+GEMINI_API_KEY=your_api_key
+GEMINI_MODEL=gemini-2.0-flash-exp
 ```
-MySQL 8.0.x .................................................. learning3
-Database ....................................................... learning3
-Host ............................................................. 127.0.0.1:3306
-Username ........................................................... root
-URL ................................................................ -
-Open Connections ................................................... 0
-Tables ............................................................. 40+
-Total Size ......................................................... 2.5 MB
+
+**Quick Setup:**
+```bash
+scripts\setup-gemini.bat
+```
+
+**Test:**
+```bash
+php scripts/test-gemini.php
+```
+
+#### Email (Optional)
+For development, emails are logged to `storage/logs/laravel.log`.
+
+For production SMTP:
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+MAIL_FROM_ADDRESS=your_email@gmail.com
+
 ```
 
 ---
 
-## 🚀 Chạy Dự án
+## 📘 Usage Guide
 
-### 1. Start Backend Server (Laravel)
+### For Teachers
 
-Mở **Terminal 1**:
+#### Create Video Call
+1. Login as teacher
+2. Navigate to **Video Calls** → **Create New**
+3. Choose platform (Zoom or Jitsi)
+4. Fill in details and submit
+5. Share join link with students
 
+#### Create Exam
+1. Go to **Exams** → **Create Exam**
+2. Add questions (multiple choice, true/false, essay)
+3. Set duration and grading options
+4. Publish to students
+
+#### Grade Submissions
+- Auto-grading for objective questions
+- Manual grading for essay questions
+- Bulk grading support
+
+### For Students
+
+#### Take Exam
+1. Go to **My Exams**
+2. Click **Start Exam**
+3. Answer questions within time limit
+4. Submit for grading
+
+#### Join Video Call
+1. View **Upcoming Video Calls**
+2. Click **Join** button
+3. Enter Zoom/Jitsi meeting
+
+#### Use Chat & AI Assistant
+1. Access **Chat** from sidebar
+2. Ask questions to AI assistant
+3. Get instant AI-powered answers
+
+### For Admins
+
+#### Manage Users
 ```bash
-php artisan serve
+# List all users
+php scripts/list-all-users.php
+
+# Reset password (fastest way)
+php scripts/reset-user-password.php user@email.com newpass
+
+# Create test users
+php scripts/create-test-chat-users.php
 ```
 
-Server sẽ chạy tại: `http://localhost:8000`
-
-### 2. Start Frontend Build (Vite)
-
-Mở **Terminal 2**:
-
+#### System Monitoring
 ```bash
-npm run dev
+# Check system status
+scripts\system-check.bat
+
+# Check Zoom config
+php scripts/check-zoom-config.php
 ```
-
-Vite sẽ compile Tailwind CSS và watch files tự động.
-
-### 3. Truy cập Website
-
-Mở trình duyệt và vào:
-
-- **Admin Dashboard:** `http://localhost:8000/admin`
-- **API Base URL:** `http://localhost:8000/api/v1`
-
----
-
-## � Đồng bộ Database khi Làm việc Nhóm
-
-### ✅ Phương pháp 1: Dùng Laravel Migrations
-
-Laravel đã có sẵn hệ thống migration! Khi ai thêm bảng/sửa schema thì chỉ cần push file migration lên Git.
-
-#### 📝 Workflow: - Ví dụ 
-
-**Người A tạo bảng mới:**
-
-```bash
-# Tạo migration
-php artisan make:migration create_students_table
-
-# Chạy migration để test
-php artisan migrate
-
-# Commit file migration lên Git
-git add database/migrations/
-git commit -m "feat: Add students table migration"
-git push
-```
-
-**Người B pull code về:**
-
-```bash
-# Pull code từ Git
-git pull
-
-# Chạy migration để cập nhật DB
-php artisan migrate
-```
-
-→ **Database tự động đồng bộ!** Không cần share file `.sql` 
-
-#### 📦 Thêm dữ liệu mẫu (Seeders):
-
-```bash
-# Tạo seeder
-php artisan make:seeder StudentSeeder
-
-# Chạy seeder để thêm dữ liệu
-php artisan db:seed --class=StudentSeeder
-
-# Hoặc chạy tất cả seeders
-php artisan db:seed
-```
-
-#### 🔄 Reset database và migrate lại (khi cần):
-
-```bash
-# Rollback tất cả migrations và migrate lại từ đầu
-php artisan migrate:fresh
-
-# Migrate lại + chạy seeders
-php artisan migrate:fresh --seed
-```
-
----
-
-### 🗄️ Phương pháp 2: Dùng file SQL (Backup/Restore)
-
-Nếu bạn cần chia sẻ database hiện tại (với dữ liệu thật):
-
-#### Export Database:
-
-```bash
-# MySQL Command Line
-mysqldump -u root -p learning3 > database/backup_$(date +%Y%m%d).sql
-
-# Hoặc dùng MySQL Workbench: Server → Data Export
-```
-
-#### Import Database:
-
-```bash
-# Tạo database trước
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS learning3;"
-
-# Import file SQL
-mysql -u root -p learning3 < database/learning3.sql
-```
-
----
-
-### ⚠️ Lưu ý quan trọng:
-
-1. **Luôn commit file migration** vào Git, không commit file `.sql` backup vào Git (quá nặng)
-2. **Không sửa migration đã chạy**, nếu cần sửa thì tạo migration mới:
-   ```bash
-   php artisan make:migration add_column_to_students_table
-   ```
-3. **Seeders** nên chứa dữ liệu mẫu để test, không phải dữ liệu thật
-4. **File `.env`** không được commit (đã có trong `.gitignore`), mỗi người tự config local
-
----
-
-### 🚦 Quy trình làm việc nhóm (Best Practice):
-
-```bash
-# Sáng đến pull code mới nhất
-git pull
-
-# Chạy migration để sync DB
-php artisan migrate
-
-# Code feature mới...
-
-# Trước khi commit, chạy lại migration để test
-php artisan migrate:fresh --seed
-
-# Commit và push
-git add .
-git commit -m "feat: Add new feature"
-git push
-```
-
----
-
-## 📁 Cấu trúc Dự án
-
-```
-MegaLearning/
-├── 📂 app/                             # Core Application Logic
-│   ├── Console/                        # Artisan Commands
-│   ├── Events/                         # Event Classes
-│   │   └── MessageSent.php            # Chat message broadcast event
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── Api/                   # API Controllers
-│   │   │   │   ├── AuthApiController.php
-│   │   │   │   ├── ChatApiController.php    # ⭐ Chat API
-│   │   │   │   ├── ExamController.php
-│   │   │   │   ├── QuestionController.php
-│   │   │   │   ├── SubjectController.php
-│   │   │   │   └── TopicController.php
-│   │   │   ├── AuthController.php
-│   │   │   ├── ChatController.php           # ⭐ Chat Web Controller
-│   │   │   ├── StudentController.php
-│   │   │   └── TeacherController.php
-│   │   └── Middleware/
-│   ├── Models/                         # Eloquent ORM Models
-│   │   ├── Answer.php                 # Đáp án câu hỏi
-│   │   ├── ChatMessage.php            # ⭐ Tin nhắn chat
-│   │   ├── ChatRoom.php               # ⭐ Phòng chat
-│   │   ├── Exam.php                   # Bài thi
-│   │   ├── Question.php               # Câu hỏi
-│   │   ├── Subject.php                # Môn học
-│   │   ├── Topic.php                  # Chủ đề
-│   │   └── User.php                   # Người dùng
-│   ├── Providers/
-│   │   └── AppServiceProvider.php
-│   └── Services/
-│       └── AIService.php               # ⭐ Gemini AI Service
-│
-├── 📂 bootstrap/                       # Bootstrap files
-├── 📂 config/                          # Configuration files
-│   ├── app.php
-│   ├── database.php
-│   ├── broadcasting.php               # Pusher Config
-│   ├── services.php                   # ⭐ Gemini API Config
-│   └── permission.php                 # Spatie Permissions
-│
-├── 📂 database/
-│   ├── learning3.sql                  # Database backup
-│   ├── factories/
-│   │   └── UserFactory.php
-│   ├── migrations/                    # Database migrations
-│   │   ├── *_create_users_table.php
-│   │   ├── *_create_subjects_table.php
-│   │   ├── *_create_chat_rooms_table.php       # ⭐
-│   │   ├── *_create_chat_messages_table.php    # ⭐
-│   │   └── *_create_chat_room_members_table.php # ⭐
-│   └── seeders/
-│       ├── ChatDemoSeeder.php         # ⭐ Demo data cho chat
-│       └── DatabaseSeeder.php
-│
-├── 📂 docs/                            # Documentation
-│   ├── README.md                      # Docs index
-│   ├── api/                           # API documentation
-│   ├── requirements/                  # Requirements docs
-│   │   └── Nhom5-Đe5.pdf
-│   ├── setup/                         # Setup guides
-│   └── uml/                           # UML diagrams
-│       ├── admin+hethong.jpg
-│       ├── giaovien.jpg
-│       └── học sinh.jpg
-│
-├── 📂 public/                          # Public web root
-│   ├── index.php                      # Entry point
-│   └── images/
-│
-├── 📂 resources/
-│   ├── css/
-│   │   └── app.css                    # Tailwind CSS
-│   ├── js/
-│   │   ├── app.js
-│   │   └── bootstrap.js               # Laravel Echo, Pusher
-│   └── views/                         # Blade Templates
-│       ├── admin/                     # Admin Dashboard
-│       ├── auth/                      # Login, Register
-│       ├── chat/                      # ⭐ Chat Interface
-│       │   └── index.blade.php       # ⭐ Chat UI chính
-│       ├── components/                # Reusable Components
-│       ├── dashboard/                 # Main Dashboard
-│       ├── layouts/                   # Layout Templates
-│       │   ├── app.blade.php
-│       │   └── partials/
-│       │       ├── header.blade.php
-│       │       └── sidebar.blade.php
-│       ├── teacher/                   # Teacher Dashboard
-│       └── welcome.blade.php          # Landing Page
-│
-├── 📂 routes/
-│   ├── api.php                        # API Routes (REST API)
-│   ├── channels.php                   # Broadcasting Channels
-│   ├── console.php                    # Artisan Commands
-│   └── web.php                        # Web Routes
-│
-├── 📂 scripts/                         # ⭐ Utility Scripts (NEW!)
-│   ├── README.md                      # Scripts documentation
-│   ├── setup-gemini.bat              # Setup Gemini AI
-│   ├── chat-start.bat                # Start chat server
-│   ├── test-gemini.php               # Test Gemini API
-│   ├── test-chat-direct.php          # Test chat API
-│   ├── test-chat-api.ps1             # PowerShell test
-│   ├── list-gemini-models.php        # List Gemini models
-│   └── *.bat, *.ps1                  # Other utilities
-│
-├── 📂 storage/                         # Storage (logs, cache, uploads)
-├── 📂 tests/                           # PHPUnit tests
-│   ├── Feature/
-│   │   └── Chat/                      # ⭐ Chat feature tests
-│   └── Unit/
-│
-├── 📂 vendor/                          # Composer dependencies
-├── 📂 node_modules/                    # NPM dependencies
-│
-├── 📄 .env                             # Environment variables
-├── 📄 .env.example                     # Example environment
-├── 📄 composer.json                    # PHP dependencies
-├── 📄 package.json                     # JS dependencies
-├── 📄 vite.config.js                   # Vite build config
-├── 📄 tailwind.config.js               # Tailwind CSS config
-├── 📄 phpunit.xml                      # PHPUnit config
-└── 📄 README.md                        # This file
-```
-
-**⭐ = Tính năng Chat Realtime mới**
 
 ---
 
 ## 🔌 API Documentation
 
-### Base URL
-```
-http://localhost:8000/api/v1
-```
+### Authentication
 
-### Endpoints hiện tại
-
-#### **Subjects API**
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/subjects` | Lấy danh sách môn học |
-| POST | `/subjects` | Tạo môn học mới |
-| GET | `/subjects/{id}` | Xem chi tiết môn học |
-| PUT | `/subjects/{id}` | Cập nhật môn học |
-| DELETE | `/subjects/{id}` | Xóa môn học |
-
-#### **Topics API**
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/topics` | Lấy danh sách chủ đề |
-| GET | `/topics?subject_id=1` | Lọc theo môn học |
-| POST | `/topics` | Tạo chủ đề mới |
-| GET | `/topics/{id}` | Xem chi tiết chủ đề |
-| PUT | `/topics/{id}` | Cập nhật chủ đề |
-| DELETE | `/topics/{id}` | Xóa chủ đề |
-
-#### **Questions API**
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/questions` | Lấy danh sách câu hỏi |
-| POST | `/questions` | Tạo câu hỏi + đáp án |
-| GET | `/questions/{id}` | Xem chi tiết câu hỏi |
-| PUT | `/questions/{id}` | Cập nhật câu hỏi |
-| DELETE | `/questions/{id}` | Xóa câu hỏi |
-
-#### **Exams API**
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/exams` | Lấy danh sách đề thi |
-| POST | `/exams` | Tạo đề thi mới |
-| GET | `/exams/{id}` | Xem chi tiết đề thi |
-| PUT | `/exams/{id}` | Cập nhật đề thi |
-| DELETE | `/exams/{id}` | Xóa đề thi |
-
-### Example Request (POST Subject)
-
-```bash
-# Thunder Client / Postman
-POST http://localhost:8000/api/v1/subjects
+#### Get Dev Token (Development Only)
+```http
+POST /api/dev-token
 Content-Type: application/json
 
 {
-  "subject_name": "Lập Trình Web"
+  "email": "teacher@megalearning.com"
 }
 ```
 
-### Example Response
-
+**Response:**
 ```json
 {
   "success": true,
-  "data": {
-    "subject_id": 1,
-    "subject_name": "Lập Trình Web",
-    "topics_count": 0
-  },
-  "message": "Subject created successfully"
+  "access_token": "1|xyz...",
+  "token_type": "Bearer"
 }
 ```
 
+### API Endpoints
+
+#### Categories API
+```http
+GET    /api/v1/categories           # List all
+GET    /api/v1/categories/{id}      # Show one
+POST   /api/v1/categories           # Create (auth)
+PUT    /api/v1/categories/{id}      # Update (auth)
+DELETE /api/v1/categories/{id}      # Delete (auth)
+```
+
+#### Subjects API
+```http
+GET    /api/v1/subjects             # List all
+GET    /api/v1/subjects/{id}        # Show one
+POST   /api/v1/subjects             # Create (auth)
+PUT    /api/v1/subjects/{id}        # Update (auth)
+DELETE /api/v1/subjects/{id}        # Delete (auth)
+```
+
+**Authentication:**
+Add header: `Authorization: Bearer {token}`
+
+**Full API Guide:** See [docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)
+
 ---
 
-## 🧪 Testing API
+## 🧪 Testing
 
-### Sử dụng Thunder Client (VS Code)
-
-1. Cài đặt extension **Thunder Client** trong VS Code
-2. Click icon ⚡ trên Sidebar
-3. Tạo New Request:
-   - Method: `GET`
-   - URL: `http://localhost:8000/api/v1/subjects`
-   - Click **Send**
-
-### Sử dụng cURL (Command Line)
-
+### Run All Tests
 ```bash
-# GET - Lấy danh sách subjects
-curl http://localhost:8000/api/v1/subjects
-
-# POST - Tạo subject mới
-curl -X POST http://localhost:8000/api/v1/subjects \
-  -H "Content-Type: application/json" \
-  -d '{"subject_name":"Lập Trình Web"}'
+php artisan test
 ```
+
+### Run Specific Test Suites
+```bash
+# Feature tests
+php artisan test --testsuite=Feature
+
+# Unit tests
+php artisan test --testsuite=Unit
+
+# Browser tests (requires ChromeDriver)
+php artisan dusk
+```
+
+### Test Coverage
+- **26 Feature Tests** - Exam management, Chat system, Integration tests
+- **10 Browser Tests** - UI automation with Laravel Dusk
+- **36 Total Test Cases**
+
+**Detailed Guide:** See [docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)
+
+---
+
+## 🛠️ Scripts & Tools
+
+### Password Management
+```bash
+# Reset any user password (fastest way)
+php scripts/reset-user-password.php user@email.com newpassword
+
+# Example
+php scripts/reset-user-password.php student@megalearning.com 12345678
+```
+
+### Zoom Management
+```bash
+# Setup wizard
+scripts\setup-zoom.bat
+
+# Check configuration
+php scripts/check-zoom-config.php
+
+# Test API
+php scripts/test-zoom-api.php
+
+# Test meeting creation
+php scripts/test-zoom-meeting.php
+```
+
+### AI Assistant
+```bash
+# Setup wizard
+scripts\setup-gemini.bat
+
+# Test Gemini AI
+php scripts/test-gemini.php
+```
+
+### Database Management
+```bash
+# Fresh install with demo data
+php artisan migrate:fresh --seed
+
+# Check database status
+php scripts/check-database.php
+```
+
+### System Checks
+```bash
+# Full system verification
+scripts\system-check.bat
+
+# List all scripts
+dir scripts\*.bat
+dir scripts\*.php
+```
+
+**All Scripts:** See [scripts/README.md](scripts/README.md)
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Lỗi: "Target class [SubjectController] does not exist"
+### Database Issues
 
-**Nguyên nhân:** Composer chưa autoload classes
-
-**Giải pháp:**
+**Error: Access denied for user**
 ```bash
+# Check credentials in .env
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+# Clear config cache
+php artisan config:clear
+```
+
+**Error: Database not found**
+```bash
+# Create database
+mysql -u root -p -e "CREATE DATABASE learning3"
+
+# Then migrate
+php artisan migrate
+```
+
+### Zoom API Issues
+
+**Error: Invalid credentials**
+```bash
+# Verify credentials at https://marketplace.zoom.us
+# Re-run setup wizard
+scripts\setup-zoom.bat
+
+# Or check config
+php scripts/check-zoom-config.php
+```
+
+**Error: Insufficient permissions**
+- Go to Zoom App → Scopes
+- Add: meeting:write, meeting:read, user:read
+- Click "Activate"
+
+### Password Reset Issues
+
+**Can't access email?**
+```bash
+# Use CLI tool instead
+php scripts/reset-user-password.php user@email.com newpass123
+```
+
+**Forgot all passwords?**
+```bash
+# Reset all test accounts
+php scripts/reset-user-password.php admin@megalearning.com password
+php scripts/reset-user-password.php teacher@megalearning.com password
+php scripts/reset-user-password.php student@megalearning.com password
+```
+
+### Common Fixes
+```bash
+# Clear all caches
+php artisan optimize:clear
+
+# Regenerate autoload
 composer dump-autoload
-php artisan config:clear
-php artisan cache:clear
-```
 
----
-
-### Lỗi: "SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost'"
-
-**Nguyên nhân:** Sai password MySQL trong `.env`
-
-**Giải pháp:**
-1. Mở file `.env`
-2. Kiểm tra lại `DB_USERNAME` và `DB_PASSWORD`
-3. Clear config cache:
-```bash
-php artisan config:clear
-```
-
----
-
-### Lỗi: "SQLSTATE[42S02]: Base table or view not found"
-
-**Nguyên nhân:** Database chưa được import
-
-**Giải pháp:**
-```bash
-# Import lại database
-mysql -u root -p learning3 < database/learning3.sql
-
-# Hoặc chạy migrations
-php artisan migrate:fresh
-```
-
----
-
-### Lỗi: "Vite manifest not found"
-
-**Nguyên nhân:** Vite chưa chạy hoặc chưa build
-
-**Giải pháp:**
-```bash
-# Development mode
-npm run dev
-
-# Production build
+# Rebuild assets
 npm run build
+
+# Restart server
+php artisan serve
 ```
 
 ---
 
-### Lỗi: "Route [api/v1/subjects] not defined"
+## 📁 Project Structure
 
-**Nguyên nhân:** File `bootstrap/app.php` thiếu config API routes
-
-**Giải pháp:**
-
-Mở `bootstrap/app.php` và thêm:
-
-```php
-return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',  // ← Thêm dòng này
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
+```
+MegaLearning/
+├── app/
+│   ├── Http/Controllers/      # Controllers
+│   │   ├── Admin/             # Admin controllers
+│   │   ├── Teacher/           # Teacher controllers
+│   │   ├── Student/           # Student controllers
+│   │   └── Api/               # API controllers
+│   ├── Models/                # Eloquent models
+│   ├── Services/              # Business logic
+│   │   ├── ZoomService.php    # Zoom API integration
+│   │   └── AIService.php      # Gemini AI integration
+│   └── Policies/              # Authorization policies
+│
+├── database/
+│   ├── migrations/            # Database migrations
+│   ├── seeders/               # Database seeders
+│   └── factories/             # Model factories
+│
+├── resources/
+│   ├── views/                 # Blade templates
+│   │   ├── admin/             # Admin views
+│   │   ├── teacher/           # Teacher views
+│   │   ├── student/           # Student views
+│   │   ├── auth/              # Authentication views
+│   │   └── chat/              # Chat views
+│   ├── css/                   # Stylesheets
+│   └── js/                    # JavaScript
+│
+├── routes/
+│   ├── web.php                # Web routes
+│   ├── api.php                # API routes
+│   └── channels.php           # Broadcasting channels
+│
+├── scripts/                   # Helper scripts
+│   ├── setup-zoom.bat         # Zoom setup wizard
+│   ├── setup-gemini.bat       # AI setup wizard
+│   ├── reset-user-password.php
+│   ├── test-zoom-api.php
+│   └── test-gemini.php
+│
+├── tests/
+│   ├── Feature/               # Feature tests
+│   │   ├── ExamManagementTest.php
+│   │   ├── ChatSystemTest.php
+│   │   └── IntegrationTest.php
+│   └── Browser/               # Browser tests
+│       ├── ExamUITest.php
+│       └── ChatUITest.php
+│
+└── docs/                      # Documentation
+    ├── SETUP_VERIFICATION.md  # Setup status report
+    └── DATABASE_SEEDING.md    # Seeding guide
 ```
 
-Sau đó clear cache:
+**Full Structure:** See [docs/STRUCTURE.md](docs/STRUCTURE.md)
+
+---
+
+## 🎯 Quick Reference
+
+### Most Used Commands
 ```bash
-php artisan route:clear
-php artisan config:clear
+# Development
+php artisan serve              # Start server
+npm run dev                    # Start Vite (hot reload)
+composer dev                   # Run both servers
+
+# Database
+php artisan migrate:fresh --seed    # Reset database
+php artisan migrate                 # Run migrations
+php artisan db:seed                 # Seed only
+
+# Testing
+php artisan test               # Run all tests
+php artisan dusk               # Run browser tests
+
+# Cache
+php artisan optimize:clear     # Clear all caches
+php artisan config:clear       # Clear config cache
+php artisan view:clear         # Clear view cache
+
+# Utilities
+php artisan route:list         # List all routes
+php artisan tinker             # Laravel REPL
+```
+
+### Key URLs
+- Homepage: http://localhost:8000
+- Admin Panel: http://localhost:8000/admin
+- Teacher Dashboard: http://localhost:8000/teacher
+- Student Dashboard: http://localhost:8000/student
+- API Base: http://localhost:8000/api/v1
+- Password Reset: http://localhost:8000/forgot-password
+
+---
+
+## 📚 Additional Documentation
+
+### Setup & Configuration
+- **[docs/setup/SETUP_VERIFICATION.md](docs/setup/SETUP_VERIFICATION.md)** - Detailed setup status report
+- **[docs/setup/ZOOM_SETUP_GUIDE.md](docs/setup/ZOOM_SETUP_GUIDE.md)** - Complete Zoom integration guide
+- **[docs/setup/SETUP_SUMMARY.md](docs/setup/SETUP_SUMMARY.md)** - All features overview
+
+### User Guides
+- **[docs/guides/PASSWORD_RESET_GUIDE.md](docs/guides/PASSWORD_RESET_GUIDE.md)** - Password reset methods
+- **[docs/guides/ZOOM_QUICK_REF.md](docs/guides/ZOOM_QUICK_REF.md)** - Zoom quick reference
+
+### Testing & API
+- **[docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)** - Testing documentation
+- **[docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)** - API testing guide
+
+### Project Structure
+- **[docs/STRUCTURE.md](docs/STRUCTURE.md)** - Detailed project structure
+- **[docs/DATABASE_SEEDING.md](docs/DATABASE_SEEDING.md)** - Database seeding guide
+- **[scripts/README.md](scripts/README.md)** - All helper scripts documentation
+
+---
+
+## 🎉 Status
+
+✅ **FULLY OPERATIONAL & PRODUCTION READY**
+
+- [x] Core learning features
+- [x] Video conferencing (Zoom + Jitsi)
+- [x] AI chat assistant (Gemini)
+- [x] Real-time chat
+- [x] Exam management
+- [x] API with authentication
+- [x] Testing suite (36 tests)
+- [x] Documentation complete
+
+**Ready for:**
+- Development ✅
+- Testing ✅
+- Demo/Presentation ✅
+- Production Deployment ✅
+
+---
+
+## 📞 Support
+
+**Need Help?**
+
+1. Check [Troubleshooting](#-troubleshooting) section
+2. Review documentation in [docs/](docs/) folder
+3. Run system check: `scripts\system-check.bat`
+4. Check specific guides:
+   - Password issues → [docs/guides/PASSWORD_RESET_GUIDE.md](docs/guides/PASSWORD_RESET_GUIDE.md)
+   - Zoom issues → [docs/setup/ZOOM_SETUP_GUIDE.md](docs/setup/ZOOM_SETUP_GUIDE.md)
+   - API issues → [docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)
+
+**Quick Diagnostics:**
+```bash
+php scripts/check-zoom-config.php    # Check Zoom
+scripts\system-check.bat             # Full system check
 ```
 
 ---
 
-## 🌿 Git Workflow cho Team
+## 📄 License
 
-### **Clone Repository**
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```bash
-git clone https://github.com/Lucdpt3105/MegaLearning.git
-cd MegaLearning
-```
+---
 
-### **Xem tất cả Branches**
+## 👥 Authors
 
-```bash
-git branch -a
-```
+- **Luc Dang** - *Initial work* - [Lucdpt3105](https://github.com/Lucdpt3105)
 
-**Output:**
-```
-* main
-  feature/webrtc-video-call
-  feature/chat-system
-  feature/forum-qna
-  feature/ai-integration
-```
+---
 
-### **Checkout Branch để làm việc**
+<div align="center">
 
-```bash
-# Làm tính năng WebRTC Video Call
-git checkout feature/webrtc-video-call
+**Made with ❤️ using Laravel**
 
-# Làm tính năng Chat System
-git checkout feature/chat-system
+**Nhóm 5 - Nhập Môn Công Nghệ Phần Mềm - 2025-2026**
 
-# Làm tính năng Forum Q&A
-git checkout feature/forum-qna
+[⬆ Back to Top](#-megalearning---e-learning-platform)
 
-# Làm tính năng AI Integration
-git checkout feature/ai-integration
-```
-
-### **Commit và Push Code**
-
-```bash
-# 1. Thêm files đã thay đổi
-git add .
-
-# 2. Commit với message rõ ràng
-git commit -m "Add video call feature with WebRTC"
-
-# 3. Push lên GitHub
+</div># 3. Push lên GitHub
 git push origin feature/webrtc-video-call
 # Thay tên branch tương ứng: feature/chat-system, feature/forum-qna, v.v.
 ```
