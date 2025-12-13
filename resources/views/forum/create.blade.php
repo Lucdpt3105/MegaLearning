@@ -10,7 +10,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
-                Back to Forum
+                Quay Lại Diễn Đàn
             </a>
             <div class="flex items-center gap-4">
                 <div class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -19,8 +19,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Create New Post</h1>
-                    <p class="text-gray-600 font-medium">Share your thoughts with the community</p>
+                    <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Tạo Bài Viết Mới</h1>
+                    <p class="text-gray-600 font-medium">Chia sẻ suy nghĩ của bạn với cộng đồng</p>
                 </div>
             </div>
         </div>
@@ -35,7 +35,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="mb-2 font-bold text-red-900">Please fix the following errors:</p>
+                        <p class="mb-2 font-bold text-red-900">Vui lòng sửa các lỗi sau:</p>
                         <ul class="list-disc list-inside space-y-1 text-sm text-red-700">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -60,7 +60,7 @@
                          class="w-12 h-12 rounded-full ring-4 ring-white shadow-md object-cover">
                     <div>
                         <p class="font-bold text-gray-900">{{ $currentUserName }}</p>
-                        <p class="text-sm text-gray-600">Posting to Public Forum</p>
+                        <p class="text-sm text-gray-600">Đang đăng lên Diễn Đàn Công Khai</p>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
                         <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
-                        Post Title
+                        Tiêu Đề Bài Viết
                     </label>
                     <input
                         type="text"
@@ -82,7 +82,7 @@
                         name="title"
                         value="{{ old('title') }}"
                         required
-                        placeholder="What's your post about? Make it catchy!"
+                        placeholder="Bài viết của bạn nói về gì? Hãy đặt tiêu đề hấp dẫn!"
                         class="block w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-gray-900 font-medium shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100 transition"
                     />
                     @error('title')
@@ -101,7 +101,7 @@
                         <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
                         </svg>
-                        Post Content
+                        Nội Dung Bài Viết
                     </label>
                     <div class="relative">
                         <textarea
@@ -109,11 +109,11 @@
                             name="content"
                             rows="12"
                             required
-                            placeholder="Share your thoughts, ideas, questions, or anything you'd like to discuss with the community..."
+                            placeholder="Chia sẻ suy nghĩ, ý tưởng, câu hỏi hoặc bất cứ điều gì bạn muốn thảo luận với cộng đồng..."
                             class="block w-full resize-y rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-gray-900 font-medium shadow-sm placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-100 transition"
                         >{{ old('content') }}</textarea>
                         <div class="absolute bottom-3 right-3 text-xs text-gray-400 font-medium bg-white px-2 py-1 rounded-md">
-                            <span id="charCount">0</span> characters
+                            <span id="charCount">0</span> ký tự
                         </div>
                     </div>
                     @error('content')
@@ -132,7 +132,7 @@
                         <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Add Image (Optional)
+                        Thêm Hình Ảnh (Tùy Chọn)
                     </label>
                     <div class="relative">
                         <input 
@@ -151,8 +151,8 @@
                                 <svg class="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                 </svg>
-                                <p class="text-sm text-gray-600 font-medium">Click to upload or drag and drop</p>
-                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 2MB</p>
+                                <p class="text-sm text-gray-600 font-medium">Nhấp để tải lên hoặc kéo và thả</p>
+                                <p class="text-xs text-gray-500 mt-1">PNG, JPG, GIF tối đa 2MB</p>
                             </div>
                         </label>
                         <button type="button" id="removeImage" onclick="removeImage()" class="hidden absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 shadow-lg transition">
@@ -177,19 +177,19 @@
                         <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
-                        Add Tags (Optional)
+                        Thêm Thẻ (Tùy Chọn)
                     </label>
                     <input
                         type="text"
                         id="tags"
                         name="tags"
                         value="{{ old('tags') }}"
-                        placeholder="e.g. Laravel, PHP, JavaScript (separate with commas)"
+                        placeholder="ví dụ: Laravel, PHP, JavaScript (phân cách bằng dấu phẩy)"
                         class="block w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-gray-900 font-medium shadow-sm placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-100 transition"
                         oninput="updateTagsPreview(this.value)"
                     />
                     <div id="tagsPreview" class="mt-2 flex flex-wrap gap-2"></div>
-                    <p class="mt-1 text-xs text-gray-500">Separate tags with commas. Maximum 5 tags recommended.</p>
+                    <p class="mt-1 text-xs text-gray-500">Phân cách các thẻ bằng dấu phẩy. Nên dùng tối đa 5 thẻ.</p>
                     @error('tags')
                         <p class="mt-2 text-sm text-red-600 font-medium flex items-center gap-1">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -209,19 +209,19 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-blue-900 mb-2">Writing Tips</h4>
+                            <h4 class="font-bold text-blue-900 mb-2">Mẹo Viết Bài</h4>
                             <ul class="text-sm text-blue-800 space-y-1">
                                 <li class="flex items-start gap-2">
                                     <span class="text-blue-600 font-bold">•</span>
-                                    <span>Be clear and specific with your title</span>
+                                    <span>Tiêu đề rõ ràng và cụ thể</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <span class="text-blue-600 font-bold">•</span>
-                                    <span>Provide detailed content to help others understand</span>
+                                    <span>Cung cấp nội dung chi tiết để người khác hiểu rõ</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <span class="text-blue-600 font-bold">•</span>
-                                    <span>Be respectful and follow community guidelines</span>
+                                    <span>Tôn trọng và tuân thủ quy tắc cộng đồng</span>
                                 </li>
                             </ul>
                         </div>
@@ -231,7 +231,7 @@
                 <!-- Action Buttons -->
                 <div class="flex items-center justify-between pt-4 border-t-2 border-gray-200">
                     <div class="text-sm text-gray-600">
-                        <span class="font-medium">All fields marked with * are required</span>
+                        <span class="font-medium">Tất cả các trường có dấu * là bắt buộc</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <a href="{{ route('forum.index', ['sort' => 'my_post']) }}" 
@@ -239,14 +239,14 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
-                            Cancel
+                            Hủy
                         </a>
                         <button type="submit" 
                                 class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all hover:shadow-xl hover:scale-105">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
-                            Publish Post
+                            Đăng Bài
                         </button>
                     </div>
                 </div>
@@ -260,10 +260,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 </svg>
-                <h3 class="font-bold text-gray-900">Post Preview</h3>
+                <h3 class="font-bold text-gray-900">Xem Trước Bài Viết</h3>
             </div>
             <div class="text-sm text-gray-600">
-                <p>Your post will appear here as you type...</p>
+                <p>Bài viết của bạn sẽ hiển thị ở đây khi bạn nhập...</p>
             </div>
         </div>
     </div>

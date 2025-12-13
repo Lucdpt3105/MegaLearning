@@ -16,7 +16,8 @@
         "masbug/flysystem-google-drive-ext": "^2.4",
         "phpoffice/phpspreadsheet": "*",
         "pusher/pusher-php-server": "^7.2",
-        "spatie/laravel-permission": "^6.23"
+        "spatie/laravel-permission": "^6.23",
+        "symfony/brevo-mailer": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
-@section('title', 'Tạo đề thi mới')
-@section('page-title', 'Tạo đề thi mới')
-@section('page-description', 'Tạo và cấu hình đề thi cho lớp học')
+@section('title', 'Chỉnh sửa đề thi')
+@section('page-title', 'Chỉnh sửa đề thi')
+@section('page-description', 'Cập nhật thông tin đề thi')
 
 @section('content')
 
@@ -10,6 +10,7 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <form action="#" method="POST">
             @csrf
+            @method('PUT')
             
             <div class="space-y-6">
                 <!-- Thông tin cơ bản -->
@@ -106,15 +107,23 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="border-t pt-6 flex items-center justify-end gap-3">
-                    <a href="{{ route('admin.exams.index') }}" 
-                       class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                        Hủy
-                    </a>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm">
-                        Tạo đề thi
+                <div class="border-t pt-6 flex items-center justify-between">
+                    <button type="button" 
+                            onclick="if(confirm('Bạn có chắc muốn xóa đề thi này?')) alert('Chức năng đang phát triển')"
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                        Xóa đề thi
                     </button>
+                    
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('admin.exams.index') }}" 
+                           class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                            Hủy
+                        </a>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                            Lưu thay đổi
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
