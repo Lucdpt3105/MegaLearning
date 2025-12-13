@@ -2,16 +2,16 @@
 
 /**
  * Test Google Gemini API connection
- * Run: php test-gemini.php
+ * Run: php scripts/test-gemini.php
  */
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-// Load .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
 
-$apiKey = $_ENV['GEMINI_API_KEY'] ?? '';
+$apiKey = config('services.gemini.api_key');
 
 echo "=========================================\n";
 echo "   GOOGLE GEMINI API TEST\n";

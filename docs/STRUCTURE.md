@@ -1,4 +1,4 @@
-# 🏗️ Cấu Trúc Dự Án MegaLearning
+# 📊 Cấu Trúc Dự Án MegaLearning
 
 > **Tài liệu chi tiết về cấu trúc thư mục và tổ chức code của dự án**
 
@@ -7,8 +7,9 @@
 ## 📋 Mục lục
 
 - [Tổng quan](#-tổng-quan)
-- [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
+- [Cấu trúc thư mục tổng thể](#-cấu-trúc-thư-mục-tổng-thể)
 - [Chi tiết các thư mục](#-chi-tiết-các-thư-mục)
+- [File quan trọng](#-file-quan-trọng)
 - [Naming Convention](#-naming-convention)
 - [Best Practices](#-best-practices)
 
@@ -20,13 +21,14 @@ MegaLearning được xây dựng theo kiến trúc **MVC (Model-View-Controller
 
 - **Backend**: Laravel 12 (PHP 8.2+)
 - **Frontend**: Blade Templates + Tailwind CSS 4
-- **Database**: MySQL 8.0 / SQLite
+- **Database**: MySQL 8.0
 - **Realtime**: Pusher + Laravel Echo
 - **AI Integration**: Google Gemini API
+- **Video**: Zoom API + Jitsi
 
 ---
 
-## 📂 Cấu trúc thư mục
+## 📂 Cấu trúc thư mục tổng thể
 
 ### Root Level
 
@@ -36,17 +38,46 @@ MegaLearning/
 ├── bootstrap/        # Framework bootstrap files
 ├── config/           # Configuration files
 ├── database/         # Database migrations, seeders, factories
-├── docs/             # Project documentation
+├── docs/             ⭐ Project documentation (ORGANIZED!)
 ├── public/           # Public web root (assets, index.php)
 ├── resources/        # Views, CSS, JS
 ├── routes/           # Route definitions
-├── scripts/          # Utility scripts and tools
+├── scripts/          ⭐ Utility scripts and tools
 ├── storage/          # Logs, cache, uploads
 ├── tests/            # Automated tests
 └── vendor/           # Composer dependencies
 ```
 
----
+### Documentation Structure (docs/)
+
+```
+docs/
+├── README.md                    ⭐ Documentation hub/index
+├── STRUCTURE.md                 📊 This file
+├── DATABASE_SEEDING.md          🌱 Seeding guide
+│
+├── setup/                       ⚙️ Setup & Configuration
+│   ├── SETUP_VERIFICATION.md   ✅ Setup status
+│   ├── SETUP_SUMMARY.md        📋 Features overview
+│   └── ZOOM_SETUP_GUIDE.md     📹 Zoom guide
+│
+├── guides/                      👥 User Guides
+│   ├── PASSWORD_RESET_GUIDE.md 🔐 Password reset
+│   └── ZOOM_QUICK_REF.md       📹 Quick reference
+│
+├── testing/                     🧪 Testing
+│   └── TESTING_GUIDE.md        ✅ Test guide
+│
+├── api/                         🔌 API Docs
+│   └── THUNDER_CLIENT_API_GUIDE.md
+│
+├── requirements/                📝 Requirements
+│   └── Nhom5-Đe5.pdf
+│
+└── uml/                         📐 Diagrams
+    ├── admin+hethong.jpg
+    ├── giaovien.jpg
+    └── học sinh.jpg
 
 ## 📁 Chi tiết các thư mục
 
