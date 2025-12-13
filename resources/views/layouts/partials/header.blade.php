@@ -108,12 +108,111 @@
         @endauth
         
         <!-- Notifications -->
-        <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-        </button>
+        <div x-data="notificationDropdown()" @click.away="open = false" class="relative">
+            <button @click="open = !open; if(open) loadNotifications()" class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1"></span>
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div x-show="open" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="absolute right-0 mt-2 w-[420px] bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
+                 style="display: none;">
+                
+                <!-- Header -->
+                <div class="bg-white px-5 py-4 border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold text-gray-900">Thông Báo</h3>
+                        <button @click="markAllAsRead()" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                            Đánh dấu đã đọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="max-h-[480px] overflow-y-auto">
+                    <template x-if="loading">
+                        <div class="py-12 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
+                                <svg class="animate-spin h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-medium text-gray-500">Đang tải thông báo...</p>
+                        </div>
+                    </template>
+
+                    <template x-if="!loading && notifications.length === 0">
+                        <div class="py-16 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-1">Chưa có thông báo</h4>
+                            <p class="text-xs text-gray-500 max-w-[280px] mx-auto">Chúng tôi sẽ thông báo khi có điều mới</p>
+                        </div>
+                    </template>
+
+                    <template x-if="!loading && notifications.length > 0">
+                        <div class="divide-y divide-gray-100">
+                            <template x-for="notification in notifications" :key="notification.id">
+                                <div @click="if(notification.data && notification.data.url) { markAsRead(notification.id); setTimeout(() => { window.location.href = notification.data.url; }, 100); }" 
+                                     :class="notification.read_at ? 'bg-white' : 'bg-blue-50/30'"
+                                     class="px-5 py-4 hover:bg-gray-50 cursor-pointer transition-all duration-150 group">
+                                    <div class="flex items-start space-x-3">
+                                        <!-- Icon based on type -->
+                                        <div :class="{
+                                            'bg-blue-100 text-blue-600': notification.type === 'exam_reminder',
+                                            'bg-amber-100 text-amber-600': notification.type === 'exam_update',
+                                            'bg-emerald-100 text-emerald-600': notification.type === 'general'
+                                        }" class="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center">
+                                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-start justify-between gap-2">
+                                                <p class="text-sm font-semibold text-gray-900 leading-snug" x-text="notification.data && notification.data.title ? notification.data.title : 'Thông báo'"></p>
+                                                <template x-if="!notification.read_at">
+                                                    <span class="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-1.5"></span>
+                                                </template>
+                                            </div>
+                                            <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed" x-text="notification.data && notification.data.message ? notification.data.message : ''"></p>
+                                            <div class="flex items-center mt-2 space-x-2 text-xs text-gray-500">
+                                                <span class="font-medium" x-text="formatTime(notification.created_at)"></span>
+                                                <template x-if="notification.data.exam_title">
+                                                    <span>• <span x-text="notification.data.exam_title"></span></span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <template x-if="!notification.read_at">
+                                            <div class="w-2 h-2 bg-indigo-600 rounded-full flex-shrink-0"></div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-white px-5 py-3 border-t border-gray-100">
+                    <a href="{{ route('notifications.index') }}" class="block text-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                        Xem tất cả thông báo
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- Messages -->
         <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
@@ -161,3 +260,110 @@
         </a>
     </div>
 </header>
+
+<script>
+// Notification Dropdown Component
+function notificationDropdown() {
+    return {
+        open: false,
+        loading: false,
+        notifications: [],
+        unreadCount: 0,
+        
+        init() {
+            this.loadUnreadCount();
+            // Poll for new notifications every 5 seconds
+            setInterval(() => {
+                this.loadUnreadCount();
+            }, 5000);
+        },
+        
+        async loadNotifications() {
+            this.loading = true;
+            try {
+                const response = await fetch('{{ route("notifications.index") }}?json=1', {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                this.notifications = data.data || [];
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        async loadUnreadCount() {
+            try {
+                const response = await fetch('{{ route("notifications.unread-count") }}', {
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                this.unreadCount = data.count || 0;
+            } catch (error) {
+                console.error('Error loading unread count:', error);
+            }
+        },
+        
+        async markAsRead(notificationId) {
+            try {
+                await fetch(`{{ url('/notifications') }}/${notificationId}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    }
+                });
+                this.loadNotifications();
+                this.loadUnreadCount();
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        },
+        
+        async markAllAsRead() {
+            try {
+                await fetch('{{ route("notifications.mark-all-read") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    }
+                });
+                this.loadNotifications();
+                this.loadUnreadCount();
+            } catch (error) {
+                console.error('Error marking all as read:', error);
+            }
+        },
+        
+        formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Vừa xong';
+            if (diffMins < 60) return `${diffMins} phút trước`;
+            if (diffHours < 24) return `${diffHours} giờ trước`;
+            if (diffDays < 7) return `${diffDays} ngày trước`;
+            
+            return date.toLocaleDateString('vi-VN', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+        }
+    }
+}
+</script>
