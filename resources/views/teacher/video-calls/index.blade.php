@@ -28,11 +28,11 @@
     @endif
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <form method="GET" action="{{ route('teacher.video-calls.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Lớp học</label>
-                <select name="class_room_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
+        <form method="GET" action="{{ route('teacher.video-calls.index') }}" class="flex flex-wrap items-end gap-3">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Lớp học</label>
+                <select name="class_room_id" class="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Tất cả lớp</option>
                     @foreach($classRooms as $classRoom)
                         <option value="{{ $classRoom->id }}" {{ request('class_room_id') == $classRoom->id ? 'selected' : '' }}>
@@ -42,9 +42,9 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Trạng thái</label>
+                <select name="status" class="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">Tất cả</option>
                     <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Đã lên lịch</option>
                     <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Đang diễn ra</option>
@@ -53,104 +53,130 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Từ ngày</label>
+            <div class="flex-1 min-w-[160px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Từ ngày</label>
                 <input type="date" name="date_from" value="{{ request('date_from') }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                       class="w-full h-10 px-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
 
-            <div class="flex items-end">
-                <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                    Lọc
-                </button>
-            </div>
+            <button type="submit" class="h-10 px-5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                Lọc
+            </button>
         </form>
     </div>
 
-    <!-- Video Calls List -->
-    <div class="grid grid-cols-1 gap-4">
+    <!-- Video Calls List (Card-based) -->
+    <div class="space-y-3">
         @forelse($videoCalls as $call)
-        <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <h3 class="text-xl font-bold text-gray-900">{{ $call->title }}</h3>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold
-                            {{ $call->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : '' }}
-                            {{ $call->status === 'in_progress' ? 'bg-green-100 text-green-800' : '' }}
-                            {{ $call->status === 'ended' ? 'bg-gray-100 text-gray-800' : '' }}
-                            {{ $call->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                            @if($call->status === 'scheduled') 📅 Đã lên lịch
-                            @elseif($call->status === 'in_progress') 🔴 Đang diễn ra
-                            @elseif($call->status === 'ended') ✅ Đã kết thúc
-                            @else ❌ Đã hủy
-                            @endif
-                        </span>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden">
+            <div class="flex items-stretch">
+                <!-- Left: Calendar Date Box -->
+                <div class="flex-shrink-0 w-20 flex flex-col text-center border-r border-gray-200">
+                    <div class="py-2 {{ $call->status === 'in_progress' ? 'bg-green-500' : ($call->status === 'ended' ? 'bg-gray-400' : 'bg-blue-500') }} text-white">
+                        <div class="text-xs font-semibold uppercase">{{ $call->scheduled_at->format('M') }}</div>
                     </div>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-                        <div>
-                            <p class="text-gray-600">Lớp học</p>
-                            <p class="font-medium">{{ $call->classRoom->name }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-600">Môn học</p>
-                            <p class="font-medium">{{ $call->classRoom->subject->name }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-600">Thời gian</p>
-                            <p class="font-medium">{{ $call->scheduled_at->format('d/m/Y H:i') }}</p>
-                        </div>
-                        <div>
-                            <p class="text-gray-600">Thời lượng</p>
-                            <p class="font-medium">{{ $call->duration }} phút</p>
-                        </div>
-                    </div>
-
-                    @if($call->description)
-                    <p class="mt-3 text-gray-600">{{ Str::limit($call->description, 100) }}</p>
-                    @endif
-
-                    <div class="mt-4 flex items-center gap-2 text-sm">
-                        <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full font-mono">
-                            {{ $call->room_code }}
-                        </span>
-                        @if($call->is_recording)
-                        <span class="px-3 py-1 bg-red-50 text-red-700 rounded-full">
-                            🔴 Ghi hình
-                        </span>
-                        @endif
+                    <div class="flex-1 flex items-center justify-center bg-white">
+                        <div class="text-2xl font-bold text-gray-900">{{ $call->scheduled_at->format('d') }}</div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-2 ml-4">
-                    @if($call->status === 'scheduled')
-                        <form action="{{ route('teacher.video-calls.start', $call) }}" method="POST" class="w-full" target="_blank">
-                            @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                ▶ Bắt đầu
-                            </button>
-                        </form>
-                    @endif
+                <!-- Middle: Content -->
+                <div class="flex-1 p-4">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <!-- Title -->
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $call->title }}</h3>
+                            
+                            <!-- Metadata -->
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                    </svg>
+                                    <span class="font-medium">{{ $call->classRoom->subject->name }}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>{{ $call->scheduled_at->format('H:i') }} • {{ $call->duration }} phút</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    <span>{{ $call->classRoom->name }}</span>
+                                </div>
+                            </div>
 
-                    @if($call->status === 'in_progress')
-                        <a href="{{ route('teacher.video-calls.join', $call) }}" 
-                           target="_blank"
-                           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center">
-                            🎥 Tham gia
-                        </a>
-                        <form action="{{ route('teacher.video-calls.end', $call) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                ⏹ Kết thúc
-                            </button>
-                        </form>
-                    @endif
+                            <!-- Description (if exists) -->
+                            @if($call->description)
+                            <p class="text-sm text-gray-600 line-clamp-1 mb-2">{{ $call->description }}</p>
+                            @endif
 
-                    <a href="{{ route('teacher.video-calls.show', $call) }}" 
-                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-center">
-                        Chi tiết
-                    </a>
+                            <!-- Tags -->
+                            <div class="flex items-center gap-2 text-xs">
+                                @if($call->is_recording)
+                                <span class="px-2 py-1 bg-red-50 text-red-700 rounded-full font-medium">
+                                    🔴 Ghi hình
+                                </span>
+                                @endif
+                                <span class="px-2 py-1 bg-purple-50 text-purple-700 rounded-full font-medium">
+                                    Zoom
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Status & Actions -->
+                        <div class="flex flex-col items-end gap-3">
+                            <!-- Status Badge -->
+                            <span class="px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap
+                                {{ $call->status === 'scheduled' ? 'bg-blue-100 text-blue-700' : '' }}
+                                {{ $call->status === 'in_progress' ? 'bg-green-100 text-green-700' : '' }}
+                                {{ $call->status === 'ended' ? 'bg-gray-100 text-gray-700' : '' }}
+                                {{ $call->status === 'cancelled' ? 'bg-red-100 text-red-700' : '' }}">
+                                @if($call->status === 'scheduled') 📅 Đã lên lịch
+                                @elseif($call->status === 'in_progress') 🔴 Đang diễn ra
+                                @elseif($call->status === 'ended') ✅ Đã kết thúc
+                                @else ❌ Đã hủy
+                                @endif
+                            </span>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col gap-2 w-28">
+                                @if($call->status === 'scheduled')
+                                    <form action="{{ route('teacher.video-calls.start', $call) }}" method="POST" target="_blank">
+                                        @csrf
+                                        <button type="submit" class="w-full h-9 px-3 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors">
+                                            ▶ Bắt đầu
+                                        </button>
+                                    </form>
+                                @endif
+
+                                @if($call->status === 'in_progress')
+                                    <a href="{{ route('teacher.video-calls.join', $call) }}" 
+                                       target="_blank"
+                                       class="h-9 px-3 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors inline-flex items-center justify-center">
+                                        🎥 Tham gia
+                                    </a>
+                                    <form action="{{ route('teacher.video-calls.end', $call) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="w-full h-9 px-3 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+                                            ⏹ Kết thúc
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <a href="{{ route('teacher.video-calls.show', $call) }}" 
+                                   class="h-9 px-3 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors inline-flex items-center justify-center">
+                                    Chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
