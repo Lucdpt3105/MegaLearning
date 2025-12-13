@@ -87,22 +87,16 @@
                             <!-- True/False -->
                             @if($question->type === 'true_false')
                                 <div class="space-y-3">
-                                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer">
-                                        <input type="radio" 
-                                               name="answers[{{ $question->id }}]" 
-                                               value="true"
-                                               class="mr-3 w-4 h-4 text-blue-600"
-                                               {{ isset($submission->answers[$question->id]) && $submission->answers[$question->id] == 'true' ? 'checked' : '' }}>
-                                        <span class="text-gray-700">Đúng</span>
-                                    </label>
-                                    <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer">
-                                        <input type="radio" 
-                                               name="answers[{{ $question->id }}]" 
-                                               value="false"
-                                               class="mr-3 w-4 h-4 text-blue-600"
-                                               {{ isset($submission->answers[$question->id]) && $submission->answers[$question->id] == 'false' ? 'checked' : '' }}>
-                                        <span class="text-gray-700">Sai</span>
-                                    </label>
+                                    @foreach($question->shuffled_answers as $answer)
+                                        <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer">
+                                            <input type="radio" 
+                                                   name="answers[{{ $question->id }}]" 
+                                                   value="{{ $answer->id }}"
+                                                   class="mr-3 w-4 h-4 text-blue-600"
+                                                   {{ isset($submission->answers[$question->id]) && $submission->answers[$question->id] == $answer->id ? 'checked' : '' }}>
+                                            <span class="text-gray-700">{{ $answer->content }}</span>
+                                        </label>
+                                    @endforeach
                                 </div>
                             @endif
                         </div>
