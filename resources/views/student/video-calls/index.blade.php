@@ -12,8 +12,8 @@
         <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/90 via-purple-900/85 to-pink-900/80"></div>
         <div class="relative h-full flex items-center justify-between p-8">
             <div class="max-w-2xl">
-                <h1 class="text-4xl font-bold text-white mb-3">Video Conferences</h1>
-                <p class="text-indigo-100 text-lg">Join live sessions with your teachers and classmates</p>
+                <h1 class="text-4xl font-bold text-white mb-3">Phòng Học Trực Tuyến</h1>
+                <p class="text-indigo-100 text-lg">Tham gia các buổi học trực tiếp với giảng viên và bạn học</p>
             </div>
             <div class="hidden lg:block">
                 <div class="w-32 h-32 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl">
@@ -34,7 +34,7 @@
             <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/5"></div>
             <div class="relative h-full flex items-center justify-between p-6">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Upcoming Sessions</p>
+                    <p class="text-gray-600 text-sm font-medium">Buổi Học Sắp Tới</p>
                     <p class="text-4xl font-bold text-blue-600 mt-1">{{ $stats['upcoming'] }}</p>
                 </div>
                 <div class="bg-blue-100 rounded-full p-4">
@@ -52,7 +52,7 @@
             <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/5"></div>
             <div class="relative h-full flex items-center justify-between p-6">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Today's Meetings</p>
+                    <p class="text-gray-600 text-sm font-medium">Hôm Nay</p>
                     <p class="text-4xl font-bold text-green-600 mt-1">{{ $stats['today'] }}</p>
                 </div>
                 <div class="bg-green-100 rounded-full p-4">
@@ -70,7 +70,7 @@
             <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-600/5"></div>
             <div class="relative h-full flex items-center justify-between p-6">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Attended Sessions</p>
+                    <p class="text-gray-600 text-sm font-medium">Đã Tham Gia</p>
                     <p class="text-4xl font-bold text-purple-600 mt-1">{{ $stats['attended'] }}</p>
                 </div>
                 <div class="bg-purple-100 rounded-full p-4">
@@ -143,11 +143,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                Upcoming Sessions
+                Buổi Học Sắp Diễn Ra
             </h2>
             @if($upcomingCalls->isNotEmpty())
                 <span class="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full font-medium">
-                    {{ $upcomingCalls->count() }} scheduled
+                    {{ $upcomingCalls->count() }} buổi học
                 </span>
             @endif
         </div>
@@ -159,8 +159,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">No Upcoming Sessions</h3>
-                <p class="text-gray-500">Check back later for scheduled video conferences</p>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa Có Buổi Học Nào</h3>
+                <p class="text-gray-500">Kiểm tra lại sau để xem các buổi học được lên lịch</p>
             </div>
         @else
             <div class="space-y-4">
@@ -181,11 +181,11 @@
                                 </div>
                                 @if($call->scheduled_at->isToday())
                                     <div class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                                        Today
+                                        Hôm Nay
                                     </div>
                                 @elseif($call->scheduled_at->isTomorrow())
                                     <div class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                                        Tomorrow
+                                        Ngày Mai
                                     </div>
                                 @endif
                             </div>
@@ -235,12 +235,12 @@
                             <!-- Right: Action -->
                             <div class="flex flex-col items-center justify-center gap-4 p-6 border-l border-gray-100 min-w-[180px]">
                                 <div class="text-center">
-                                    <p class="text-xs text-gray-500 mb-1">Starts in</p>
+                                    <p class="text-xs text-gray-500 mb-1">Bắt đầu sau</p>
                                     <p class="text-lg font-bold text-indigo-600">{{ $call->scheduled_at->diffForHumans() }}</p>
                                 </div>
                                 <a href="{{ route('student.video-calls.show', $call->id) }}" 
                                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-center text-sm">
-                                    View Details
+                                    Xem Chi Tiết
                                 </a>
                             </div>
                         </div>
@@ -260,10 +260,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    Session History
+                    Lịch Sử Buổi Học
                 </h2>
                 <span class="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full font-medium">
-                    {{ $pastCalls->count() }} sessions
+                    {{ $pastCalls->count() }} buổi học
                 </span>
             </div>
 
@@ -306,14 +306,14 @@
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                             </svg>
-                                            Attended
+                                            Đã Tham Gia
                                         </span>
                                     @else
                                         <span class="flex items-center gap-1 text-red-600 font-medium">
                                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                             </svg>
-                                            Absent
+                                            Vắng Mặt
                                         </span>
                                     @endif
                                 </div>
@@ -327,7 +327,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    <span class="text-sm">Watch Recording</span>
+                                    <span class="text-sm">Xem Bản Ghi</span>
                                 </a>
                             @endif
                         </div>
