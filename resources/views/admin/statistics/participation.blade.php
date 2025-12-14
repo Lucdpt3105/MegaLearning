@@ -2,56 +2,30 @@
 
 @section('title', 'Tham gia Hoạt động')
 @section('page-title', 'Thống kê Tham gia')
-@section('page-description', 'Theo dõi mức độ tham gia của học sinh và giáo viên')
-
-@push('styles')
-<style>
-    .stat-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb;
-        transition: all 0.3s ease;
-    }
-    .stat-card:hover {
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        transform: translateY(-2px);
-    }
-    .progress-bar {
-        height: 0.5rem;
-        background: #e5e7eb;
-        border-radius: 9999px;
-        overflow: hidden;
-    }
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-        transition: width 0.5s ease;
-    }
-</style>
-@endpush
+@section('page-description', 'Theo dõi mức độ tham gia của học sinh và giáo viên trong các hoạt động')
 
 @section('content')
 
 <!-- Subject Statistics -->
-<div class="mb-8">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">
-        <i data-feather="book-open" class="w-6 h-6 inline text-blue-600"></i>
+<div class="mb-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+        <i data-feather="book-open" class="w-5 h-5 inline text-blue-600"></i>
         Thống kê theo Môn học
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($subjectStats as $subject)
-            <div class="stat-card">
-                <div class="flex items-start justify-between mb-4">
-                    <div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-1">
                         <h4 class="text-lg font-semibold text-gray-800">{{ $subject->name }}</h4>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm text-gray-600 mt-1">
                             GV: {{ $subject->teacher ? $subject->teacher->name : 'Chưa có' }}
                         </p>
                     </div>
-                    <div class="text-3xl">📚</div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0 ml-3">
+                        <span class="text-2xl">📚</span>
+                    </div>
                 </div>
 
                 <div class="space-y-3">
@@ -78,12 +52,12 @@
                     $activityScore = min(100, $totalActivities * 5);
                 @endphp
                 <div class="mt-4">
-                    <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <div class="flex justify-between text-xs text-gray-600 mb-2">
                         <span>Mức độ hoạt động</span>
-                        <span>{{ $activityScore }}%</span>
+                        <span class="font-semibold">{{ $activityScore }}%</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ $activityScore }}%"></div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full transition-all" style="width: {{ $activityScore }}%"></div>
                     </div>
                 </div>
             </div>
@@ -96,13 +70,15 @@
 </div>
 
 <!-- Video Call Statistics -->
-<div class="mb-8">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">
-        <i data-feather="video" class="w-6 h-6 inline text-green-600"></i>
-        Thống kê Video Call
-    </h3>
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">
+            <i data-feather="video" class="w-5 h-5 inline text-green-600"></i>
+            Thống kê Video Call
+        </h3>
+    </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -152,13 +128,15 @@
 </div>
 
 <!-- Exam Participation -->
-<div class="mb-8">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">
-        <i data-feather="file-text" class="w-6 h-6 inline text-purple-600"></i>
-        Top 20 Bài thi được tham gia nhiều nhất
-    </h3>
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800">
+            <i data-feather="file-text" class="w-5 h-5 inline text-purple-600"></i>
+            Top 20 Bài thi được tham gia nhiều nhất
+        </h3>
+    </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -210,15 +188,15 @@
 </div>
 
 <!-- Completion Rate -->
-<div class="mb-8">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">
-        <i data-feather="pie-chart" class="w-6 h-6 inline text-orange-600"></i>
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">
+        <i data-feather="pie-chart" class="w-5 h-5 inline text-orange-600"></i>
         Tỷ lệ hoàn thành bài thi
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @foreach($completionRate as $rate)
-            <div class="stat-card">
+            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
                 <div class="flex items-center justify-between mb-3">
                     <h4 class="text-lg font-semibold text-gray-800">
                         @if($rate->grading_status == 'graded')
