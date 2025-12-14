@@ -369,10 +369,19 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/exam-results/{submission}', [App\Http\Controllers\Admin\ExamResultsController::class, 'show'])->name('exam-results.show');
 
     // Forums
-    Route::get('/forums/topics', fn() => view('admin.forums.topics'))->name('forums.topics');
-    Route::post('/forums/topics', fn() => redirect()->route('admin.forums.topics'))->name('forums.topics.create');
-    Route::get('/forums/posts', fn() => view('admin.forums.posts'))->name('forums.posts');
-    Route::get('/forums/moderation', fn() => view('admin.forums.moderation'))->name('forums.moderation');
+    Route::get('/forums/topics', [App\Http\Controllers\Admin\ForumController::class, 'topics'])->name('forums.topics');
+    Route::post('/forums/threads/{id}/approve', [App\Http\Controllers\Admin\ForumController::class, 'approveThread'])->name('forums.threads.approve');
+    Route::post('/forums/threads/{id}/reject', [App\Http\Controllers\Admin\ForumController::class, 'rejectThread'])->name('forums.threads.reject');
+    Route::delete('/forums/threads/{id}', [App\Http\Controllers\Admin\ForumController::class, 'deleteThread'])->name('forums.threads.delete');
+    Route::post('/forums/threads/{id}/toggle-pin', [App\Http\Controllers\Admin\ForumController::class, 'togglePin'])->name('forums.threads.toggle-pin');
+    Route::post('/forums/threads/{id}/toggle-lock', [App\Http\Controllers\Admin\ForumController::class, 'toggleLock'])->name('forums.threads.toggle-lock');
+    
+    Route::get('/forums/posts', [App\Http\Controllers\Admin\ForumController::class, 'posts'])->name('forums.posts');
+    Route::post('/forums/posts/{id}/approve', [App\Http\Controllers\Admin\ForumController::class, 'approvePost'])->name('forums.posts.approve');
+    Route::post('/forums/posts/{id}/reject', [App\Http\Controllers\Admin\ForumController::class, 'rejectPost'])->name('forums.posts.reject');
+    Route::delete('/forums/posts/{id}', [App\Http\Controllers\Admin\ForumController::class, 'deletePost'])->name('forums.posts.delete');
+    
+    Route::get('/forums/moderation', [App\Http\Controllers\Admin\ForumController::class, 'moderation'])->name('forums.moderation');
 
     // Meetings
     Route::get('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'rooms'])->name('meetings.rooms');
