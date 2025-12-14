@@ -212,8 +212,34 @@ class GradingController extends Controller
             'essay_scores' => 'nullable|array',
             'essay_scores.*' => 'nullable|numeric|min:0',
             'feedback' => 'nullable|string|max:1000',
-            'final_score' => 'nullable|numeric|min:0|max:10',
+            'final_score' => 'nullable|numeric|min:0',
         ]);
+
+        // Validate essay scores don't exceed max points for each question
+        if (!empty($validated['essay_scores'])) {
+            $examQuestions = $submission->exam->questions()->withPivot('points')->get()->keyBy('id');
+            
+            foreach ($validated['essay_scores'] as $questionId => $score) {
+                $question = $examQuestions->get($questionId);
+                if ($question) {
+                    $maxPoints = $question->pivot->points;
+                    
+                    if ($score > $maxPoints) {
+                        return redirect()->back()
+                            ->withInput()
+                            ->with('error', "❌ Lỗi chấm điểm!\n\nCâu hỏi #{$questionId}: Điểm bạn nhập ({$score}) vượt quá điểm tối đa ({$maxPoints}).\n\n💡 Vui lòng nhập điểm từ 0 đến {$maxPoints}.");
+                    }
+                }
+            }
+        }
+
+        // Validate final score doesn't exceed exam's total points
+        $maxExamPoints = $submission->exam->total_points;
+        if (isset($validated['final_score']) && $validated['final_score'] > $maxExamPoints) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "❌ Lỗi điểm tổng!\n\nĐiểm tổng bạn nhập ({$validated['final_score']}) vượt quá tổng điểm đề thi ({$maxExamPoints}).\n\n💡 Vui lòng nhập điểm từ 0 đến {$maxExamPoints}.");
+        }
 
         DB::beginTransaction();
         try {
@@ -221,6 +247,9 @@ class GradingController extends Controller
             $autoScore = $submission->score ?? 0; // From auto-grading
             $essayScore = array_sum($validated['essay_scores'] ?? []);
             $finalScore = $validated['final_score'] ?? ($autoScore + $essayScore);
+            
+            // Final check: ensure final score doesn't exceed max
+            $finalScore = min($finalScore, $maxExamPoints);
 
             // Update submission
             $submission->update([
