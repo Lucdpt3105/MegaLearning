@@ -44,10 +44,9 @@ class DatabaseSeeder extends Seeder
         ]);
         
         // Step 4: Exams & Assessments
-        $this->command->info('📝 Step 4: Exams & Submissions');
+        $this->command->info('📝 Step 4: Exams');
         $this->call([
             ExamSeeder::class,                 // Sample exams
-            ExamSubmissionSeeder::class,       // Exam submissions with realistic scores
         ]);
         
         // Step 5: Communication
@@ -56,13 +55,6 @@ class DatabaseSeeder extends Seeder
             PrivateChatSeeder::class,          // Private chat rooms
             ChatSeeder::class,                 // Chat messages
             ForumSeeder::class,                // Forum discussions
-        ]);
-        
-        // Step 6: Activity Logs & Rankings
-        $this->command->info('📊 Step 6: Activity Logs & Rankings');
-        $this->call([
-            ActivityLogSeeder::class,          // Activity logs for statistics
-            StudentRankingSeeder::class,       // Calculate student rankings
         ]);
         
         $this->command->info('');
