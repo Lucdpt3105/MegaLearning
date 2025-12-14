@@ -9,7 +9,7 @@
                 @input.debounce.300ms="fetchSuggestions()"
                 @focus="showSuggestions = true"
                 @keydown.escape="showSuggestions = false"
-                placeholder="Tìm kiếm khóa học, tài liệu, diễn đàn..."
+                placeholder="Tìm kiếm lớp học, tài liệu, diễn đàn..."
                 class="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
                 autocomplete="off"
             >

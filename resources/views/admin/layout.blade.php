@@ -81,31 +81,21 @@
                 </a>
 
                 {{-- Divider --}}
-                <div class="sidebar-divider">Khóa học</div>
+                <div class="sidebar-divider">Lớp học</div>
                 
                 <a href="{{ route('admin.courses.index') }}" class="sidebar-nav-item {{ request()->is('admin/courses*') && !request()->is('admin/courses/create') ? 'active' : '' }}">
                     <i data-feather="book" class="w-5 h-5"></i>
-                    <span class="nav-text">Danh sách khóa học</span>
+                    <span class="nav-text">Danh sách lớp học</span>
                 </a>
                 
                 <a href="{{ route('admin.courses.create') }}" class="sidebar-nav-item {{ request()->is('admin/courses/create') ? 'active' : '' }}">
                     <i data-feather="plus-circle" class="w-5 h-5"></i>
-                    <span class="nav-text">Thêm khóa học</span>
-                </a>
-                
-                <a href="{{ route('admin.categories.index') }}" class="sidebar-nav-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
-                    <i data-feather="folder" class="w-5 h-5"></i>
-                    <span class="nav-text">Danh mục</span>
+                    <span class="nav-text">Thêm lớp học</span>
                 </a>
                 
                 <a href="{{ route('admin.subjects.index') }}" class="sidebar-nav-item {{ request()->is('admin/subjects*') ? 'active' : '' }}">
                     <i data-feather="layers" class="w-5 h-5"></i>
                     <span class="nav-text">Môn học</span>
-                </a>
-                
-                <a href="{{ route('admin.lessons.index') }}" class="sidebar-nav-item {{ request()->is('admin/lessons*') ? 'active' : '' }}">
-                    <i data-feather="book-open" class="w-5 h-5"></i>
-                    <span class="nav-text">Bài học</span>
                 </a>
 
                 {{-- Divider --}}
@@ -136,7 +126,7 @@
                 
                 <a href="{{ route('admin.reports.courses') }}" class="sidebar-nav-item {{ request()->is('admin/reports/courses*') ? 'active' : '' }}">
                     <i data-feather="book-open" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê khóa học</span>
+                    <span class="nav-text">Thống kê lớp học</span>
                 </a>
                 
                 <a href="{{ route('admin.statistics.index') }}" class="sidebar-nav-item {{ request()->is('admin/statistics*') ? 'active' : '' }}">

@@ -74,7 +74,7 @@ class CourseController extends Controller
         ]);
 
         return redirect()->route('admin.courses.index')
-                         ->with('success', 'Tạo khóa học thành công!');
+                         ->with('success', 'Tạo lớp học thành công!');
     }
 
     /** EDIT COURSE */
@@ -113,6 +113,6 @@ class CourseController extends Controller
     public function destroy($id)
     {
         ClassRoom::findOrFail($id)->delete();
-        return redirect()->route('admin.courses.index')->with('success', 'Xóa khóa học thành công!');
+        return redirect()->route('admin.courses.index')->with('success', 'Xóa lớp học thành công!');
     }
 }

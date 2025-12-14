@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Khóa Học Của Tôi</a></li>
+            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Lớp Học Của Tôi</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
             <li class="text-gray-900 font-semibold">{{ $classRoom->name }}</li>
         </ol>
@@ -78,7 +78,7 @@
                     <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Mô Tả Khóa Học
+                    Mô Tả Lớp Học
                 </h2>
                 <p class="text-gray-700 leading-relaxed">{{ $classRoom->description }}</p>
             </div>
@@ -192,7 +192,7 @@
 
             <!-- Course Info -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Thông Tin Khóa Học</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Thông Tin Lớp Học</h3>
                 <div class="space-y-3 text-sm">
                     @if($classRoom->start_date && $classRoom->end_date)
                     <div class="flex items-center justify-between">

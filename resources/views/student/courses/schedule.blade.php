@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Khóa Học Của Tôi</a></li>
+            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Lớp Học Của Tôi</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
             <li><a href="{{ route('student.courses.show', $classRoom->id) }}" class="hover:text-indigo-600">{{ $classRoom->name }}</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
@@ -153,7 +153,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có lịch học</h3>
-            <p class="text-gray-600">Giảng viên chưa tạo lịch học cho khóa học này.</p>
+            <p class="text-gray-600">Giảng viên chưa tạo lịch học cho lớp học này.</p>
         </div>
     @else
         <!-- Group by status -->

@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Khám Phá Khóa Học - MegaLearning')
+@section('title', 'Khám Phá Lớp Học - MegaLearning')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Khám Phá Khóa Học</h1>
-        <p class="text-gray-600">Tìm và đăng ký các khóa học phù hợp với bạn</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Khám Phá Lớp Học</h1>
+        <p class="text-gray-600">Tìm và đăng ký các lớp học phù hợp với bạn</p>
     </div>
 
     <!-- Back Button -->
@@ -16,7 +16,7 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Quay lại khóa học của tôi
+            Quay lại lớp học của tôi
         </a>
     </div>
 
@@ -27,7 +27,7 @@
                 <!-- Search Box -->
                 <div class="md:col-span-2">
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                        🔍 Tìm kiếm khóa học
+                        🔍 Tìm kiếm lớp học
                     </label>
                     <div class="relative">
                         <input 
@@ -35,7 +35,7 @@
                             name="search" 
                             id="search"
                             value="{{ request('search') }}"
-                            placeholder="Tìm theo tên khóa học, môn học, giáo viên..."
+                            placeholder="Tìm theo tên lớp học, môn học, giáo viên..."
                             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         >
                         <svg class="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>
-                        Tìm thấy <strong class="text-indigo-600">{{ $availableClasses->count() }}</strong> khóa học
+                        Tìm thấy <strong class="text-indigo-600">{{ $availableClasses->count() }}</strong> lớp học
                         @if(request('search'))
                             với từ khóa "<strong>{{ request('search') }}</strong>"
                         @endif
@@ -116,8 +116,8 @@
                 <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Không có khóa học mới</h3>
-                <p class="text-gray-600 mb-6">Hiện tại không có khóa học nào khả dụng để đăng ký. Vui lòng quay lại sau!</p>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Không có lớp học mới</h3>
+                <p class="text-gray-600 mb-6">Hiện tại không có lớp học nào khả dụng để đăng ký. Vui lòng quay lại sau!</p>
                 <a href="{{ route('student.courses.index') }}" class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
                     Quay Lại
                 </a>
@@ -136,7 +136,7 @@
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900">{{ $subjectName }}</h2>
-                        <p class="text-sm text-gray-600">{{ $courses->count() }} khóa học khả dụng</p>
+                        <p class="text-sm text-gray-600">{{ $courses->count() }} lớp học khả dụng</p>
                     </div>
                 </div>
 

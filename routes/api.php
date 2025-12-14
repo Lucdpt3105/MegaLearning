@@ -92,17 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
 // API Version 1
 Route::prefix('v1')->group(function () {
     
-    // Categories API - Public GET, Protected Create/Update/Delete
-    Route::get('categories', [App\Http\Controllers\Admin\CategoryController::class, 'index']);
-    Route::get('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'show']);
-    
-    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-        Route::post('categories', [App\Http\Controllers\Admin\CategoryController::class, 'store']);
-        Route::put('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'update']);
-        Route::patch('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'update']);
-        Route::delete('categories/{category}', [App\Http\Controllers\Admin\CategoryController::class, 'destroy']);
-    });
-    
     // Public routes - No authentication needed
     Route::get('subjects', [SubjectController::class, 'index']);
     Route::get('subjects/{id}', [SubjectController::class, 'show']);

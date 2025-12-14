@@ -60,8 +60,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                     </svg>
                 </div>
-                <h3 class="font-extrabold text-2xl mb-1 text-white drop-shadow">Khóa Học</h3>
-                <p class="text-sm text-white font-medium">Quản lý khóa học</p>
+                <h3 class="font-extrabold text-2xl mb-1 text-white drop-shadow">Lớp Học</h3>
+                <p class="text-sm text-white font-medium">Quản lý lớp học</p>
             </div>
         </a>
 
@@ -94,7 +94,7 @@
                     </svg>
                 </div>
                 <div class="text-right">
-                    <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Tổng Khóa Học</p>
+                    <p class="text-gray-800 text-xs font-bold uppercase tracking-wide">Tổng Lớp Học</p>
                     <p class="text-4xl font-black text-gray-900">{{ $stats['total_courses'] }}</p>
                 </div>
             </div>
@@ -171,7 +171,7 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Chưa có sự kiện nào sắp tới</h3>
                         <p class="text-gray-600 mb-6 max-w-md mx-auto">
                             Hiện tại bạn chưa có bài thi hoặc buổi học trực tuyến nào. 
-                            Hãy đăng ký thêm khóa học để không bỏ lỡ các sự kiện quan trọng!
+                            Hãy đăng ký thêm lớp học để không bỏ lỡ các sự kiện quan trọng!
                         </p>
                         <div class="flex gap-3 justify-center">
                             <a href="{{ route('student.courses.index') }}" 
@@ -179,7 +179,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                 </svg>
-                                Khám phá khóa học
+                                Khám phá lớp học
                             </a>
                             <a href="{{ route('student.exams.index') }}" 
                                class="inline-flex items-center px-6 py-3 bg-white border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 font-semibold transition-colors">
@@ -397,17 +397,17 @@
         <div class="header-purple">
             <h2 class="text-xl font-bold text-white flex items-center">
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                Khóa Học Đang Tham Gia
+                Lớp Học Đang Tham Gia
             </h2>
         </div>
         <div class="bg-white p-6">
             @if($enrolledClasses->isEmpty())
                 <div class="empty-state py-12">
                     <svg class="w-20 h-20 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có khóa học nào</h3>
-                    <p class="text-gray-500 mb-4">Hãy đăng ký khóa học để bắt đầu học tập</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có lớp học nào</h3>
+                    <p class="text-gray-500 mb-4">Hãy đăng ký lớp học để bắt đầu học tập</p>
                     <a href="{{ route('student.courses.browse') }}" class="btn-purple-primary">
-                        Khám Phá Khóa Học
+                        Khám Phá Lớp Học
                     </a>
                 </div>
             @else
@@ -434,7 +434,7 @@
                 </div>
                 <div class="mt-6 text-center">
                     <a href="{{ route('student.courses.index') }}" class="text-purple-600 hover:text-purple-800 font-medium">
-                        Xem tất cả khóa học →
+                        Xem tất cả lớp học →
                     </a>
                 </div>
             @endif

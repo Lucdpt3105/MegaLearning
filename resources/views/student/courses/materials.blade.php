@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Khóa Học Của Tôi</a></li>
+            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Lớp Học Của Tôi</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
             <li><a href="{{ route('student.courses.show', $classRoom->id) }}" class="hover:text-indigo-600">{{ $classRoom->name }}</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
@@ -125,7 +125,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có tài liệu</h3>
-                <p class="text-gray-600">Giảng viên chưa upload tài liệu học tập cho khóa học này.</p>
+                <p class="text-gray-600">Giảng viên chưa upload tài liệu học tập cho lớp học này.</p>
                 <p class="text-sm text-gray-500 mt-2">Tài liệu sẽ được hiển thị sau khi giảng viên upload và quản trị viên phê duyệt.</p>
             </div>
         @endif
