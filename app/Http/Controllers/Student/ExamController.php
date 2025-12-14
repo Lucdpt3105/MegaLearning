@@ -308,7 +308,7 @@ class ExamController extends Controller
     }
 
     /**
-     * Calculate score for auto-gradable questions
+     * Calculate score for auto-gradable questions (on scale of 10)
      */
     private function calculateScore($exam, $answers)
     {
@@ -341,7 +341,7 @@ class ExamController extends Controller
             return 0;
         }
         
-        // Return earned points directly
-        return round($earnedPoints, 2);
+        // Convert to scale of 10
+        return round(($earnedPoints / $totalPoints) * 10, 2);
     }
 }

@@ -212,7 +212,7 @@ class GradingController extends Controller
             'essay_scores' => 'nullable|array',
             'essay_scores.*' => 'nullable|numeric|min:0',
             'feedback' => 'nullable|string|max:1000',
-            'final_score' => 'nullable|numeric|min:0|max:' . $submission->exam->total_points,
+            'final_score' => 'nullable|numeric|min:0|max:10',
         ]);
 
         DB::beginTransaction();
