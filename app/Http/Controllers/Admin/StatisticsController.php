@@ -323,4 +323,154 @@ class StatisticsController extends Controller
             'type' => $type
         ]);
     }
+
+    /**
+     * Thống kê học sinh chi tiết
+     * Student Statistics - detailed performance analysis
+     */
+    public function studentStatistics(Request $request)
+    {
+        $query = User::role('student')
+            ->with(['studentRankings', 'examSubmissions', 'classEnrollments.classRoom.subject']);
+
+        // Filters
+        if ($request->has('class_room_id')) {
+            $query->whereHas('classEnrollments', function($q) use ($request) {
+                $q->where('class_room_id', $request->class_room_id);
+            });
+        }
+
+        if ($request->has('subject_id')) {
+            $query->whereHas('classEnrollments.classRoom', function($q) use ($request) {
+                $q->where('subject_id', $request->subject_id);
+            });
+        }
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $students = $query->paginate(20);
+
+        // Thống kê chi tiết cho mỗi học sinh
+        $students->getCollection()->transform(function ($student) use ($request) {
+            // Lọc submissions theo class/subject nếu có
+            $submissionsQuery = $student->examSubmissions()
+                ->where('status', 'submitted');
+
+            if ($request->has('class_room_id')) {
+                $submissionsQuery->whereHas('exam.classRoom', function($q) use ($request) {
+                    $q->where('id', $request->class_room_id);
+                });
+            }
+
+            if ($request->has('subject_id')) {
+                $submissionsQuery->whereHas('exam.subject', function($q) use ($request) {
+                    $q->where('id', $request->subject_id);
+                });
+            }
+
+            $submissions = $submissionsQuery->get();
+
+            $student->total_submissions = $submissions->count();
+            $student->graded_submissions = $submissions->where('grading_status', 'graded')->count();
+            $student->pending_submissions = $submissions->where('grading_status', 'pending')->count();
+            
+            $gradedScores = $submissions->where('grading_status', 'graded')->whereNotNull('score');
+            $student->average_score = $gradedScores->count() > 0 
+                ? round($gradedScores->avg('score'), 2) 
+                : null;
+            
+            $student->highest_score = $gradedScores->count() > 0 
+                ? $gradedScores->max('score') 
+                : null;
+            
+            $student->lowest_score = $gradedScores->count() > 0 
+                ? $gradedScores->min('score') 
+                : null;
+
+            // Số lớp đã tham gia
+            $student->enrolled_classes = $student->classEnrollments->count();
+
+            // Tỷ lệ hoàn thành (có điểm/tổng bài thi)
+            $student->completion_rate = $student->total_submissions > 0
+                ? round(($student->graded_submissions / $student->total_submissions) * 100, 1)
+                : 0;
+
+            return $student;
+        });
+
+        // Thống kê tổng quan
+        $overallStats = [
+            'total_students' => User::role('student')->count(),
+            'active_students' => User::role('student')
+                ->whereHas('examSubmissions', function($q) {
+                    $q->where('created_at', '>=', Carbon::now()->subMonth());
+                })
+                ->count(),
+            'average_submissions' => ExamSubmission::whereHas('student', function($q) {
+                $q->role('student');
+            })->count() / max(User::role('student')->count(), 1),
+            'average_score_all' => ExamSubmission::whereHas('student', function($q) {
+                    $q->role('student');
+                })
+                ->where('grading_status', 'graded')
+                ->whereNotNull('score')
+                ->avg('score'),
+        ];
+
+        // Top performers
+        $topPerformers = User::role('student')
+            ->withAvg(['examSubmissions as avg_score' => function($q) {
+                $q->where('grading_status', 'graded')->whereNotNull('score');
+            }], 'score')
+            ->having('avg_score', '>', 0)
+            ->orderByDesc('avg_score')
+            ->limit(10)
+            ->get();
+
+        // Distribution điểm số
+        $scoreDistribution = ExamSubmission::whereHas('student', function($q) {
+                $q->role('student');
+            })
+            ->where('grading_status', 'graded')
+            ->whereNotNull('score')
+            ->selectRaw('
+                CASE 
+                    WHEN score >= 9 THEN "9-10"
+                    WHEN score >= 8 THEN "8-9"
+                    WHEN score >= 7 THEN "7-8"
+                    WHEN score >= 6 THEN "6-7"
+                    WHEN score >= 5 THEN "5-6"
+                    ELSE "0-5"
+                END as score_range,
+                COUNT(*) as count
+            ')
+            ->groupBy('score_range')
+            ->orderBy('score_range', 'DESC')
+            ->get();
+
+        // Data for filters
+        $classRooms = ClassRoom::select('id', 'name', 'subject_id')
+            ->with('subject:id,name')
+            ->orderBy('name')
+            ->get();
+        
+        $subjects = Subject::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.statistics.student-statistics', compact(
+            'students',
+            'overallStats',
+            'topPerformers',
+            'scoreDistribution',
+            'classRooms',
+            'subjects'
+        ));
+    }
 }

@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
-@section('title', 'Thống kê Hệ thống')
-@section('page-title', 'Dashboard Thống kê')
-@section('page-description', 'Theo dõi thống kê và phân tích hoạt động hệ thống')
+@section('title', 'Dashboard Thống kê')
+@section('page-title', '📊 Dashboard Thống kê Tổng quan')
+@section('page-description', 'Theo dõi thống kê và phân tích hoạt động hệ thống realtime')
 
 @push('styles')
 <style>

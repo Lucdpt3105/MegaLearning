@@ -322,6 +322,7 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/statistics/usage-duration', [App\Http\Controllers\Admin\StatisticsController::class, 'usageDuration'])->name('statistics.usage-duration');
     Route::get('/statistics/participation', [App\Http\Controllers\Admin\StatisticsController::class, 'participation'])->name('statistics.participation');
     Route::get('/statistics/rankings', [App\Http\Controllers\Admin\StatisticsController::class, 'rankings'])->name('statistics.rankings');
+    Route::get('/statistics/students', [App\Http\Controllers\Admin\StatisticsController::class, 'studentStatistics'])->name('statistics.students');
     Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
 
 
@@ -390,23 +391,6 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/files', fn() => view('admin.files.index'))->name('files.index');
     Route::get('/files/upload', fn() => view('admin.files.upload'))->name('files.upload');
     Route::post('/files', fn() => redirect()->route('admin.files.index'))->name('files.store');
-
-    // Reports
-    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
-    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
-    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
-
-    // Reports
-    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
-    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
-    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
-
-    // Statistics (detailed analytics)
-    Route::get('/statistics', fn() => view('admin.statistics.index'))->name('statistics.index');
-    Route::get('/statistics/activity-logs', fn() => view('admin.statistics.activity-logs'))->name('statistics.activity-logs');
-    Route::get('/statistics/usage-duration', fn() => view('admin.statistics.usage-duration'))->name('statistics.usage-duration');
-    Route::get('/statistics/participation', fn() => view('admin.statistics.participation'))->name('statistics.participation');
-    Route::get('/statistics/rankings', fn() => view('admin.statistics.rankings'))->name('statistics.rankings');
 
     // Settings
     Route::get('/settings/email', fn() => view('admin.settings.email'))->name('settings.email');

@@ -111,19 +111,29 @@
                 {{-- Divider --}}
                 <div class="sidebar-divider">Báo cáo</div>
                 
-                <a href="{{ route('admin.reports.students') }}" class="sidebar-nav-item {{ request()->is('admin/reports/students*') ? 'active' : '' }}">
+                <a href="{{ route('admin.statistics.index') }}" class="sidebar-nav-item {{ request()->is('admin/statistics') && !request()->is('admin/statistics/*') ? 'active' : '' }}">
+                    <i data-feather="pie-chart" class="w-5 h-5"></i>
+                    <span class="nav-text">Tổng quan thống kê</span>
+                </a>
+
+                <a href="{{ route('admin.statistics.students') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/students*') ? 'active' : '' }}">
                     <i data-feather="users" class="w-5 h-5"></i>
                     <span class="nav-text">Thống kê học sinh</span>
                 </a>
-                
-                <a href="{{ route('admin.reports.courses') }}" class="sidebar-nav-item {{ request()->is('admin/reports/courses*') ? 'active' : '' }}">
-                    <i data-feather="book-open" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê lớp học</span>
+
+                <a href="{{ route('admin.statistics.participation') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/participation*') ? 'active' : '' }}">
+                    <i data-feather="activity" class="w-5 h-5"></i>
+                    <span class="nav-text">Tham gia hoạt động</span>
                 </a>
                 
-                <a href="{{ route('admin.statistics.index') }}" class="sidebar-nav-item {{ request()->is('admin/statistics*') ? 'active' : '' }}">
-                    <i data-feather="pie-chart" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê chi tiết</span>
+                <a href="{{ route('admin.statistics.rankings') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/rankings*') ? 'active' : '' }}">
+                    <i data-feather="award" class="w-5 h-5"></i>
+                    <span class="nav-text">Xếp hạng học sinh</span>
+                </a>
+
+                <a href="{{ route('admin.statistics.activity-logs') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/activity-logs*') ? 'active' : '' }}">
+                    <i data-feather="file-text" class="w-5 h-5"></i>
+                    <span class="nav-text">Log hoạt động</span>
                 </a>
 
                 {{-- Divider --}}
