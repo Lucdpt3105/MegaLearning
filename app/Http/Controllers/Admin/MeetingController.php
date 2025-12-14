@@ -85,33 +85,47 @@ class MeetingController extends Controller
 
         $meetings = $query->paginate(20);
 
-        // Statistics by month
-        $monthlyStats = VideoCall::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('COUNT(*) as total_meetings'),
-                DB::raw('SUM(duration) as total_duration'),
-                DB::raw('AVG(duration) as avg_duration')
-            )
-            ->whereIn('status', ['ended', 'cancelled'])
-            ->where('created_at', '>=', Carbon::now()->subMonths(6))
-            ->groupBy('month')
-            ->orderBy('month', 'DESC')
-            ->get();
+        // Current month statistics
+        $monthly_stats = [
+            'total_meetings' => VideoCall::whereIn('status', ['ended', 'cancelled'])
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->count(),
+            'total_duration' => VideoCall::whereIn('status', ['ended', 'cancelled'])
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->sum('duration') ?? 0,
+            'average_duration' => round(VideoCall::whereIn('status', ['ended', 'cancelled'])
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->avg('duration') ?? 0),
+        ];
 
         // Top hosts
-        $topHosts = VideoCall::select('host_id', DB::raw('COUNT(*) as meeting_count'))
-            ->whereIn('status', ['ended', 'cancelled'])
-            ->groupBy('host_id')
-            ->orderByDesc('meeting_count')
-            ->limit(10)
-            ->with('host:id,name,email')
-            ->get();
+        $top_hosts = User::whereHas('hostedVideoCalls', function($query) {
+                $query->whereIn('status', ['ended', 'cancelled']);
+            })
+            ->withCount(['hostedVideoCalls' => function($query) {
+                $query->whereIn('status', ['ended', 'cancelled']);
+            }])
+            ->withSum(['hostedVideoCalls' => function($query) {
+                $query->whereIn('status', ['ended', 'cancelled']);
+            }], 'duration')
+            ->orderByDesc('hosted_video_calls_count')
+            ->limit(3)
+            ->get()
+            ->map(function($host) {
+                return (object)[
+                    'name' => $host->name,
+                    'meetings_count' => $host->hosted_video_calls_count ?? 0,
+                    'total_duration' => $host->hosted_video_calls_sum_duration ?? 0,
+                ];
+            });
 
         // For filters
         $classRooms = ClassRoom::with('subject')->orderBy('name')->get();
-        $hosts = User::role('teacher')->orderBy('name')->get();
 
-        return view('admin.meetings.history', compact('meetings', 'monthlyStats', 'topHosts', 'classRooms', 'hosts'));
+        return view('admin.meetings.history', compact('meetings', 'monthly_stats', 'top_hosts', 'classRooms'));
     }
 
     /**
