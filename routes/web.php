@@ -338,10 +338,7 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
 
 
     // Subjects
-    Route::get('/subjects', fn() => view('admin.subjects.index'))->name('subjects.index');
-    Route::get('/subjects/create', fn() => view('admin.subjects.create'))->name('subjects.create');
-    Route::get('/subjects/{id}', fn($id) => view('admin.subjects.show', ['id' => $id]))->name('subjects.show');
-    Route::get('/subjects/{id}/edit', fn($id) => view('admin.subjects.edit', ['id' => $id]))->name('subjects.edit');
+    Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class);
 
     // Categories
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);

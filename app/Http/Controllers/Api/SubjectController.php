@@ -20,8 +20,8 @@ class SubjectController extends Controller
             ->get()
             ->map(function ($subject) {
                 return [
-                    'subject_id' => $subject->id,
-                    'subject_name' => $subject->name,
+                    'id' => $subject->id,
+                    'name' => $subject->name,
                     'code' => $subject->code,
                     'description' => $subject->description,
                     'topics_count' => $subject->topics_count,
@@ -46,7 +46,9 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subject_name' => 'required|string|max:100|unique:subjects,subject_name',
+            'name' => 'required|string|max:100|unique:subjects,name',
+            'code' => 'nullable|string|max:20|unique:subjects,code',
+            'description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -56,8 +58,14 @@ class SubjectController extends Controller
             ], 422);
         }
 
+        // Auto-generate code if not provided
+        $code = $request->code ?? strtoupper(substr(preg_replace('/[^A-Z]/i', '', $request->name), 0, 6));
+        
         $subject = Subject::create([
-            'subject_name' => $request->subject_name
+            'name' => $request->name,
+            'code' => $code,
+            'description' => $request->description,
+            'status' => 'active',
         ]);
 
         return response()->json([
@@ -104,7 +112,10 @@ class SubjectController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'subject_name' => 'required|string|max:100|unique:subjects,subject_name,' . $id . ',subject_id',
+            'name' => 'required|string|max:100|unique:subjects,name,' . $id,
+            'code' => 'nullable|string|max:20|unique:subjects,code,' . $id,
+            'description' => 'nullable|string',
+            'status' => 'nullable|in:active,inactive',
         ]);
 
         if ($validator->fails()) {
@@ -114,9 +125,7 @@ class SubjectController extends Controller
             ], 422);
         }
 
-        $subject->update([
-            'subject_name' => $request->subject_name
-        ]);
+        $subject->update($request->only(['name', 'code', 'description', 'status']));
 
         return response()->json([
             'success' => true,

@@ -14,7 +14,9 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::orderBy('created_at', 'desc')->get();
+        $categories = Category::withCount('courses')
+            ->orderBy('created_at', 'desc')
+            ->get();
         
         // Return JSON for API requests
         if ($request->expectsJson() || $request->is('api/*')) {
