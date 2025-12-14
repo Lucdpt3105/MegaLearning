@@ -316,16 +316,9 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     |--------------------------------------------------------------------------
     */
 
-    // Statistics Dashboard
-    Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
+    // Statistics
     Route::get('/statistics/activity-logs', [App\Http\Controllers\Admin\StatisticsController::class, 'activityLogs'])->name('statistics.activity-logs');
-    Route::get('/statistics/usage-duration', [App\Http\Controllers\Admin\StatisticsController::class, 'usageDuration'])->name('statistics.usage-duration');
     Route::get('/statistics/participation', [App\Http\Controllers\Admin\StatisticsController::class, 'participation'])->name('statistics.participation');
-    Route::get('/statistics/rankings', [App\Http\Controllers\Admin\StatisticsController::class, 'rankings'])->name('statistics.rankings');
-    Route::post('/statistics/rankings/recalculate', [App\Http\Controllers\Admin\StatisticsController::class, 'recalculateRankings'])->name('statistics.rankings.recalculate');
-    Route::get('/statistics/students', [App\Http\Controllers\Admin\StatisticsController::class, 'studentStatistics'])->name('statistics.students');
-    Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
-
 
     // User Management - Students, Teachers, Admins
     Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])->name('students.index');

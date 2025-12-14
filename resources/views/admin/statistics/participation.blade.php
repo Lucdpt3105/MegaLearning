@@ -1,286 +1,258 @@
 @extends('admin.layout')
 
-@section('title', 'Thống kê Tham gia')
-@section('page-title', '📈 Thống kê Tham gia Hoạt động')
-@section('page-description', 'Phân tích mức độ tham gia của học sinh theo môn học và lớp học')
+@section('title', 'Tham gia Hoạt động')
+@section('page-title', 'Thống kê Tham gia')
+@section('page-description', 'Theo dõi mức độ tham gia của học sinh và giáo viên')
 
 @push('styles')
 <style>
-    .subject-card {
+    .stat-card {
         background: white;
         border-radius: 1rem;
         padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         border: 1px solid #e5e7eb;
         transition: all 0.3s ease;
     }
-    .subject-card:hover {
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    .stat-card:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         transform: translateY(-2px);
     }
-    .metric-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        color: white;
+    .progress-bar {
+        height: 0.5rem;
+        background: #e5e7eb;
+        border-radius: 9999px;
+        overflow: hidden;
     }
-    .chart-container {
-        position: relative;
-        height: 300px;
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        transition: width 0.5s ease;
     }
 </style>
 @endpush
 
 @section('content')
 
-<!-- Overall Statistics -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-blue-100 text-sm mb-1">Tổng môn học</p>
-                <h3 class="text-3xl font-bold">{{ number_format($subjectStats->count()) }}</h3>
-            </div>
-            <div class="text-4xl opacity-80">📚</div>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-green-100 text-sm mb-1">Tổng lớp học</p>
-                <h3 class="text-3xl font-bold">{{ number_format($subjectStats->sum('class_rooms_count')) }}</h3>
-            </div>
-            <div class="text-4xl opacity-80">🏫</div>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-purple-100 text-sm mb-1">Tổng học sinh</p>
-                <h3 class="text-3xl font-bold">{{ number_format($subjectStats->sum('total_students')) }}</h3>
-            </div>
-            <div class="text-4xl opacity-80">👨‍🎓</div>
-        </div>
-    </div>
-
-    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-orange-100 text-sm mb-1">Tổng đề thi</p>
-                <h3 class="text-3xl font-bold">{{ number_format($subjectStats->sum('exams_count')) }}</h3>
-            </div>
-            <div class="text-4xl opacity-80">📝</div>
-        </div>
-    </div>
-</div>
-
-<!-- Subjects Statistics -->
-<div class="mb-6">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">
-        <i data-feather="book-open" class="w-5 h-5 inline text-blue-600"></i>
-        Thống kê chi tiết theo môn học
+<!-- Subject Statistics -->
+<div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i data-feather="book-open" class="w-6 h-6 inline text-blue-600"></i>
+        Thống kê theo Môn học
     </h3>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach($subjectStats as $subject)
-        <div class="subject-card">
-            <div class="flex items-center justify-between mb-4">
-                <h4 class="font-bold text-gray-800 text-lg">{{ $subject->name }}</h4>
-                <span class="text-3xl">📖</span>
+        @forelse($subjectStats as $subject)
+            <div class="stat-card">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800">{{ $subject->name }}</h4>
+                        <p class="text-sm text-gray-600">
+                            GV: {{ $subject->teacher ? $subject->teacher->name : 'Chưa có' }}
+                        </p>
+                    </div>
+                    <div class="text-3xl">📚</div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Số lớp</span>
+                        <span class="font-semibold text-gray-800">{{ $subject->class_rooms_count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Tổng học sinh</span>
+                        <span class="font-semibold text-gray-800">{{ $subject->total_students ?? 0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Số bài thi</span>
+                        <span class="font-semibold text-gray-800">{{ $subject->exams_count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Tài liệu</span>
+                        <span class="font-semibold text-gray-800">{{ $subject->documents_count }}</span>
+                    </div>
+                </div>
+
+                @php
+                    $totalActivities = $subject->exams_count + $subject->documents_count + $subject->class_rooms_count;
+                    $activityScore = min(100, $totalActivities * 5);
+                @endphp
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>Mức độ hoạt động</span>
+                        <span>{{ $activityScore }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ $activityScore }}%"></div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Giáo viên</span>
-                    <span class="font-semibold text-gray-800">{{ $subject->teacher->name ?? 'N/A' }}</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Số lớp</span>
-                    <span class="text-lg font-bold text-blue-600">{{ $subject->class_rooms_count }}</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Học sinh</span>
-                    <span class="text-lg font-bold text-green-600">{{ $subject->total_students ?? 0 }}</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Đề thi</span>
-                    <span class="text-lg font-bold text-purple-600">{{ $subject->exams_count }}</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Tài liệu</span>
-                    <span class="text-lg font-bold text-orange-600">{{ $subject->documents_count }}</span>
-                </div>
+        @empty
+            <div class="col-span-3 text-center py-12 text-gray-500">
+                <p>Chưa có môn học nào</p>
             </div>
-        </div>
-        @endforeach
+        @endforelse
     </div>
 </div>
 
 <!-- Video Call Statistics -->
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">
-        <i data-feather="video" class="w-5 h-5 inline text-red-600"></i>
+<div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i data-feather="video" class="w-6 h-6 inline text-green-600"></i>
         Thống kê Video Call
     </h3>
-    
-    @if($videoCallStats->count() > 0)
-    <div class="overflow-x-auto">
-        <table class="min-w-full">
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Lớp học</th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Môn học</th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Số buổi</th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Tổng thời gian (phút)</th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">TB thời gian</th>
-                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Max người tham gia</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lớp học</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Môn học</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Số cuộc gọi</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Tổng thời lượng</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">TB/cuộc gọi</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Max tham gia</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-                @foreach($videoCallStats as $stat)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4">
-                        <span class="font-medium text-gray-900">{{ $stat->classRoom->name ?? 'N/A' }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="text-sm text-gray-600">{{ $stat->classRoom->subject->name ?? 'N/A' }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="text-lg font-bold text-blue-600">{{ $stat->total_calls }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="text-lg font-bold text-green-600">{{ number_format($stat->total_duration ?? 0) }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="text-lg font-bold text-purple-600">{{ number_format($stat->avg_duration ?? 0, 1) }}</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="text-lg font-bold text-orange-600">{{ $stat->max_participants }}</span>
-                    </td>
-                </tr>
-                @endforeach
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($videoCallStats as $stat)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ $stat->classRoom ? $stat->classRoom->name : 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ $stat->classRoom && $stat->classRoom->subject ? $stat->classRoom->subject->name : 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                            {{ $stat->total_calls }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600">
+                            {{ gmdate('H:i:s', $stat->total_duration ?? 0) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600">
+                            {{ gmdate('H:i:s', $stat->avg_duration ?? 0) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                {{ $stat->max_participants }} người
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <i data-feather="video-off" class="w-12 h-12 mx-auto mb-2 text-gray-400"></i>
+                            <p>Chưa có cuộc gọi video nào</p>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-    @else
-    <div class="text-center py-8">
-        <div class="text-4xl mb-2">📹</div>
-        <p class="text-gray-600">Chưa có dữ liệu video call</p>
-    </div>
-    @endif
 </div>
 
 <!-- Exam Participation -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Top Exams -->
-    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-            <h3 class="text-lg font-bold text-gray-800">
-                <i data-feather="trending-up" class="w-5 h-5 inline text-green-600"></i>
-                Top 20 đề thi có nhiều bài nộp nhất
-            </h3>
-        </div>
-        
-        <div class="p-6 space-y-3">
-            @foreach($examParticipation as $index => $exam)
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                <div class="flex items-center gap-3 flex-1">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full font-bold text-white
-                        {{ $index < 3 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-gray-400' }}">
-                        {{ $index + 1 }}
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-900">{{ $exam->title }}</p>
-                        <p class="text-sm text-gray-500">{{ $exam->subject->name ?? 'N/A' }}</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl font-bold text-blue-600">{{ $exam->total_submissions }}</p>
-                    <p class="text-xs text-gray-500">bài nộp</p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
+<div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i data-feather="file-text" class="w-6 h-6 inline text-purple-600"></i>
+        Top 20 Bài thi được tham gia nhiều nhất
+    </h3>
 
-    <!-- Completion Rate -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">
-            <i data-feather="pie-chart" class="w-5 h-5 inline text-purple-600"></i>
-            Tỷ lệ hoàn thành bài thi
-        </h3>
-        
-        <div class="chart-container">
-            <canvas id="completionChart"></canvas>
-        </div>
-        
-        <div class="mt-4 space-y-2">
-            @foreach($completionRate as $rate)
-            <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span class="text-sm font-medium text-gray-700">
-                    {{ ucfirst(str_replace('_', ' ', $rate->grading_status)) }}
-                </span>
-                <span class="font-bold 
-                    {{ $rate->grading_status == 'graded' ? 'text-green-600' : 
-                       ($rate->grading_status == 'pending' ? 'text-yellow-600' : 'text-blue-600') }}">
-                    {{ $rate->count }}
-                </span>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">STT</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên bài thi</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Môn học</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Số bài nộp</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($examParticipation as $index => $exam)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ $index + 1 }}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            {{ $exam->title }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ $exam->subject ? $exam->subject->name : 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ $exam->total_submissions }} bài
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                            @if($exam->status == 'published')
+                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Đã xuất bản</span>
+                            @elseif($exam->status == 'draft')
+                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Nháp</span>
+                            @else
+                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">{{ $exam->status }}</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <i data-feather="inbox" class="w-12 h-12 mx-auto mb-2 text-gray-400"></i>
+                            <p>Chưa có bài thi nào</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Completion Rate -->
+<div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i data-feather="pie-chart" class="w-6 h-6 inline text-orange-600"></i>
+        Tỷ lệ hoàn thành bài thi
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @foreach($completionRate as $rate)
+            <div class="stat-card">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-lg font-semibold text-gray-800">
+                        @if($rate->grading_status == 'graded')
+                            Đã chấm điểm
+                        @elseif($rate->grading_status == 'pending')
+                            Đang chờ
+                        @else
+                            {{ ucfirst($rate->grading_status) }}
+                        @endif
+                    </h4>
+                    <span class="text-3xl">
+                        @if($rate->grading_status == 'graded')
+                            ✅
+                        @elseif($rate->grading_status == 'pending')
+                            ⏳
+                        @else
+                            📝
+                        @endif
+                    </span>
+                </div>
+                <div class="text-4xl font-bold text-gray-800 mb-2">{{ $rate->count }}</div>
+                <div class="text-sm text-gray-600">
+                    {{ round(($rate->count / max($completionRate->sum('count'), 1)) * 100, 1) }}% tổng số
+                </div>
             </div>
-            @endforeach
-        </div>
+        @endforeach
     </div>
 </div>
 
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Feather icons
     feather.replace();
-    
-    // Completion Rate Chart
-    const completionData = @json($completionRate);
-    const ctx = document.getElementById('completionChart');
-    
-    if (ctx) {
-        const colors = {
-            'graded': '#10b981',
-            'pending': '#f59e0b',
-            'auto_graded': '#3b82f6'
-        };
-        
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: completionData.map(d => ucfirst(d.grading_status.replace('_', ' '))),
-                datasets: [{
-                    data: completionData.map(d => d.count),
-                    backgroundColor: completionData.map(d => colors[d.grading_status] || '#6b7280'),
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
-    
-    function ucfirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-});
 </script>
 @endpush
