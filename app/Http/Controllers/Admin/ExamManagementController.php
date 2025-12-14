@@ -174,7 +174,7 @@ class ExamManagementController extends Controller
     public function results(Exam $exam)
     {
         $submissions = $exam->submissions()
-            ->with(['student', 'answers'])
+            ->with(['student', 'grader'])
             ->latest()
             ->paginate(50);
 
