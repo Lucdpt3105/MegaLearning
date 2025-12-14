@@ -32,6 +32,12 @@
                         </svg>
                         {{ $classRoom->code }}
                     </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        {{ $classRoom->active_students_count }} học viên
+                    </span>
                 </div>
             </div>
             <div class="text-right">
@@ -109,8 +115,8 @@
                         <p class="text-sm text-gray-600">Chủ Đề</p>
                     </div>
                     <div class="text-center p-4 bg-green-50 rounded-lg">
-                        <p class="text-2xl font-bold text-green-600">{{ $classRoom->students_count }}</p>
-                        <p class="text-sm text-gray-600">Học Viên</p>
+                        <p class="text-2xl font-bold text-green-600">{{ $classRoom->active_students_count }}</p>
+                        <p class="text-sm text-gray-600">Sĩ Số</p>
                     </div>
                     <div class="text-center p-4 bg-purple-50 rounded-lg">
                         <p class="text-2xl font-bold text-purple-600">{{ $upcomingCalls->count() }}</p>
@@ -190,6 +196,35 @@
             </div>
             @endif
 
+            <!-- Students List -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Sĩ số ({{ $classRoom->active_students_count }}/{{ $classRoom->max_students }})
+                </h3>
+                <div class="space-y-2 max-h-60 overflow-y-auto">
+                    @forelse($classRoom->students as $classStudent)
+                    <div class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg">
+                        @if($classStudent->avatar)
+                            <img src="{{ asset('storage/' . $classStudent->avatar) }}" alt="{{ $classStudent->name }}" class="w-8 h-8 rounded-full">
+                        @else
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                                {{ substr($classStudent->name, 0, 1) }}
+                            </div>
+                        @endif
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">{{ $classStudent->name }}</p>
+                            <p class="text-xs text-gray-500">{{ $classStudent->email }}</p>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="text-sm text-gray-500 text-center py-4">Chưa có học viên nào</p>
+                    @endforelse
+                </div>
+            </div>
+
             <!-- Course Info -->
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">Thông Tin Lớp Học</h3>
@@ -204,7 +239,7 @@
                     @endif
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Sĩ số:</span>
-                        <span class="font-semibold text-gray-900">{{ $classRoom->students_count }}/{{ $classRoom->max_students }}</span>
+                        <span class="font-semibold text-gray-900">{{ $classRoom->active_students_count }}/{{ $classRoom->max_students }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Trạng thái:</span>
