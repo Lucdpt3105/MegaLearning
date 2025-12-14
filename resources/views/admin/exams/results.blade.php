@@ -117,7 +117,7 @@
                             <span class="text-lg font-bold text-blue-600">
                                 {{ number_format($submission->score, 2) }}
                             </span>
-                            <span class="text-sm text-gray-500">/ {{ $exam->total_points }}</span>
+                            <span class="text-sm text-gray-500">/ 10</span>
                         @else
                             <span class="text-gray-400">-</span>
                         @endif
