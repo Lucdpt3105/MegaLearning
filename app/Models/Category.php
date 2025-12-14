@@ -14,14 +14,20 @@ class Category extends Model
         'name',
         'description',
         'slug',
-        'courses_count',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'courses_count' => 'integer',
     ];
+
+    /**
+     * Relationship with courses
+     */
+    public function courses()
+    {
+        return $this->hasMany(ClassRoom::class, 'category_id');
+    }
 
     /**
      * Boot function to auto-generate slug

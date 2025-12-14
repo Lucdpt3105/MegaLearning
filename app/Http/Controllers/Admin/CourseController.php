@@ -47,6 +47,7 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'code' => 'nullable|string|max:50|unique:class_rooms,code',
             'subject_id' => 'required|exists:subjects,id',
             'teacher_id' => 'required|exists:users,id',
             'max_students' => 'required|integer|min:1',
@@ -55,8 +56,14 @@ class CourseController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        // Auto-generate unique code if not provided
+        if (empty($validated['code'])) {
+            $validated['code'] = strtoupper(substr(preg_replace('/[^A-Z0-9]/i', '', $validated['name']), 0, 6)) . '-' . time();
+        }
+
         ClassRoom::create([
             'name' => $validated['name'],
+            'code' => $validated['code'],
             'subject_id' => $validated['subject_id'],
             'teacher_id' => $validated['teacher_id'],
             'max_students' => $validated['max_students'],
@@ -87,6 +94,7 @@ class CourseController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:class_rooms,code,' . $id,
             'subject_id' => 'required|exists:subjects,id',
             'teacher_id' => 'required|exists:users,id',
             'max_students' => 'required|integer|min:1',

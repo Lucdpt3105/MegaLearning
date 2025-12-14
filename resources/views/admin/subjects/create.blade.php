@@ -6,6 +6,20 @@
 
 @section('content')
     <div class="max-w-3xl">
+        <!-- Success Message -->
+        @if(session('success'))
+        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+        @endif
+
+        <!-- Error Message -->
+        @if(session('error'))
+        <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+        @endif
+
         <!-- Back Button -->
         <a href="{{ route('admin.subjects.index') }}" 
            class="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6">
@@ -15,22 +29,79 @@
 
         <!-- Form Card -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <form id="createSubjectForm">
+            <form action="{{ route('admin.subjects.store') }}" method="POST">
                 @csrf
                 
                 <!-- Subject Name -->
                 <div class="mb-6">
-                    <label for="subject_name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                         Tên môn học <span class="text-red-500">*</span>
                     </label>
                     <input type="text" 
-                           id="subject_name" 
-                           name="subject_name" 
+                           id="name" 
+                           name="name" 
+                           value="{{ old('name') }}"
                            required
                            placeholder="Ví dụ: Lập Trình Web"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('name') border-red-500 @enderror">
                     <p class="mt-2 text-sm text-gray-500">Nhập tên môn học rõ ràng và dễ hiểu</p>
-                    <p id="subject_name_error" class="mt-2 text-sm text-red-600 hidden"></p>
+                    @error('name')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Subject Code (Optional) -->
+                <div class="mb-6">
+                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">
+                        Mã môn học <span class="text-gray-400">(Tùy chọn)</span>
+                    </label>
+                    <input type="text" 
+                           id="code" 
+                           name="code" 
+                           value="{{ old('code') }}"
+                           placeholder="Ví dụ: WEB101"
+                           maxlength="20"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('code') border-red-500 @enderror">
+                    <p class="mt-2 text-sm text-gray-500">Để trống nếu muốn tự động tạo mã</p>
+                    @error('code')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Mô tả <span class="text-gray-400">(Tùy chọn)</span>
+                    </label>
+                    <textarea id="description" 
+                              name="description" 
+                              rows="4"
+                              placeholder="Nhập mô tả chi tiết về môn học..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Teacher (Optional) -->
+                <div class="mb-6">
+                    <label for="teacher_id" class="block text-sm font-medium text-gray-700 mb-2">
+                        Giáo viên phụ trách <span class="text-gray-400">(Tùy chọn)</span>
+                    </label>
+                    <select id="teacher_id" 
+                            name="teacher_id"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('teacher_id') border-red-500 @enderror">
+                        <option value="">-- Chưa chọn giáo viên --</option>
+                        @foreach(\App\Models\User::role('teacher')->get() as $teacher)
+                            <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}>
+                                {{ $teacher->name }} ({{ $teacher->email }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-2 text-sm text-gray-500">Có thể gán giáo viên sau khi tạo môn học</p>
+                    @error('teacher_id')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Actions -->
@@ -40,75 +111,11 @@
                         Hủy
                     </a>
                     <button type="submit" 
-                            id="submitBtn"
                             class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
-                        <span id="btnText">Tạo môn học</span>
-                        <span id="btnLoading" class="hidden">Đang tạo...</span>
+                        Tạo môn học
                     </button>
                 </div>
             </form>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.getElementById('createSubjectForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const btnLoading = document.getElementById('btnLoading');
-        const errorEl = document.getElementById('subject_name_error');
-        
-        // Disable button
-        submitBtn.disabled = true;
-        btnText.classList.add('hidden');
-        btnLoading.classList.remove('hidden');
-        errorEl.classList.add('hidden');
-        
-        const formData = {
-            subject_name: document.getElementById('subject_name').value
-        };
-        
-        try {
-            const response = await fetch('/api/v1/subjects', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                alert('✅ Tạo môn học thành công!');
-                window.location.href = '{{ route("admin.subjects.index") }}';
-            } else {
-                // Show validation errors
-                if (data.errors && data.errors.subject_name) {
-                    errorEl.textContent = data.errors.subject_name[0];
-                    errorEl.classList.remove('hidden');
-                } else {
-                    alert('Có lỗi xảy ra: ' + (data.message || 'Vui lòng thử lại'));
-                }
-                
-                // Re-enable button
-                submitBtn.disabled = false;
-                btnText.classList.remove('hidden');
-                btnLoading.classList.add('hidden');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra. Vui lòng thử lại.');
-            
-            // Re-enable button
-            submitBtn.disabled = false;
-            btnText.classList.remove('hidden');
-            btnLoading.classList.add('hidden');
-        }
-    });
-</script>
-@endpush

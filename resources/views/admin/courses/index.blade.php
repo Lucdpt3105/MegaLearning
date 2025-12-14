@@ -35,7 +35,10 @@
 
         {{-- Header --}}
         <div class="flex justify-between">
-            <h3 class="text-lg font-semibold text-slate-800">{{ $course->name }}</h3>
+            <div>
+                <h3 class="text-lg font-semibold text-slate-800">{{ $course->name }}</h3>
+                <p class="text-xs text-slate-500 mt-1">{{ $course->code }}</p>
+            </div>
 
             <span class="px-3 py-1 rounded-full text-xs 
             @if($course->status=='active') bg-green-100 text-green-700
