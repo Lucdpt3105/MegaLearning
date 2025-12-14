@@ -370,7 +370,8 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::resource('exams', App\Http\Controllers\Admin\ExamManagementController::class);
 
     // Exam Results
-    Route::get('/exam-results', fn() => view('admin.exam-results.index'))->name('exam-results.index');
+    Route::get('/exam-results', [App\Http\Controllers\Admin\ExamResultsController::class, 'index'])->name('exam-results.index');
+    Route::get('/exam-results/{submission}', [App\Http\Controllers\Admin\ExamResultsController::class, 'show'])->name('exam-results.show');
 
     // Forums
     Route::get('/forums/topics', fn() => view('admin.forums.topics'))->name('forums.topics');
