@@ -263,8 +263,8 @@ if (Schema::hasTable('exams')) {
 
     {{-- Các link điều hướng cũ --}}
     <div class="space-y-2 text-sm">
-        @if (Route::has('admin.users.index'))
-            <a href="{{ route('admin.users.index') }}"
+        @if (Route::has('admin.students.index'))
+            <a href="{{ route('admin.students.index') }}"
                class="flex items-center justify-between px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition">
                 <span>Quản lý người dùng</span>
                 <i data-feather="arrow-right" class="w-4 h-4"></i>
@@ -304,48 +304,6 @@ if (Schema::hasTable('exams')) {
         @endif
     </div>
 
-    {{-- Chuyển giao diện --}}
-    <h2 class="text-sm font-semibold mt-5 mb-3">Chuyển giao diện</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-
-        {{-- Học sinh --}}
-        <a href="{{ route('student.dashboard') }}"
-           class="flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition">
-            <div>
-                <p class="text-[11px] opacity-70">Chế độ</p>
-                <h3 class="text-sm font-semibold">Học sinh</h3>
-            </div>
-            <div class="w-10 h-10 rounded-lg bg-indigo-200/20 flex items-center justify-center">
-                <i data-feather="user" class="w-5 h-5 text-white"></i>
-            </div>
-        </a>
-
-        {{-- Giáo viên --}}
-        <a href="{{ route('teacher.dashboard') }}"
-           class="flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition">
-            <div>
-                <p class="text-[11px] opacity-70">Chế độ</p>
-                <h3 class="text-sm font-semibold">Giáo viên</h3>
-            </div>
-            <div class="w-10 h-10 rounded-lg bg-green-200/20 flex items-center justify-center">
-                <i data-feather="user-check" class="w-5 h-5 text-white"></i>
-            </div>
-        </a>
-
-        {{-- Quản trị viên --}}
-        <a href="{{ route('admin.dashboard') }}"
-           class="flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 hover:bg-white/20 transition">
-            <div>
-                <p class="text-[11px] opacity-70">Chế độ</p>
-                <h3 class="text-sm font-semibold">Quản trị viên</h3>
-            </div>
-            <div class="w-10 h-10 rounded-lg bg-purple-200/20 flex items-center justify-center">
-                <i data-feather="shield" class="w-5 h-5 text-white"></i>
-            </div>
-        </a>
-
-    </div>
 </div>
 
     </div>

@@ -29,14 +29,6 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-['Poppins',system-ui,sans-serif] text-slate-800 antialiased">
 
-    {{-- TOGGLE BUTTON (Hamburger) --}}
-    <button id="sidebarToggle" class="fixed top-4 left-4 z-[100] text-gray-400 hover:text-white focus:outline-none p-2 rounded-md transition-colors duration-200">
-        <div class="hamburger-icon">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </div>
-    </button>
-
     <div class="min-h-screen flex">
 
         {{-- SIDEBAR MODERN DESIGN (matching teacher/student style) --}}

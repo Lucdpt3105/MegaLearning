@@ -203,4 +203,103 @@ class QuestionManagementController extends Controller
 
         return back()->with('success', $message);
     }
+
+    /**
+     * Display questions by subject
+     */
+    public function bySubject(Request $request, Subject $subject)
+    {
+        $query = Question::with(['topic', 'answers'])
+            ->where('subject_id', $subject->id)
+            ->where('in_question_bank', true);
+
+        // Filter by topic
+        if ($request->filled('topic_id')) {
+            $query->where('topic_id', $request->topic_id);
+        }
+
+        // Filter by bloom level
+        if ($request->filled('bloom_level')) {
+            $query->where('bloom_level', $request->bloom_level);
+        }
+
+        // Filter by difficulty
+        if ($request->filled('difficulty')) {
+            $query->where('difficulty', $request->difficulty);
+        }
+
+        // Filter by type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $query->where('content', 'like', '%' . $request->search . '%');
+        }
+
+        $questions = $query->latest()->paginate(15);
+        $topics = \App\Models\Topic::where('subject_id', $subject->id)->orderBy('order')->get();
+
+        return view('admin.questions.by-subject', compact('questions', 'subject', 'topics'));
+    }
+
+    /**
+     * Export questions to Excel
+     */
+    public function export(Subject $subject)
+    {
+        $filename = 'questions_' . $subject->code . '_' . date('Y-m-d') . '.xlsx';
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\QuestionsExport($subject->id), $filename);
+    }
+
+    /**
+     * Import questions from Excel
+     */
+    public function import(Request $request, Subject $subject)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:5120'
+        ]);
+
+        try {
+            $beforeCount = Question::where('subject_id', $subject->id)
+                ->where('in_question_bank', true)
+                ->count();
+            
+            $import = new \App\Imports\QuestionsImport($subject->id);
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+            
+            $afterCount = Question::where('subject_id', $subject->id)
+                ->where('in_question_bank', true)
+                ->count();
+            
+            $importedCount = $afterCount - $beforeCount;
+            
+            return redirect()->route('admin.questions.by-subject', $subject)
+                ->with('success', "Import thành công! Đã thêm {$importedCount} câu hỏi vào ngân hàng.");
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = 'Dòng ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return redirect()->route('admin.questions.by-subject', $subject)
+                ->with('error', 'Import thất bại. Lỗi: ' . implode(' | ', $errors));
+        } catch (\Exception $e) {
+            return redirect()->route('admin.questions.by-subject', $subject)
+                ->with('error', 'Import thất bại: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download Excel template
+     */
+    public function downloadTemplate()
+    {
+        $filename = 'template_import_questions.xlsx';
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\QuestionTemplateExport(), $filename);
+    }
 }
