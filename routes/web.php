@@ -129,10 +129,6 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
     
-    // Categories (Read-only)
-    Route::get('/categories', [App\Http\Controllers\Teacher\CategoryController::class, 'index'])->name('categories.index');
-    Route::get('/categories/{category}', [App\Http\Controllers\Teacher\CategoryController::class, 'show'])->name('categories.show');
-    
     // Phase 1: Subject Management (UC-GV-010 to UC-GV-015)
     Route::resource('subjects', App\Http\Controllers\Teacher\SubjectController::class);
     Route::post('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'createChatRoom'])->name('subjects.chat-room.create');
@@ -343,14 +339,6 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
 
     // Subjects
     Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class);
-
-    // Categories
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-
-    // Lessons
-    Route::get('/lessons', fn() => view('admin.lessons.index'))->name('lessons.index');
-    Route::get('/lessons/create', fn() => view('admin.lessons.create'))->name('lessons.create');
-    Route::post('/lessons', fn() => redirect()->route('admin.lessons.index'))->name('lessons.store');
 
     // Topics
     Route::get('/topics', fn() => view('admin.topics.index'))->name('topics.index');

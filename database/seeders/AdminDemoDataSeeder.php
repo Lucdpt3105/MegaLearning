@@ -69,7 +69,7 @@ class AdminDemoDataSeeder extends Seeder
                 [
                     'subject_id' => $subject->id,
                     'teacher_id' => $teacher->id,
-                    'description' => "Khóa học {$subject->name} cho học sinh năm 2024",
+                    'description' => "Lớp học {$subject->name} cho học sinh năm 2024",
                     'status' => 'active',
                     'max_students' => 30,
                 ]

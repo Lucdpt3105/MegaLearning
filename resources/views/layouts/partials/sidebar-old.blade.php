@@ -252,7 +252,7 @@
                         </svg>
                     </div>
                     <div class="nav-content">
-                        <span class="nav-label">Khóa học</span>
+                        <span class="nav-label">Lớp học</span>
                         <span class="nav-desc">My Courses</span>
                     </div>
                 </a>

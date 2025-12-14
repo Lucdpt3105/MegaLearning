@@ -19,13 +19,13 @@
 
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Khóa Học Của Tôi</h1>
-        <p class="text-gray-600">Quản lý và theo dõi các khóa học bạn đang tham gia</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Lớp Học Của Tôi</h1>
+        <p class="text-gray-600">Quản lý và theo dõi các lớp học bạn đang tham gia</p>
     </div>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Card 1: Tổng Khóa Học -->
+        <!-- Card 1: Tổng Lớp Học -->
         <div class="relative overflow-hidden rounded-2xl shadow-lg h-32 bg-white border border-gray-200">
             <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80" 
                  alt="Books" 
@@ -33,7 +33,7 @@
             <div class="absolute inset-0 bg-[#0056D2]/10"></div>
             <div class="relative h-full flex items-center justify-between p-6">
                 <div>
-                    <p class="text-gray-600 text-sm font-medium">Tổng Khóa Học</p>
+                    <p class="text-gray-600 text-sm font-medium">Tổng Lớp Học</p>
                     <p class="text-4xl font-bold text-[#0056D2] mt-1">{{ $stats['total_courses'] }}</p>
                 </div>
                 <div class="bg-[#0056D2]/10 rounded-full p-4">
@@ -91,7 +91,7 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            Khám Phá Khóa Học Mới
+            Khám Phá Lớp Học Mới
         </a>
     </div>
 
@@ -102,10 +102,10 @@
                 <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có khóa học nào</h3>
-                <p class="text-gray-600 mb-6">Bạn chưa đăng ký khóa học nào. Hãy khám phá và đăng ký ngay!</p>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có lớp học nào</h3>
+                <p class="text-gray-600 mb-6">Bạn chưa đăng ký lớp học nào. Hãy khám phá và đăng ký ngay!</p>
                 <a href="{{ route('student.courses.browse') }}" class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
-                    Khám Phá Khóa Học
+                    Khám Phá Lớp Học
                 </a>
             </div>
         </div>

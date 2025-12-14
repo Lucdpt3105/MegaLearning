@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
-@section('title', 'Quản lý khóa học')
-@section('page-title', 'Quản lý khóa học')
+@section('title', 'Quản lý lớp học')
+@section('page-title', 'Quản lý lớp học')
 @section('page-description', 'Danh sách tất cả các lớp học đang hoạt động trong hệ thống.')
 
 @section('content')

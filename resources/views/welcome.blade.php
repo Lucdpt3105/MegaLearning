@@ -119,7 +119,7 @@
                         </div>
                         <div>
                             <div class="text-3xl font-bold text-gray-900 stat-number" data-target="500">0</div>
-                            <div class="text-gray-600">Khóa học</div>
+                            <div class="text-gray-600">Lớp học</div>
                         </div>
                         <div>
                             <div class="text-3xl font-bold text-gray-900 stat-number" data-target="50">0</div>
@@ -222,7 +222,7 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-4">Chứng chỉ</h3>
                     <p class="text-gray-600 leading-relaxed">
-                        Nhận chứng chỉ hoàn thành khóa học được công nhận và chia sẻ thành tích.
+                        Nhận chứng chỉ hoàn thành lớp học được công nhận và chia sẻ thành tích.
                     </p>
                 </div>
             </div>
@@ -245,7 +245,7 @@
                 </div>
                 <div class="text-center">
                     <div class="text-5xl font-bold text-white mb-2 stat-number" data-target="1200">0</div>
-                    <div class="text-purple-200 text-lg">Khóa học</div>
+                    <div class="text-purple-200 text-lg">Lớp học</div>
                 </div>
                 <div class="text-center">
                     <div class="text-5xl font-bold text-white mb-2 stat-number" data-target="150">0</div>
@@ -311,7 +311,7 @@
                 <div>
                     <h3 class="text-white font-semibold mb-4">Sản phẩm</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="hover:text-white transition">Khóa học</a></li>
+                        <li><a href="#" class="hover:text-white transition">Lớp học</a></li>
                         <li><a href="#" class="hover:text-white transition">Quiz</a></li>
                         <li><a href="#" class="hover:text-white transition">AI Chat</a></li>
                     </ul>
@@ -406,7 +406,7 @@
                 const testimonialTexts = [
                     'Platform này đã giúp tôi nâng cao kiến thức một cách đáng kể. Giao diện thân thiện và AI hỗ trợ rất tốt!',
                     'Quiz tương tác và hệ thống theo dõi tiến độ giúp tôi luôn có động lực học tập. Rất đáng để thử!',
-                    'Cộng đồng học tập sôi động, giảng viên nhiệt tình. Tôi đã hoàn thành 10 khóa học trong 3 tháng!'
+                    'Cộng đồng học tập sôi động, giảng viên nhiệt tình. Tôi đã hoàn thành 10 lớp học trong 3 tháng!'
                 ];
                 
                 users.forEach((user, index) => {

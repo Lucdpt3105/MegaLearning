@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class CourseController extends Controller
 {
     /**
-     * UC-STUDENT-001: Danh sách khóa học của học sinh
+     * UC-STUDENT-001: Danh sách lớp học của học sinh
      */
     public function index()
     {
@@ -47,7 +47,7 @@ class CourseController extends Controller
     }
 
     /**
-     * UC-STUDENT-002: Chi tiết khóa học
+     * UC-STUDENT-002: Chi tiết lớp học
      */
     public function show($id)
     {
@@ -68,7 +68,7 @@ class CourseController extends Controller
         $enrollment = $classRoom->enrollments->first();
 
         if (!$enrollment || $enrollment->status !== 'active') {
-            abort(403, 'Bạn không được phép xem khóa học này.');
+            abort(403, 'Bạn không được phép xem lớp học này.');
         }
 
         $upcomingCalls = $classRoom->videoCalls()
@@ -92,7 +92,7 @@ class CourseController extends Controller
     }
 
     /**
-     * UC-STUDENT-003: Tài liệu khóa học
+     * UC-STUDENT-003: Tài liệu lớp học
      */
     public function materials($id)
     {
@@ -107,7 +107,7 @@ class CourseController extends Controller
 
         $enrollment = $classRoom->enrollments->first();
         if (!$enrollment || $enrollment->status !== 'active') {
-            abort(403, 'Bạn không được phép xem tài liệu khóa học này.');
+            abort(403, 'Bạn không được phép xem tài liệu lớp học này.');
         }
 
         $topics = $classRoom->subject->topics;
@@ -131,7 +131,7 @@ class CourseController extends Controller
 
         $enrollment = $classRoom->enrollments->first();
         if (!$enrollment || $enrollment->status !== 'active') {
-            abort(403, 'Bạn không được phép xem lịch khóa học này.');
+            abort(403, 'Bạn không được phép xem lịch lớp học này.');
         }
 
         return view('student.courses.schedule', [
@@ -142,7 +142,7 @@ class CourseController extends Controller
     }
 
     /**
-     * UC-STUDENT-005: Duyệt khóa học
+     * UC-STUDENT-005: Duyệt lớp học
      */
     public function browse(Request $request)
     {
@@ -203,7 +203,7 @@ class CourseController extends Controller
     }
 
     /**
-     * UC-STUDENT-006: Đăng ký khóa học
+     * UC-STUDENT-006: Đăng ký lớp học
      */
     public function enroll($id)
     {
@@ -219,11 +219,11 @@ class CourseController extends Controller
             ->first();
 
         if ($existing && $existing->status === 'active') {
-            return back()->with('error', 'Bạn đã đăng ký khóa học này rồi!');
+            return back()->with('error', 'Bạn đã đăng ký lớp học này rồi!');
         }
 
         if ($classRoom->active_students_count >= $classRoom->max_students) {
-            return back()->with('error', 'Khóa học đã đầy!');
+            return back()->with('error', 'Lớp học đã đầy!');
         }
 
         if ($existing && $existing->status === 'dropped') {
@@ -241,7 +241,7 @@ class CourseController extends Controller
         }
 
         return redirect()->route('student.courses.index')
-            ->with('success', 'Đăng ký khóa học thành công!');
+            ->with('success', 'Đăng ký lớp học thành công!');
     }
 
     /**
