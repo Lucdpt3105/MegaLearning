@@ -391,18 +391,18 @@ class StatisticsController extends Controller
         // Thống kê chi tiết cho mỗi học sinh
         $students->getCollection()->transform(function ($student) use ($request) {
             // Lọc submissions theo class/subject nếu có
-            $submissionsQuery = $student->examSubmissions()
+            $submissionsQuery = ExamSubmission::where('student_id', $student->id)
                 ->where('status', 'submitted');
 
             if ($request->has('class_room_id')) {
-                $submissionsQuery->whereHas('exam.classRoom', function($q) use ($request) {
-                    $q->where('id', $request->class_room_id);
+                $submissionsQuery->whereHas('exam', function($q) use ($request) {
+                    $q->where('class_room_id', $request->class_room_id);
                 });
             }
 
             if ($request->has('subject_id')) {
-                $submissionsQuery->whereHas('exam.subject', function($q) use ($request) {
-                    $q->where('id', $request->subject_id);
+                $submissionsQuery->whereHas('exam', function($q) use ($request) {
+                    $q->where('subject_id', $request->subject_id);
                 });
             }
 
