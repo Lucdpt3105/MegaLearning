@@ -57,6 +57,12 @@ class DatabaseSeeder extends Seeder
             ForumSeeder::class,                // Forum discussions
         ]);
         
+        // Step 6: Rankings & Statistics
+        $this->command->info('🏆 Step 6: Student Rankings');
+        $this->call([
+            StudentRankingSeeder::class,       // Calculate student rankings
+        ]);
+        
         $this->command->info('');
         $this->command->info('✅ Database seeding completed successfully!');
         $this->command->info('');

@@ -100,12 +100,20 @@
 
 <!-- Filters -->
 <div class="filter-card mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-gray-700">Bộ lọc & Tính toán</h3>
+        <button onclick="recalculateRankings()" id="recalculateBtn" 
+                class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition shadow-md">
+            <i data-feather="refresh-cw" class="w-4 h-4 inline mr-1"></i> Tính lại xếp hạng
+        </button>
+    </div>
+    
     <form action="{{ route('admin.statistics.rankings') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i data-feather="book" class="w-4 h-4 inline text-blue-600"></i> Lớp học
             </label>
-            <select name="class_room_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <select name="class_room_id" id="filterClassRoom" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 <option value="">Tất cả lớp</option>
                 @foreach($classRooms as $class)
                     <option value="{{ $class->id }}" {{ request('class_room_id') == $class->id ? 'selected' : '' }}>
@@ -307,5 +315,73 @@
 document.addEventListener('DOMContentLoaded', function() {
     feather.replace();
 });
+
+function recalculateRankings() {
+    const btn = document.getElementById('recalculateBtn');
+    const originalText = btn.innerHTML;
+    
+    // Disable button
+    btn.disabled = true;
+    btn.innerHTML = '<i data-feather="loader" class="w-4 h-4 inline mr-1 animate-spin"></i> Đang tính toán...';
+    feather.replace();
+    
+    // Get class_room_id if filtered
+    const classRoomId = document.getElementById('filterClassRoom').value;
+    const url = '{{ route("admin.statistics.rankings.recalculate") }}';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            class_room_id: classRoomId || null
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            showNotification('success', data.message);
+            
+            // Reload page after 1 second
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotification('error', data.message || 'Có lỗi xảy ra');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            feather.replace();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('error', 'Không thể kết nối đến server');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        feather.replace();
+    });
+}
+
+function showNotification(type, message) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i data-feather="${type === 'success' ? 'check-circle' : 'x-circle'}" class="w-5 h-5"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    feather.replace();
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 </script>
 @endpush
