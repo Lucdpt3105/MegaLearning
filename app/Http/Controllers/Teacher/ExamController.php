@@ -85,17 +85,6 @@ class ExamController extends Controller
             'shuffle_answers' => 'boolean',
             'show_results_immediately' => 'boolean',
             'allow_review' => 'boolean',
-            // Security fields
-            'require_access_code' => 'boolean',
-            'access_code' => 'nullable|string|max:20',
-            'restrict_to_class' => 'boolean',
-            'detect_cheating' => 'boolean',
-            'detect_tab_switch' => 'boolean',
-            'detect_device_change' => 'boolean',
-            'lock_on_exit' => 'boolean',
-            'max_exit_time' => 'nullable|integer|min:5|max:300',
-            'require_camera' => 'boolean',
-            'require_screen_recording' => 'boolean',
             // Auto-generate fields
             'auto_generate' => 'boolean',
             'auto_gen_level_1' => 'nullable|integer|min:0',
@@ -168,17 +157,6 @@ class ExamController extends Controller
             'show_results_immediately' => $request->boolean('show_results_immediately', true),
             'allow_review' => $request->boolean('allow_review', true),
             'status' => 'draft',
-            // Security settings
-            'require_access_code' => $request->boolean('require_access_code'),
-            'access_code' => $request->boolean('require_access_code') ? $validated['access_code'] : null,
-            'restrict_to_class' => $request->boolean('restrict_to_class', true),
-            'detect_cheating' => $request->boolean('detect_cheating'),
-            'detect_tab_switch' => $request->boolean('detect_tab_switch'),
-            'detect_device_change' => $request->boolean('detect_device_change'),
-            'lock_on_exit' => $request->boolean('lock_on_exit'),
-            'max_exit_time' => $request->boolean('lock_on_exit') ? $validated['max_exit_time'] : null,
-            'require_camera' => $request->boolean('require_camera'),
-            'require_screen_recording' => $request->boolean('require_screen_recording'),
         ]);
 
         // Auto-generate questions if requested
