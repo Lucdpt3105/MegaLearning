@@ -12,6 +12,7 @@ class ClassRoom extends Model
     protected $fillable = [
         'name',
         'code',
+        'category_id',
         'subject_id',
         'teacher_id',
         'description',
@@ -27,6 +28,11 @@ class ClassRoom extends Model
         'end_date' => 'date',
         'settings' => 'array',
     ];
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     public function subject(): BelongsTo
     {

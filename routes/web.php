@@ -353,17 +353,15 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/topics/create', fn() => view('admin.topics.create'))->name('topics.create');
     Route::get('/topics/{id}/edit', fn($id) => view('admin.topics.edit', ['id' => $id]))->name('topics.edit');
 
-    // Questions
-    Route::get('/questions', fn() => view('admin.questions.index'))->name('questions.index');
-    Route::get('/questions/create', fn() => view('admin.questions.create'))->name('questions.create');
-    Route::post('/questions', fn() => redirect()->route('admin.questions.index'))->name('questions.store');
-    Route::get('/questions/{id}/edit', fn($id) => view('admin.questions.edit', ['id' => $id]))->name('questions.edit');
+    // Questions Management (Link với Teacher's Questions)
+    Route::resource('questions', App\Http\Controllers\Admin\QuestionManagementController::class);
+    Route::post('/questions/bulk-delete', [App\Http\Controllers\Admin\QuestionManagementController::class, 'bulkDestroy'])->name('questions.bulk-delete');
 
-    // Exams
-    Route::get('/exams', fn() => view('admin.exams.index'))->name('exams.index');
-    Route::get('/exams/create', fn() => view('admin.exams.create'))->name('exams.create');
-    Route::post('/exams', fn() => redirect()->route('admin.exams.index'))->name('exams.store');
-    Route::get('/exams/{id}/edit', fn($id) => view('admin.exams.edit', ['id' => $id]))->name('exams.edit');
+    // Exams Management (Link với Teacher's Exams)
+    Route::get('/exams/{exam}/questions', [App\Http\Controllers\Admin\ExamManagementController::class, 'questions'])->name('exams.questions');
+    Route::get('/exams/{exam}/results', [App\Http\Controllers\Admin\ExamManagementController::class, 'results'])->name('exams.results');
+    Route::post('/exams/{exam}/status', [App\Http\Controllers\Admin\ExamManagementController::class, 'updateStatus'])->name('exams.update-status');
+    Route::resource('exams', App\Http\Controllers\Admin\ExamManagementController::class);
 
     // Exam Results
     Route::get('/exam-results', fn() => view('admin.exam-results.index'))->name('exam-results.index');
