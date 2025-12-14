@@ -135,7 +135,7 @@
                     </td>
                     <td class="px-6 py-4">
                         <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
-                            {{ $topic->subject->name }}
+                            {{ $topic->subject ? $topic->subject->name : 'N/A' }}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-center">

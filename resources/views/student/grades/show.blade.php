@@ -9,7 +9,10 @@
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">{{ $exam->title }}</h1>
-                <p class="text-gray-600 mt-1">{{ $exam->subject->name }} - {{ $exam->classRoom->name }}</p>
+                <p class="text-gray-600 mt-1">
+                    {{ $exam->subject ? $exam->subject->name : 'Chưa có môn học' }} - 
+                    {{ $exam->classRoom ? $exam->classRoom->name : 'Chưa có lớp' }}
+                </p>
             </div>
             <div class="text-right">
                 @if($stats['passed'])

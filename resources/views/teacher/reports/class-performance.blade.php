@@ -54,7 +54,7 @@
                         ← Quay lại Báo cáo
                     </a>
                     <h1 class="text-3xl font-bold text-gray-800">{{ $classRoom->name }}</h1>
-                    <p class="text-gray-600">{{ $classRoom->subject->name }} • Kết quả tổng hợp</p>
+                    <p class="text-gray-600">{{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }} • Kết quả tổng hợp</p>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('teacher.reports.print-gradebook', $classRoom->id) }}" 

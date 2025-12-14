@@ -82,7 +82,7 @@
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                 <div>
                                     <span class="text-gray-500">Môn học:</span>
-                                    <span class="font-medium text-gray-900 ml-1">{{ $exam->subject->name }}</span>
+                                    <span class="font-medium text-gray-900 ml-1">{{ $exam->subject ? $exam->subject->name : 'Chưa có môn học' }}</span>
                                 </div>
                                 <div>
                                     <span class="text-gray-500">Lớp:</span>

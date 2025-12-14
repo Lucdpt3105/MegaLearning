@@ -186,7 +186,7 @@
 
     <div class="info-section">
         <div class="info-row">
-            <div><span class="info-label">Giáo viên:</span> {{ $subject->teacher->name }}</div>
+            <div><span class="info-label">Giáo viên:</span> {{ $subject->teacher ? $subject->teacher->name : 'N/A' }}</div>
             <div><span class="info-label">Học kỳ:</span> {{ $classRoom->semester ?? 'I' }}</div>
         </div>
         <div class="info-row">

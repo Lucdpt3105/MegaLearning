@@ -199,41 +199,46 @@
                                 {{ $exam->status === 'archived' ? 'Lưu trữ' : '' }}
                             </span>
                         </td>
-                        <td class="px-4 py-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-2 justify-center">
+                                {{-- Xem chi tiết --}}
                                 <a href="{{ route('admin.exams.show', $exam) }}" 
-                                   class="text-blue-600 hover:text-blue-800" title="Xem chi tiết">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
+                                   class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+                                   title="Xem chi tiết">
+                                    <i data-feather="eye" class="w-4 h-4"></i>
                                 </a>
+
+                                {{-- Câu hỏi --}}
                                 <a href="{{ route('admin.exams.questions', $exam) }}" 
-                                   class="text-indigo-600 hover:text-indigo-800" title="Câu hỏi">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
+                                   class="p-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg transition"
+                                   title="Quản lý câu hỏi">
+                                    <i data-feather="help-circle" class="w-4 h-4"></i>
                                 </a>
+
+                                {{-- Kết quả --}}
                                 <a href="{{ route('admin.exams.results', $exam) }}" 
-                                   class="text-green-600 hover:text-green-800" title="Kết quả">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                    </svg>
+                                   class="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg transition"
+                                   title="Xem kết quả">
+                                    <i data-feather="bar-chart-2" class="w-4 h-4"></i>
                                 </a>
+
+                                {{-- Sửa --}}
                                 <a href="{{ route('admin.exams.edit', $exam) }}" 
-                                   class="text-yellow-600 hover:text-yellow-800" title="Sửa">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
+                                   class="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition"
+                                   title="Chỉnh sửa">
+                                    <i data-feather="edit-2" class="w-4 h-4"></i>
                                 </a>
-                                <form action="{{ route('admin.exams.destroy', $exam) }}" method="POST" class="inline" 
-                                      onsubmit="return confirm('Bạn có chắc muốn xóa đề thi này?')">
+
+                                {{-- Xóa --}}
+                                <form action="{{ route('admin.exams.destroy', $exam) }}" method="POST" 
+                                      onsubmit="return confirm('Bạn có chắc muốn xóa đề thi này? Hành động không thể hoàn tác!');"
+                                      class="inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Xóa">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
+                                    <button type="submit"
+                                            class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition"
+                                            title="Xóa">
+                                        <i data-feather="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </form>
                             </div>

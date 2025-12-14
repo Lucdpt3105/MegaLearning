@@ -54,7 +54,7 @@
                                     <option value="">Chọn lớp học</option>
                                     @foreach($classRooms as $classRoom)
                                         <option value="{{ $classRoom->id }}" {{ old('class_room_id') == $classRoom->id ? 'selected' : '' }}>
-                                            {{ $classRoom->name }} - {{ $classRoom->subject->name }}
+                                            {{ $classRoom->name }} - {{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }}
                                         </option>
                                     @endforeach
                                 </select>

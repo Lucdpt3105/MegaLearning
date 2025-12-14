@@ -154,7 +154,7 @@
                         <!-- Course Title on Image -->
                         <div class="absolute bottom-4 left-4 right-4">
                             <h3 class="text-xl font-bold text-white mb-1 drop-shadow-lg">{{ $class->name }}</h3>
-                            <p class="text-sm text-gray-200 drop-shadow-md">{{ $class->subject->name }}</p>
+                            <p class="text-sm text-gray-200 drop-shadow-md">{{ $class->subject ? $class->subject->name : 'N/A' }}</p>
                         </div>
                     </div>
 
@@ -173,7 +173,7 @@
                             <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs mr-2">
                                 {{ substr($class->teacher->name, 0, 2) }}
                             </div>
-                            <span class="font-medium">{{ $class->teacher->name }}</span>
+                            <span class="font-medium">{{ $class->teacher ? $class->teacher->name : 'N/A' }}</span>
                         </div>
 
                         <!-- Students Count -->

@@ -103,7 +103,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <h3 class="text-sm font-medium text-gray-700 mb-2">Môn học</h3>
-                            <p class="text-gray-900">{{ $document->subject->name }}</p>
+                            <p class="text-gray-900">{{ $document->subject ? $document->subject->name : 'N/A' }}</p>
                             <p class="text-sm text-gray-500">{{ $document->subject->code }}</p>
                         </div>
 
