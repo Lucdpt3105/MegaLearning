@@ -37,7 +37,9 @@
             <div class="flex items-center space-x-2">
                 <span class="text-gray-500 font-medium">Môn học:</span>
                 <span class="font-semibold text-gray-900">{{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }}</span>
+                @if($classRoom->subject)
                 <span class="text-xs text-gray-400">({{ $classRoom->subject->code }})</span>
+                @endif
             </div>
             <div class="h-4 w-px bg-gray-300"></div>
             <div class="flex items-center space-x-2">
