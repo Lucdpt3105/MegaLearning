@@ -117,24 +117,31 @@ class ExamController extends Controller
             $totalByType = ($request->input('auto_gen_multiple_choice', 0) ?? 0) + 
                           ($request->input('auto_gen_essay', 0) ?? 0);
 
-            // Check if total questions by type exceeds total by level
-            if ($totalByType > $totalByLevel) {
+            // Check if totals are equal (REQUIRED)
+            if ($totalByType !== $totalByLevel) {
+                $level1 = $request->input('auto_gen_level_1', 0);
+                $level2 = $request->input('auto_gen_level_2', 0);
+                $level3 = $request->input('auto_gen_level_3', 0);
+                $level4 = $request->input('auto_gen_level_4', 0);
+                $multipleChoice = $request->input('auto_gen_multiple_choice', 0);
+                $essay = $request->input('auto_gen_essay', 0);
+                
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\nTổng số câu theo loại: {$totalByType} câu\n(Trắc nghiệm: {$request->input('auto_gen_multiple_choice', 0)} + Tự luận: {$request->input('auto_gen_essay', 0)})\n\nTổng số câu theo mức độ: {$totalByLevel} câu\n(Mức 1: {$request->input('auto_gen_level_1', 0)} + Mức 2: {$request->input('auto_gen_level_2', 0)} + Mức 3: {$request->input('auto_gen_level_3', 0)} + Mức 4: {$request->input('auto_gen_level_4', 0)})\n\n❌ Số câu theo loại KHÔNG ĐƯỢC vượt quá số câu theo mức độ!\n\nVui lòng điều chỉnh lại số lượng.");
+                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\n📊 Tổng số câu theo LOẠI: {$totalByType} câu\n   • Trắc nghiệm: {$multipleChoice} câu\n   • Tự luận: {$essay} câu\n\n📈 Tổng số câu theo MỨC ĐỘ: {$totalByLevel} câu\n   • Mức 1 (Nhận biết): {$level1} câu\n   • Mức 2 (Thông hiểu): {$level2} câu\n   • Mức 3 (Vận dụng): {$level3} câu\n   • Mức 4 (Vận dụng cao): {$level4} câu\n\n❌ HAI TỔNG SỐ PHẢI BẰNG NHAU!\n\nTổng câu theo loại ({$totalByType}) " . ($totalByType > $totalByLevel ? '>' : '<') . " Tổng câu theo mức độ ({$totalByLevel})\n\n💡 Mẹo: Nếu muốn {$totalByLevel} câu, hãy điều chỉnh:\n   • Trắc nghiệm + Tự luận = {$totalByLevel} câu");
             }
 
             // Check if total is valid
             if ($totalByLevel == 0) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo mức độ (Mức 1, 2, 3, hoặc 4).');
+                    ->with('error_popup', '❌ Vui lòng chọn ít nhất một câu hỏi theo mức độ (Mức 1, 2, 3, hoặc 4).\n\nBạn phải nhập số lượng câu hỏi cho ít nhất một mức độ!');
             }
 
             if ($totalByType == 0) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo loại (Trắc nghiệm hoặc Tự luận).');
+                    ->with('error_popup', '❌ Vui lòng chọn ít nhất một câu hỏi theo loại (Trắc nghiệm hoặc Tự luận).\n\nBạn phải nhập số lượng câu hỏi cho ít nhất một loại!');
             }
         }
 
