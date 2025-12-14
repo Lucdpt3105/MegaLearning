@@ -384,7 +384,9 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/forums/moderation', [App\Http\Controllers\Admin\ForumController::class, 'moderation'])->name('forums.moderation');
 
     // Meetings
+    Route::get('/meetings', [App\Http\Controllers\Admin\MeetingController::class, 'index'])->name('meetings.index');
     Route::get('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'rooms'])->name('meetings.rooms');
+    Route::post('/meetings', [App\Http\Controllers\Admin\MeetingController::class, 'store'])->name('meetings.store');
     Route::post('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'store'])->name('meetings.rooms.create');
     Route::patch('/meetings/{id}/status', [App\Http\Controllers\Admin\MeetingController::class, 'updateStatus'])->name('meetings.updateStatus');
     Route::delete('/meetings/{id}', [App\Http\Controllers\Admin\MeetingController::class, 'destroy'])->name('meetings.destroy');
