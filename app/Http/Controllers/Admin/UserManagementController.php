@@ -122,6 +122,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
             'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
             'role' => 'required|exists:roles,name',
@@ -129,12 +130,19 @@ class UserManagementController extends Controller
 
         $oldValues = $user->toArray();
 
-        $user->update([
+        $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'bio' => $validated['bio'] ?? null,
-        ]);
+        ];
+
+        // Chỉ cập nhật password nếu có nhập mật khẩu mới
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($updateData);
 
         // Cập nhật role
         $user->syncRoles([$validated['role']]);
@@ -145,7 +153,7 @@ class UserManagementController extends Controller
             'action' => 'update_user',
             'entity_type' => 'user',
             'entity_id' => $user->id,
-            'description' => "Updated user: {$user->name}",
+            'description' => "Updated user: {$user->name}" . (!empty($validated['password']) ? ' (password changed)' : ''),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'old_values' => $oldValues,
@@ -153,7 +161,7 @@ class UserManagementController extends Controller
         ]);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Cập nhật thông tin người dùng thành công!');
+            ->with('success', 'Cập nhật thông tin người dùng thành công!' . (!empty($validated['password']) ? ' Mật khẩu đã được thay đổi.' : ''));
     }
 
     /**
