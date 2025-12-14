@@ -27,8 +27,7 @@ class StatisticsController extends Controller
      */
     public function activityLogs(Request $request)
     {
-        $query = ActivityLog::with('user')
-            ->orderByDesc('created_at');
+        $query = ActivityLog::with('user');
 
         // Filters
         if ($request->has('action')) {
@@ -50,6 +49,9 @@ class StatisticsController extends Controller
         if ($request->has('date_to')) {
             $query->where('created_at', '<=', $request->date_to);
         }
+
+        // Sắp xếp theo thời gian mới nhất
+        $query->orderBy('created_at', 'DESC')->orderBy('id', 'DESC');
 
         $logs = $query->paginate(50);
 
