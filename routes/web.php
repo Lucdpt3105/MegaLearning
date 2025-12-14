@@ -365,7 +365,6 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::post('/exams/{exam}/publish', [App\Http\Controllers\Admin\ExamManagementController::class, 'publish'])->name('exams.publish');
     Route::post('/exams/{exam}/notify', [App\Http\Controllers\Admin\ExamManagementController::class, 'sendNotification'])->name('exams.notify');
     Route::post('/exams/import', [App\Http\Controllers\Admin\ExamManagementController::class, 'importFromExcel'])->name('exams.import');
-    Route::get('/exams/{exam}/questions', [App\Http\Controllers\Admin\ExamManagementController::class, 'questions'])->name('exams.questions');
     Route::get('/exams/{exam}/results', [App\Http\Controllers\Admin\ExamManagementController::class, 'results'])->name('exams.results');
     Route::post('/exams/{exam}/status', [App\Http\Controllers\Admin\ExamManagementController::class, 'updateStatus'])->name('exams.update-status');
     Route::resource('exams', App\Http\Controllers\Admin\ExamManagementController::class);

@@ -208,13 +208,6 @@
                                     <i data-feather="eye" class="w-4 h-4"></i>
                                 </a>
 
-                                {{-- Câu hỏi --}}
-                                <a href="{{ route('admin.exams.questions', $exam) }}" 
-                                   class="p-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg transition"
-                                   title="Quản lý câu hỏi">
-                                    <i data-feather="help-circle" class="w-4 h-4"></i>
-                                </a>
-
                                 {{-- Kết quả --}}
                                 <a href="{{ route('admin.exams.results', $exam) }}" 
                                    class="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-lg transition"
