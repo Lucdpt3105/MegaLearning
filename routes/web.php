@@ -295,14 +295,8 @@ Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::cl
     | 📌 4. ADMIN → VIEW USERS BY ROLE
     |--------------------------------------------------------------------------
     */
- Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])
-    ->name('students.index');
+    // Routes moved to section 5 below
 
-Route::get('/teachers', [App\Http\Controllers\Admin\UserManagementController::class, 'teachers'])
-    ->name('teachers.index');
-
-Route::get('/admins', [App\Http\Controllers\Admin\UserManagementController::class, 'admins'])
-    ->name('admins.index');
 
     Route::get('/profile', function () {
     return view('admin.profile');
@@ -331,10 +325,20 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
 
 
-    // User Management (resource)
-    Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
-    Route::post('users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
-    Route::post('users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
+    // User Management - Students, Teachers, Admins
+    Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])->name('students.index');
+    Route::get('/teachers', [App\Http\Controllers\Admin\UserManagementController::class, 'teachers'])->name('teachers.index');
+    Route::get('/admins', [App\Http\Controllers\Admin\UserManagementController::class, 'admins'])->name('admins.index');
+    
+    // User CRUD operations
+    Route::get('/users/create', [App\Http\Controllers\Admin\UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('users.destroy');
+    Route::patch('/users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
+    Route::post('/users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
 
 
     // Subjects
@@ -346,10 +350,21 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/topics/{id}/edit', fn($id) => view('admin.topics.edit', ['id' => $id]))->name('topics.edit');
 
     // Questions Management (Link với Teacher's Questions)
-    Route::resource('questions', App\Http\Controllers\Admin\QuestionManagementController::class);
+    Route::get('/questions/subjects/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'bySubject'])->name('questions.by-subject');
+    Route::get('/questions/export/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'export'])->name('questions.export');
+    Route::post('/questions/import/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'import'])->name('questions.import');
+    Route::get('/questions/download-template', [App\Http\Controllers\Admin\QuestionManagementController::class, 'downloadTemplate'])->name('questions.download-template');
     Route::post('/questions/bulk-delete', [App\Http\Controllers\Admin\QuestionManagementController::class, 'bulkDestroy'])->name('questions.bulk-delete');
+    Route::resource('questions', App\Http\Controllers\Admin\QuestionManagementController::class);
 
     // Exams Management (Link với Teacher's Exams)
+    Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Admin\ExamManagementController::class, 'addQuestions'])->name('exams.questions.add');
+    Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Admin\ExamManagementController::class, 'createQuestion'])->name('exams.questions.create');
+    Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Admin\ExamManagementController::class, 'removeQuestion'])->name('exams.questions.remove');
+    Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Admin\ExamManagementController::class, 'reorderQuestions'])->name('exams.questions.reorder');
+    Route::post('/exams/{exam}/publish', [App\Http\Controllers\Admin\ExamManagementController::class, 'publish'])->name('exams.publish');
+    Route::post('/exams/{exam}/notify', [App\Http\Controllers\Admin\ExamManagementController::class, 'sendNotification'])->name('exams.notify');
+    Route::post('/exams/import', [App\Http\Controllers\Admin\ExamManagementController::class, 'importFromExcel'])->name('exams.import');
     Route::get('/exams/{exam}/questions', [App\Http\Controllers\Admin\ExamManagementController::class, 'questions'])->name('exams.questions');
     Route::get('/exams/{exam}/results', [App\Http\Controllers\Admin\ExamManagementController::class, 'results'])->name('exams.results');
     Route::post('/exams/{exam}/status', [App\Http\Controllers\Admin\ExamManagementController::class, 'updateStatus'])->name('exams.update-status');

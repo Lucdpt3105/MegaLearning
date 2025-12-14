@@ -98,21 +98,16 @@ class SubjectController extends Controller
     }
 
     /**
-     * Remove the specified subject
+     * Remove the specified subject (Soft Delete)
      */
     public function destroy($id)
     {
         $subject = Subject::findOrFail($id);
 
-        // Check if subject has related data
-        if ($subject->topics()->count() > 0 || $subject->classRooms()->count() > 0) {
-            return redirect()->route('admin.subjects.index')
-                ->with('error', 'Không thể xóa môn học đang có chủ đề hoặc lớp học!');
-        }
-
+        // Soft delete - chỉ đánh dấu xóa, không xóa thật
         $subject->delete();
 
         return redirect()->route('admin.subjects.index')
-            ->with('success', 'Xóa môn học thành công!');
+            ->with('success', 'Xóa môn học thành công! Dữ liệu đã được lưu trữ và có thể khôi phục.');
     }
 }
