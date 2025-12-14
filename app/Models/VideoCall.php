@@ -15,6 +15,7 @@ class VideoCall extends Model
         'description',
         'room_code',
         'meeting_url',
+        'password',
         'scheduled_at',
         'started_at',
         'ended_at',

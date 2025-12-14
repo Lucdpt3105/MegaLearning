@@ -6,14 +6,61 @@ use App\Http\Controllers\Controller;
 use App\Models\VideoCall;
 use App\Models\ClassRoom;
 use App\Models\User;
+use App\Services\ZoomService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class MeetingController extends Controller
 {
     /**
-     * Display list of meeting rooms
+     * Display a listing of all video calls (Admin)
+     */
+    public function index(Request $request)
+    {
+        $query = VideoCall::with(['classRoom.subject', 'host']);
+
+        // Filters
+        if ($request->filled('class_room_id')) {
+            $query->where('class_room_id', $request->class_room_id);
+        }
+
+        if ($request->filled('host_id')) {
+            $query->where('host_id', $request->host_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->where('scheduled_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->where('scheduled_at', '<=', $request->date_to);
+        }
+
+        $videoCalls = $query->latest('scheduled_at')->paginate(15);
+        
+        $classRooms = ClassRoom::with('subject')->get();
+        $teachers = User::role('teacher')->get();
+
+        // Statistics
+        $stats = [
+            'total_meetings' => VideoCall::count(),
+            'active_meetings' => VideoCall::where('status', 'in_progress')->count(),
+            'scheduled_meetings' => VideoCall::where('status', 'scheduled')->count(),
+            'completed_meetings' => VideoCall::where('status', 'ended')->count(),
+            'total_duration' => VideoCall::sum('duration'),
+        ];
+
+        return view('admin.meetings.index', compact('videoCalls', 'classRooms', 'teachers', 'stats'));
+    }
+
+    /**
+     * Display list of meeting rooms (legacy)
      */
     public function rooms(Request $request)
     {
@@ -46,7 +93,7 @@ class MeetingController extends Controller
         // Statistics
         $stats = [
             'total_meetings' => VideoCall::count(),
-            'active_meetings' => VideoCall::where('status', 'active')->count(),
+            'active_meetings' => VideoCall::where('status', 'in_progress')->count(),
             'completed_meetings' => VideoCall::where('status', 'ended')->count(),
             'total_duration' => VideoCall::sum('duration'),
         ];
@@ -136,24 +183,64 @@ class MeetingController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'class_room_id' => 'required|exists:class_rooms,id',
-            'scheduled_at' => 'nullable|date',
-            'duration' => 'nullable|integer|min:0',
+            'host_id' => 'required|exists:users,id',
+            'scheduled_at' => 'required|date|after:now',
+            'duration' => 'nullable|integer|min:15|max:480',
             'description' => 'nullable|string',
+            'platform' => 'required|in:jitsi,zoom',
         ]);
+
+        $platform = $validated['platform'];
+        $roomCode = 'VC-' . strtoupper(Str::random(8));
+        $meetingUrl = '';
+        $password = null;
+        $settings = [
+            'allow_chat' => true,
+            'allow_screen_share' => true,
+            'lobby_enabled' => false,
+            'platform' => $platform,
+        ];
+
+        // Create meeting based on platform
+        if ($platform === 'zoom') {
+            try {
+                $zoomService = app(ZoomService::class);
+                $zoomMeeting = $zoomService->createMeeting([
+                    'topic' => $validated['title'],
+                    'start_time' => $validated['scheduled_at'],
+                    'duration' => $validated['duration'] ?? 60,
+                    'agenda' => $validated['description'] ?? '',
+                ]);
+
+                $roomCode = (string) $zoomMeeting['meeting_id'];
+                $meetingUrl = $zoomMeeting['meeting_url'];
+                $password = $zoomMeeting['password'] ?? null;
+                $settings['zoom_meeting_id'] = $zoomMeeting['meeting_id'];
+                $settings['zoom_password'] = $password;
+                $settings['zoom_start_url'] = $zoomMeeting['start_url'];
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', 'Lỗi tạo Zoom meeting: ' . $e->getMessage());
+            }
+        } else {
+            // Jitsi
+            $meetingUrl = 'https://meet.jit.si/' . $roomCode;
+        }
 
         $meeting = VideoCall::create([
             'title' => $validated['title'],
             'class_room_id' => $validated['class_room_id'],
-            'host_id' => auth()->id(),
-            'scheduled_at' => $validated['scheduled_at'] ?? null,
-            'duration' => $validated['duration'] ?? 0,
+            'host_id' => $validated['host_id'],
+            'scheduled_at' => $validated['scheduled_at'],
+            'duration' => $validated['duration'] ?? 60,
             'description' => $validated['description'] ?? null,
-            'status' => 'pending',
-            'meeting_url' => 'https://meet.megalearning.com/' . uniqid(),
+            'status' => 'scheduled',
+            'room_code' => $roomCode,
+            'meeting_url' => $meetingUrl,
+            'password' => $password,
+            'settings' => $settings,
         ]);
 
-        return redirect()->route('admin.meetings.rooms')
-            ->with('success', 'Phòng họp đã được tạo thành công!');
+        return back()->with('success', 'Đã tạo phòng học thành công! Mã phòng: ' . $roomCode);
     }
 
     /**
@@ -162,7 +249,7 @@ class MeetingController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,active,ended,cancelled',
+            'status' => 'required|in:scheduled,in_progress,ended,cancelled',
         ]);
 
         $meeting = VideoCall::findOrFail($id);
