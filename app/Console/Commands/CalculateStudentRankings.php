@@ -152,7 +152,9 @@ class CalculateStudentRankings extends Command
             ->whereHas('exam', function($query) use ($classRoom) {
                 $query->where('subject_id', $classRoom->subject_id);
             })
-            ->where('grading_status', 'completed')
+            ->where('status', 'submitted')
+            ->where('grading_status', 'graded')
+            ->whereNotNull('score')
             ->get();
 
         if ($submissions->isEmpty()) {
@@ -164,7 +166,7 @@ class CalculateStudentRankings extends Command
         $passedExams = 0;
 
         foreach ($submissions as $submission) {
-            $score = $submission->total_score ?? 0;
+            $score = $submission->score ?? 0;
             $totalScore += $score;
             
             // Assume passing score is 5.0 or above (can be configurable)

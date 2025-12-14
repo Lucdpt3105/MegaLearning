@@ -44,9 +44,10 @@ class DatabaseSeeder extends Seeder
         ]);
         
         // Step 4: Exams & Assessments
-        $this->command->info('📝 Step 4: Exams');
+        $this->command->info('📝 Step 4: Exams & Submissions');
         $this->call([
             ExamSeeder::class,                 // Sample exams
+            ExamSubmissionSeeder::class,       // Exam submissions with realistic scores
         ]);
         
         // Step 5: Communication
