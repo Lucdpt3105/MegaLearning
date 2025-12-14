@@ -395,9 +395,12 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/meetings/history', [App\Http\Controllers\Admin\MeetingController::class, 'history'])->name('meetings.history');
 
     // Files
-    Route::get('/files', fn() => view('admin.files.index'))->name('files.index');
-    Route::get('/files/upload', fn() => view('admin.files.upload'))->name('files.upload');
-    Route::post('/files', fn() => redirect()->route('admin.files.index'))->name('files.store');
+    Route::get('/files', [App\Http\Controllers\Admin\FileController::class, 'index'])->name('files.index');
+    Route::get('/files/create', [App\Http\Controllers\Admin\FileController::class, 'create'])->name('files.create');
+    Route::get('/files/upload', [App\Http\Controllers\Admin\FileController::class, 'create'])->name('files.upload');
+    Route::post('/files', [App\Http\Controllers\Admin\FileController::class, 'store'])->name('files.store');
+    Route::get('/files/{id}/download', [App\Http\Controllers\Admin\FileController::class, 'download'])->name('files.download');
+    Route::delete('/files/{id}', [App\Http\Controllers\Admin\FileController::class, 'destroy'])->name('files.destroy');
 
     // Settings
     Route::get('/settings/email', fn() => view('admin.settings.email'))->name('settings.email');
