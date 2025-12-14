@@ -291,7 +291,8 @@ class StatisticsController extends Controller
     public function rankings(Request $request)
     {
         $query = StudentRanking::with(['student:id,name,email', 'classRoom:id,name', 'subject:id,name'])
-            ->orderByDesc('gpa');
+            ->orderByDesc('gpa')
+            ->orderBy('rank');
 
         // Filters
         if ($request->has('class_room_id')) {
@@ -308,6 +309,37 @@ class StatisticsController extends Controller
         $subjects = Subject::select('id', 'name')->orderBy('name')->get();
 
         return view('admin.statistics.rankings', compact('rankings', 'classRooms', 'subjects'));
+    }
+
+    /**
+     * Recalculate rankings manually
+     */
+    public function recalculateRankings(Request $request)
+    {
+        try {
+            $rankingService = app(\App\Services\RankingService::class);
+            
+            if ($request->has('class_room_id')) {
+                // Tính cho một lớp cụ thể
+                $updated = $rankingService->calculateClassRoomRanking($request->class_room_id);
+                $message = "Đã cập nhật xếp hạng cho {$updated} học sinh trong lớp này";
+            } else {
+                // Tính cho tất cả
+                $updated = $rankingService->calculateAllRankings();
+                $message = "Đã cập nhật xếp hạng cho {$updated} học sinh";
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'total_updated' => $updated
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
