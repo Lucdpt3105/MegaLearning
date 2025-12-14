@@ -57,9 +57,10 @@ class DatabaseSeeder extends Seeder
             ForumSeeder::class,                // Forum discussions
         ]);
         
-        // Step 6: Rankings & Statistics
-        $this->command->info('🏆 Step 6: Student Rankings');
+        // Step 6: Activity Logs & Rankings
+        $this->command->info('📊 Step 6: Activity Logs & Rankings');
         $this->call([
+            ActivityLogSeeder::class,          // Activity logs for statistics
             StudentRankingSeeder::class,       // Calculate student rankings
         ]);
         
