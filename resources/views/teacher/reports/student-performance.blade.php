@@ -122,7 +122,7 @@
                             <td>
                                 <strong>{{ $submission->exam->title }}</strong>
                                 <br>
-                                <small class="text-muted">{{ $submission->exam->subject->name }}</small>
+                                <small class="text-muted">{{ $submission->exam->subject ? $submission->exam->subject->name : 'N/A' }}</small>
                             </td>
                             <td>
                                 @if($submission->submitted_at)

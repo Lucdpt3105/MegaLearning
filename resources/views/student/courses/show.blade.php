@@ -18,13 +18,13 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-3xl font-bold mb-2">{{ $classRoom->name }}</h1>
-                <p class="text-indigo-100 text-lg mb-2">{{ $classRoom->subject->name }}</p>
+                <p class="text-indigo-100 text-lg mb-2">{{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }}</p>
                 <div class="flex items-center space-x-4 text-sm">
                     <span class="flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        {{ $classRoom->teacher->name }}
+                        {{ $classRoom->teacher ? $classRoom->teacher->name : 'N/A' }}
                     </span>
                     <span class="flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@
                         </div>
                     @endif
                     <div>
-                        <p class="font-semibold text-gray-900">{{ $classRoom->teacher->name }}</p>
+                        <p class="font-semibold text-gray-900">{{ $classRoom->teacher ? $classRoom->teacher->name : 'N/A' }}</p>
                         <p class="text-sm text-gray-600">{{ $classRoom->teacher->email }}</p>
                     </div>
                 </div>

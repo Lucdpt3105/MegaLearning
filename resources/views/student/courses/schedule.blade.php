@@ -18,7 +18,7 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Lịch Học</h1>
-        <p class="text-gray-600">{{ $classRoom->name }} - {{ $classRoom->subject->name }}</p>
+        <p class="text-gray-600">{{ $classRoom->name }} - {{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }}</p>
     </div>
 
     <!-- Navigation Tabs -->

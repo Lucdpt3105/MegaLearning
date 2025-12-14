@@ -14,7 +14,10 @@
             </a>
             <div class="flex-1">
                 <h1 class="text-3xl font-bold text-gray-900">{{ $videoCall->title }}</h1>
-                <p class="text-gray-600 mt-1">{{ $videoCall->classRoom->name }} - {{ $videoCall->classRoom->subject->name }}</p>
+                <p class="text-gray-600 mt-1">
+                    {{ $videoCall->classRoom ? $videoCall->classRoom->name : 'N/A' }} - 
+                    {{ $videoCall->classRoom && $videoCall->classRoom->subject ? $videoCall->classRoom->subject->name : 'N/A' }}
+                </p>
             </div>
             <span class="px-4 py-2 rounded-full text-sm font-semibold
                 {{ $videoCall->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : '' }}

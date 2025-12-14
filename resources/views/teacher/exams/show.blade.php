@@ -68,7 +68,7 @@
                                 {{ ucfirst($exam->type) }}
                             </span>
                             <span class="text-sm text-gray-600">
-                                {{ $exam->subject->name }} 
+                                {{ $exam->subject ? $exam->subject->name : 'N/A' }} 
                                 @if($exam->classRoom)
                                     - {{ $exam->classRoom->name }}
                                 @endif
