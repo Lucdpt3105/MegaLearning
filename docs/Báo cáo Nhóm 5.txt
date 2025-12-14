@@ -1,0 +1,487 @@
+﻿BỘ KHOA HỌC VÀ CÔNG NGHỆ
+HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG
+
+
+BÁO CÁO ĐỒ ÁN MÔN HỌC: 
+NHẬP MÔN CÔNG NGHỆ PHẦN MỀM
+ĐỀ TÀI: MINI APP HỖ TRỢ HỌC TẬP VÀ THI TRỰC TUYẾN
+
+
+
+Môn học: Nhập môn công nghệ phần mềm (INT1340)
+Giảng viên hướng dẫn:  Châu Văn Vân
+Thực hiện bởi nhóm sinh viên, bao gồm:
+
+1. Hoàng CườngN21DCAT007<Trưởng nhóm>2.  Hoàng Quang MinhN23DCCN106<Thành viên>3.  Phùng Anh LựcN23DCPT033<Thành viên>4.  Nguyễn Thái TuấnN23DCPT054<Thành viên>
+
+
+
+TP.HCM, tháng 12/2025
+MỤC LỤC
+MỤC LỤC	2
+DANH SÁCH HÌNH, BẢNG	4
+LỜI CẢM ƠN	5
+TÓM TẮT	6
+CHƯƠNG 1 TỔNG QUAN DỰ ÁN	8
+1.1. ĐỀ XUẤT DỰ ÁN (PROJECT PROPOSAL)	8
+1.1.1 Bảng Phân Công và Đánh Giá Thành Viên	8
+1.1.2 Phát Biểu Bài Toán (Problem Statement)	8
+1.2. GIẢI PHÁP ĐỀ XUẤT (PROPOSED SOLUTION)	9
+1.2.1 Yêu Cầu Chức Năng (Functional Requirements)	9
+1.2.2 Yêu Cầu Phi Chức Năng (Non-Functional Requirements)	14
+1.2.3 Kiến Trúc Hệ Thống và Công Nghệ (System Architecture & Technology)	18
+1.3. KẾ HOẠCH PHÁT TRIỂN	22
+1.3.1 Phương Pháp Luận Phát Triển: Agile-Scrum	22
+1.3.2 Lộ Trình Phát Triển và Phân Rã Sprints (Development Roadmap & Sprints)	23
+1.3.3 Kế Hoạch Kiểm Thử Tích Hợp (Integrated Testing Plan)	26
+1.4. KẾ HOẠCH NHÂN SỰ & CHI PHÍ	27
+1.4.1 Cơ Cấu Nhân Sự và Phân Công Vai Trò	27
+1.4.2 Ước Tính Chi Phí Dự Án	30
+CHƯƠNG 2 CHƯƠNG II. MÔ HÌNH UML	32
+2.1. Use Case Diagram	32
+2.2. Class Diagram	34
+2.3. Package Diagram	36
+2.4. Sequence Diagram	37
+2.5. Sơ đồ luồng (Flowchart)	41
+CHƯƠNG 3 DATABASE VÀ CODE MINH HỌA	42
+3.1. Database	42
+3.1.1 ERD (Entity Relationship Diagram)	42
+3.1.2 Mô tả các bảng chính và quan hệ	44
+3.1.3 Chức năng demo và Code minh họa	45
+CHƯƠNG 4 CHƯƠNG IV. KẾT QUẢ TEST VÀ SPRINT REPORT	47
+4.1. Kết quả test	47
+4.2. Sprint Report	47
+CHƯƠNG 5 KẾT QUẢ VÀ ĐỊNH HƯỚNG MỞ RỘNG	49
+5.1. Tổng kết và Hạn chế	49
+5.2. Đề xuất cải tiến và Định hướng mở rộng	49
+
+
+DANH SÁCH HÌNH, BẢNG
+Bảng  11 Bảng thông tin và phân công nhóm 5	8
+Bảng  12 Bảng Yêu Cầu Chức Năng Chi Tiết	9
+Bảng  13 Bảng Yêu Cầu Phi Chức Năng	14
+Sơ đồ 11 Sơ đồ kiến trúc tổng thể	20
+Bảng  15 Bảng Lộ Trình Phát Triển Dự Kiến	23
+Bảng  16 Bảng Phân Công Vai Trò và Trách Nhiệm	28
+Sơ đồ 21 Sơ đồ UC Học sinh	32
+Sơ đồ 22 Sơ đồ UC giáo viên	33
+Sơ đồ 23 Use Case Diagram (Admin + Hệ thống)	33
+Sơ đồ 24 Sơ đồ packages	36
+
+
+LỜI CẢM ƠN
+
+Nhóm 5 xin gửi lời cảm ơn chân thành đến Học viện Công nghệ Bưu chính Viễn thông đã tạo điều kiện thuận lợi về môi trường học tập và nghiên cứu, giúp sinh viên có cơ hội tiếp cận kiến thức nền tảng và thực tiễn trong lĩnh vực Công nghệ Phần mềm.
+Nhóm xin bày tỏ lòng biết ơn sâu sắc đến thầy Châu Văn Vân, giảng viên phụ trách học phần Nhập môn Công nghệ Phần mềm, người đã tận tình hướng dẫn, truyền đạt kiến thức chuyên môn và đưa ra những góp ý quý báu trong suốt quá trình thực hiện đồ án. Sự hướng dẫn và hỗ trợ của thầy là nền tảng quan trọng giúp nhóm hoàn thành dự án đúng định hướng và đạt được các mục tiêu đề ra.
+Mặc dù đã nỗ lực hết mình trong quá trình thực hiện, đồ án không thể tránh khỏi những thiếu sót do hạn chế về thời gian và kinh nghiệm thực tế. Nhóm 5 rất mong nhận được sự đóng góp ý kiến và chỉ dẫn thêm từ thầy cô để có thể tiếp tục hoàn thiện và phát triển đề tài trong thời gian tới.
+Nhóm 5 chúng em xin chân thành cảm ơn!
+
+TÓM TẮT
+
+Trong bối cảnh các nền tảng học tập trực tuyến ngày càng phát triển mạnh mẽ, nhu cầu xây dựng những hệ thống hỗ trợ học tập và thi cử trực tuyến một cách toàn diện, linh hoạt và an toàn trở nên cấp thiết. Xuất phát từ thực tế đó, nhóm thực hiện đề tài “Mini App Hỗ Trợ Học Tập & Thi Trực Tuyến” với mục tiêu xây dựng một ứng dụng web hỗ trợ quản lý môn học, khóa học và hoạt động học tập dành cho học sinh, giảng viên và quản trị viên.
+Dự án được phát triển theo phương pháp quản lý dự án Agile Scrum, sử dụng Jira làm công cụ quản lý công việc, theo dõi Sprint Backlog, tiến độ và phân công nhiệm vụ cho từng thành viên. Quá trình phát triển được chia thành nhiều Sprint ngắn, trong đó nhóm thực hiện đầy đủ các hoạt động của Scrum như Sprint Planning, theo dõi tiến độ, Sprint Review và Sprint Retrospective nhằm đảm bảo tính linh hoạt và khả năng thích nghi với thay đổi yêu cầu.
+Hệ thống cho phép giảng viên tạo và quản lý các môn học, khóa học, mở lớp cho học sinh tham gia, tổ chức các kỳ thi trực tuyến và quản lý tài liệu học tập. Học sinh có thể đăng ký môn học, tham gia thi, trao đổi trong lớp học, cũng như sử dụng diễn đàn hỏi đáp để thảo luận các bài tập khó với giảng viên và các học viên khác. Bên cạnh đó, hệ thống còn tích hợp chức năng nhắn tin theo lớp học và nhóm học tập, cho phép chia sẻ tài liệu và trao đổi thông tin học tập một cách thuận tiện. Một điểm nổi bật của dự án là việc tích hợp chatbot AI, hỗ trợ học sinh đặt câu hỏi liên quan đến môn học nhằm nâng cao trải nghiệm học tập.
+Ứng dụng được khởi tạo và phát triển trên nền tảng Laravel, kết hợp với cơ sở dữ liệu để quản lý người dùng, khóa học, môn học và các hoạt động học tập. Hệ thống được thiết kế với các cơ chế phân quyền rõ ràng giữa học sinh, giảng viên và quản trị viên. Admin panel cho phép quản trị nội dung, quản lý người dùng, khóa học và hỗ trợ xử lý các tình huống như đặt lại mật khẩu cho học sinh khi cần thiết. Ngoài ra, dự án cũng chú trọng đến các vấn đề bảo mật, đảm bảo an toàn dữ liệu và kiểm soát truy cập trong quá trình sử dụng.
+Kết quả của dự án là một hệ thống mini app học tập trực tuyến đáp ứng các yêu cầu cơ bản của đề tài, đồng thời thể hiện rõ việc áp dụng quy trình Agile Scrum trong quản lý và phát triển phần mềm. Dự án hướng tới việc mô phỏng và tiếp cận các mô hình website học tập hiện đại hiện nay, làm nền tảng cho các hướng phát triển và mở rộng trong tương lai.
+
+CHƯƠNG 1 TỔNG QUAN DỰ ÁN 
+1.1.  ĐỀ XUẤT DỰ ÁN (PROJECT PROPOSAL)
+Chương này trình bày tổng quan dự án MegaLearning, bao gồm bài toán đặt ra, giải pháp đề xuất, các yêu cầu chức năng – phi chức năng, kiến trúc hệ thống, cũng như kế hoạch phát triển theo mô hình Agile Scrum và phân bổ nguồn lực của nhóm.
+1.1.1 Bảng Phân Công và Đánh Giá Thành Viên
+Bảng  11 Bảng thông tin và phân công nhóm 5
+MSSVHọ và Tên% Đóng góp (ước tính)Chữ kýN21DCAT007Hoàng Cường20%N23DCPT033Phùng Anh Lực30%N23DCCN106Hoàng Quang Minh24%N23DCPT054Nguyễn Thái Tuấn26%
+1.1.2 Phát Biểu Bài Toán (Problem Statement)
+Bối cảnh:
+Sự chuyển dịch mạnh mẽ sang mô hình giáo dục trực tuyến và kết hợp (hybrid learning) đã bộc lộ những thách thức đáng kể đối với cả người dạy và người học. Môi trường học tập số hiện nay thường bị phân mảnh, với tài liệu, thông báo và các kênh trao đổi nằm rải rác trên nhiều nền tảng khác nhau như Zalo, Google Drive, Email, và các hệ thống LMS (Learning Management System) riêng lẻ. Sự thiếu tích hợp này không chỉ gây khó khăn trong việc quản lý và truy cập thông tin mà còn làm giảm hiệu quả tương tác và cộng tác, những yếu tố cốt lõi của một môi trường giáo dục chất lượng.
+
+
+
+1.1.2.1. Các vấn đề chính:
+1. Thiếu một nền tảng học tập tập trung và tích hợp: Sinh viên và giảng viên phải liên tục chuyển đổi giữa nhiều ứng dụng để truy cập tài liệu, tham gia thảo luận nhóm, nộp bài tập và nhận thông báo. Điều này gây lãng phí thời gian, dễ bỏ sót thông tin quan trọng và tạo ra một trải nghiệm học tập rời rạc, thiếu tính liền mạch.
+2. Hạn chế trong tương tác và cộng tác: Các công cụ giao tiếp phổ thông không được thiết kế chuyên biệt cho mục đích học thuật. Việc thiếu một không gian thảo luận (diễn đàn Q&A) và các công cụ học nhóm trực tuyến (video call) tích hợp ngay trong nền tảng học tập khiến cho việc trao đổi kiến thức và làm việc nhóm trở nên kém hiệu quả.
+3. Khó khăn trong việc tổ chức và quản lý thi cử trực tuyến: Việc tạo, quản lý và tổ chức các kỳ thi trực tuyến một cách an toàn, công bằng và hiệu quả là một thách thức lớn. Giảng viên gặp khó khăn trong việc xây dựng ngân hàng câu hỏi, trộn đề thi, giám sát quá trình làm bài và chấm điểm tự động. Về phía sinh viên, các rủi ro về gian lận thi cử và sự thiếu minh bạch trong đánh giá vẫn là một mối quan ngại lớn.
+1.1.2.2. Mục tiêu của dự án:
+● Tập trung hóa việc quản lý môn học, tài liệu và đề thi.
+● Tăng cường tương tác thông qua các công cụ chat nhóm, diễn đàn hỏi đáp và gọi video học nhóm.
+● Cung cấp một môi trường thi cử trực tuyến an toàn, đáng tin cậy với các tính năng tự động hóa mạnh mẽ.
+● Phân quyền rõ ràng cho từng đối tượng người dùng (Admin, Giảng viên, Học viên) để đảm bảo an ninh và quản lý hiệu quả.
+
+1.2. GIẢI PHÁP ĐỀ XUẤT (PROPOSED SOLUTION)
+1.2.1 Yêu Cầu Chức Năng (Functional Requirements)
+Bảng  12 Bảng Yêu Cầu Chức Năng Chi Tiết
+ModuleVai tròUser StoryChi tiết Yêu cầu & Ràng buộcQuản lý Người dùng & Phân quyềnAdminLà Admin, tôi muốn tạo, xem, sửa, và xóa tài khoản cho giảng viên và học viên để quản lý người dùng trên toàn hệ thống.Hệ thống phải cho phép tạo tài khoản với vai trò được chỉ định (Giảng viên/Học viên). Mật khẩu người dùng phải được lưu trữ dưới dạng mã hóa (hashed). Admin có quyền đặt lại (reset) mật khẩu cho bất kỳ tài khoản nào.Giảng viên / Học viênLà một người dùng, tôi muốn đăng ký tài khoản, đăng nhập vào hệ thống và quản lý thông tin cá nhân của mình để có thể sử dụng các chức năng của ứng dụng.Quá trình đăng ký yêu cầu email hợp lệ. Hệ thống phải có chức năng "Quên mật khẩu". Người dùng có thể cập nhật thông tin cá nhân như họ tên, ảnh đại diện.Quản lý Khóa học & Tài liệuGiảng viênLà Giảng viên, tôi muốn tạo các khóa học mới, tải lên tài liệu (PDF, DOCX, video links) và tổ chức chúng theo từng chương hoặc bài học để sinh viên dễ dàng truy cập và theo dõi.Giao diện phải hỗ trợ tạo cấu trúc cây thư mục cho từng môn học. Hệ thống cần có giới hạn về dung lượng và định dạng file được phép tải lên. Giảng viên có thể thêm/xóa sinh viên vào khóa học của mình.Học viênLà Học viên, tôi muốn xem danh sách các khóa học mình đã đăng ký và truy cập, tải về tài liệu học tập để phục vụ cho việc học.Giao diện hiển thị danh sách khóa học một cách trực quan. Chức năng tìm kiếm tài liệu theo tên hoặc từ khóa.Thi Trực TuyếnGiảng viênLà Giảng viên, tôi muốn tạo ngân hàng câu hỏi, từ đó xây dựng các bộ đề thi trắc nghiệm, thiết lập thời gian bắt đầu/kết thúc và giới hạn thời gian làm bài để tổ chức các kỳ thi online.Hệ thống hỗ trợ nhiều loại câu hỏi (trắc nghiệm một/nhiều lựa chọn). Có chức năng tự động xáo trộn thứ tự câu hỏi và đáp án cho mỗi thí sinh. Cho phép xem lại lịch sử các kỳ thi đã tổ chức.Giảng viênLà Giảng viên, tôi muốn hệ thống tự động chấm điểm bài thi trắc nghiệm và xuất báo cáo kết quả để tiết kiệm thời gian và đảm bảo tính chính xác.Hệ thống tự động chấm điểm ngay sau khi sinh viên nộp bài hoặc hết giờ làm bài. Giảng viên có thể xem điểm chi tiết của từng sinh viên và thống kê phổ điểm của cả lớp.Học viênLà Học viên, tôi muốn tham gia làm bài thi trực tuyến trong khoảng thời gian cho phép và nhận được kết quả ngay sau khi hoàn thành.Giao diện làm bài thi phải rõ ràng, có đồng hồ đếm ngược. Hệ thống tự động nộp bài khi hết giờ. Sinh viên có thể xem lại điểm số và đáp án (nếu được giảng viên cho phép).Tương tác & Cộng tácGiảng viên / Học viênLà một người dùng, tôi muốn tham gia vào các nhóm chat theo từng môn học để trao đổi nhanh với các thành viên khác trong lớp.Cung cấp tính năng chat thời gian thực (real-time). Hỗ trợ gửi tin nhắn văn bản, hình ảnh và tệp đính kèm. Có thông báo khi có tin nhắn mới.Giảng viên / Học viênLà một người dùng, tôi muốn sử dụng diễn đàn Q&A của môn học để đặt câu hỏi và trả lời các thắc mắc liên quan đến bài giảng, giúp mọi người cùng học hỏi.Cho phép tạo chủ đề câu hỏi, bình luận và trả lời. Có chức năng đánh dấu câu trả lời hay nhất. Hỗ trợ tìm kiếm câu hỏi theo từ khóa.Học viênLà Học viên, tôi muốn tạo các cuộc gọi video để học nhóm và trao đổi trực tiếp với bạn bè, nâng cao hiệu quả hợp tác.Tích hợp API cho chức năng video call (ví dụ: WebRTC hoặc Zoom API).1 Cho phép mời thành viên vào cuộc gọi và chia sẻ màn hình.Báo cáo & Cải tiếnGiảng viênLà Giảng viên, tôi muốn xem các báo cáo thống kê về điểm số của sinh viên và hoạt động học tập trong các khóa học của mình để đánh giá hiệu quả giảng dạy.Hệ thống cung cấp các biểu đồ thống kê điểm số, tỷ lệ hoàn thành bài tập. Báo cáo hoạt động tương tác trên diễn đàn.
+1.2.2 Yêu Cầu Phi Chức Năng (Non-Functional Requirements)
+Bảng  13 Bảng Yêu Cầu Phi Chức Năng
+Hạng mụcYêu cầuChi tiết & Tiêu chí đo lườngTính hiệu năng (Performance)Hệ thống phải có thời gian phản hồi nhanh, đặc biệt trong các tác vụ quan trọng như thi cử và tải tài liệu.Thời gian phản hồi của các lời gọi API không được vượt quá 500ms trong điều kiện tải bình thường. Hệ thống phải có khả năng hỗ trợ ít nhất 100 người dùng tham gia thi đồng thời mà không bị suy giảm hiệu năng đáng kể. Thời gian tải trang chính (Dashboard) phải dưới 3 giây.Tính bảo mật (Security)Dữ liệu người dùng và thông tin thi cử phải được bảo vệ nghiêm ngặt. Hệ thống phải có khả năng chống lại các hình thức tấn công phổ biến.Tất cả mật khẩu người dùng phải được băm (hashed) bằng thuật toán mạnh như bcrypt. Áp dụng cơ chế phân quyền dựa trên vai trò (Role-Based Access Control - RBAC) một cách nghiêm ngặt. Toàn bộ dữ liệu truyền tải giữa client và server phải được mã hóa bằng giao thức HTTPS. Cần có các biện pháp phòng chống các lỗ hổng bảo mật web phổ biến như SQL Injection và Cross-Site Scripting (XSS).1.2.2.1. Tính khả dụng (Availability)Hệ thống phải hoạt động ổn định và luôn sẵn sàng để người dùng truy cập, đặc biệt trong các khung giờ cao điểm như thời gian thi.Hệ thống phải đạt độ sẵn sàng (uptime) ở mức 99.5%. Cần thiết lập cơ chế sao lưu cơ sở dữ liệu tự động hàng ngày để đảm bảo khả năng khôi phục dữ liệu khi có sự cố.Tính dễ sử dụng (Usability)Giao diện người dùng (UI) phải trực quan, nhất quán và dễ sử dụng cho cả giảng viên và sinh viên, kể cả những người không có nhiều kinh nghiệm về công nghệ.Thiết kế giao diện phải tuân thủ các nguyên tắc UI/UX hiện đại, đảm bảo tính nhất quán về màu sắc, font chữ và bố cục trên các màn hình. Người dùng mới có thể thực hiện các tác vụ cơ bản (tìm tài liệu, vào phòng thi, gửi tin nhắn) mà không cần hướng dẫn chi tiết. Ứng dụng phải có thiết kế đáp ứng (responsive), hoạt động tốt trên cả máy tính và thiết bị di động.Tính toàn vẹn dữ liệu (Integrity)Dữ liệu trong hệ thống phải luôn chính xác và nhất quán, đặc biệt là dữ liệu liên quan đến điểm số và kết quả thi.Hệ thống phải có các ràng buộc ở cấp độ cơ sở dữ liệu và logic nghiệp vụ để ngăn chặn dữ liệu không hợp lệ (ví dụ: không thể nộp bài sau khi đã hết giờ làm bài). Mọi thay đổi liên quan đến điểm số phải được ghi lại (logging) để phục vụ cho việc kiểm tra và truy vết khi cần.Khả năng mở rộng (Scalability)Kiến trúc hệ thống phải cho phép dễ dàng mở rộng trong tương lai để đáp ứng số lượng người dùng và dữ liệu ngày càng tăng.Hệ thống nên được thiết kế theo các module độc lập (ví dụ: module thi cử, module chat) để có thể nâng cấp hoặc mở rộng quy mô từng phần mà không ảnh hưởng đến toàn bộ hệ thống.
+1.2.3 Kiến Trúc Hệ Thống và Công Nghệ (System Architecture & Technology)
+
+1.2.3.1. Mô hình kiến trúc:
+Để đáp ứng các yêu cầu về tính linh hoạt, khả năng mở rộng và bảo trì, hệ thống sẽ được xây dựng dựa trên kiến trúc đa lớp (Multi-tier Architecture) và theo định hướng hướng dịch vụ (Service-Oriented). Kiến trúc này phân tách rõ ràng các thành phần của ứng dụng, tạo điều kiện cho việc phát triển và triển khai độc lập.
+Sự kết hợp giữa một "Mini App" ở phía client và một backend mạnh mẽ như Spring Boot đòi hỏi một kiến trúc tách biệt (decoupled), trong đó giao tiếp giữa hai bên được thực hiện hoàn toàn qua một bộ API được định nghĩa rõ ràng. Lựa chọn này không chỉ là một quyết định kỹ thuật mà còn là một chiến lược quan trọng để hỗ trợ quy trình phát triển Agile-Scrum. Nó cho phép đội ngũ Frontend và Backend làm việc song song, chỉ cần tuân thủ "hợp đồng API" đã thống nhất, từ đó tối ưu hóa tiến độ và hiệu quả của dự án.
+1.2.3.2. Hệ thống bao gồm ba lớp chính:
+1. Presentation Layer (Frontend): Đây là lớp giao diện người dùng, chịu trách nhiệm hiển thị dữ liệu và tương tác với người dùng. Lớp này sẽ được xây dựng dưới dạng một Single Page Application (SPA) sử dụng framework hiện đại như React.js hoặc Vue.js. SPA mang lại trải nghiệm người dùng mượt mà, nhanh chóng và phù hợp với khái niệm "Mini App" - nhẹ và linh hoạt. Toàn bộ giao tiếp với lớp backend sẽ được thực hiện thông qua các lời gọi RESTful API bất đồng bộ.
+2. Business Logic Layer (Backend): Lớp này là "bộ não" của hệ thống, chứa toàn bộ logic nghiệp vụ, xử lý các yêu cầu từ frontend, quản lý xác thực và phân quyền người dùng. Lớp backend sẽ được phát triển bằng Java với framework Spring Boot. Spring Boot cung cấp một hệ sinh thái mạnh mẽ để xây dựng các API hiệu suất cao và an toàn. Các module chức năng chính (Quản lý khóa học, Thi cử, Chat) sẽ được thiết kế thành các services riêng biệt để đảm bảo tính module hóa và dễ bảo trì.
+3. Data Access Layer (Database): Lớp này chịu trách nhiệm lưu trữ và truy xuất dữ liệu. Hệ quản trị cơ sở dữ liệu quan hệ MySQL sẽ được sử dụng để lưu trữ toàn bộ dữ liệu của ứng dụng, bao gồm thông tin người dùng, khóa học, ngân hàng câu hỏi, điểm số, và lịch sử tin nhắn.
+1.2.3.3. Sơ đồ kiến trúc tổng thể: 
+Sơ đồ kiến trúc tổng thể của hệ thống MegaLearning được mô hình hóa bằng Deployment Diagram, nhằm minh họa cách thức triển khai các thành phần chính của hệ thống và luồng dữ liệu giữa chúng. Kiến trúc hệ thống được xây dựng theo mô hình client–server, trong đó người dùng truy cập hệ thống thông qua trình duyệt web và tương tác với máy chủ ứng dụng Laravel.
+
+Cụ thể, phía Client Device bao gồm trình duyệt web được sử dụng bởi các đối tượng người dùng như quản trị viên, giảng viên và học viên. Các yêu cầu từ phía người dùng được gửi đến Application Server thông qua giao thức HTTP/HTTPS.
+
+Tại Application Server, Web Server (Apache/Nginx) tiếp nhận và chuyển tiếp các yêu cầu đến Laravel Application để xử lý nghiệp vụ. Ứng dụng Laravel được tổ chức theo mô hình MVC, trong đó các Controller chịu trách nhiệm xử lý yêu cầu, các Service đảm nhiệm nghiệp vụ và tích hợp dịch vụ bên thứ ba như Zoom API và Gemini AI, còn Policies đảm bảo kiểm soát phân quyền và bảo mật truy cập.
+
+Sơ đồ 11 Sơ đồ kiến trúc tổng thể
+
+Sơ đồ 12
+1.2.3.4. Công nghệ và Công cụ sử dụng:
+Hạng mụcCông nghệ / Công cụMô tảBackendSpring Boot (Java), Spring Security, Spring Data JPAFramework chính để xây dựng các RESTful API, xử lý logic nghiệp vụ và bảo mật.FrontendReact.js (đề xuất)Thư viện JavaScript để xây dựng giao diện người dùng tương tác và hiệu quả.DatabaseMySQL 8+Hệ quản trị cơ sở dữ liệu quan hệ để lưu trữ dữ liệu.Quản lý mã nguồnGit & GitHubHệ thống quản lý phiên bản phân tán và nền tảng lưu trữ mã nguồn công khai.1Kiểm thửJUnit, Mockito, Postman, SeleniumCác công cụ chuyên dụng cho kiểm thử đơn vị, kiểm thử API và kiểm thử tự động giao diện người dùng.Triển khai & Vận hànhDocker, Jenkins (cho CI/CD)Công nghệ container hóa để đóng gói ứng dụng và công cụ tự động hóa quá trình tích hợp và triển khai liên tục (CI/CD).Môi trường phát triểnVisual Studio Code, Spring Tool Suite (STS), Các trình soạn thảo mã và môi trường phát triển tích hợp (IDE) hỗ trợ phát triển hiệu quả.
+1.3. KẾ HOẠCH PHÁT TRIỂN
+Kế hoạch phát triển của dự án sẽ từ bỏ hoàn toàn mô hình thác nước (waterfall) tuần tự như trong các phương pháp truyền thống. Thay vào đó, dự án sẽ áp dụng phương pháp luận Agile-Scrum. Cách tiếp cận này nhấn mạnh vào sự linh hoạt, phát triển lặp lại và tăng trưởng, cho phép nhóm thích ứng nhanh với các thay đổi và liên tục cung cấp giá trị cho người dùng cuối qua từng chu kỳ phát triển ngắn.
+
+1.3.1 Phương Pháp Luận Phát Triển: Agile-Scrum
+
+Dự án sẽ được quản lý và vận hành theo khuôn khổ Scrum, một trong những phương pháp phổ biến nhất của Agile.
+1.3.1.1. Các vai trò trong Scrum:
+○ Product Owner: Vai trò này sẽ do Giảng viên phụ trách học phần đảm nhiệm. Product Owner là người đại diện cho các bên liên quan (stakeholders), chịu trách nhiệm xác định các yêu cầu và ưu tiên hóa các hạng mục trong Product Backlog để tối đa hóa giá trị của sản phẩm.
+○ Scrum Master: Vai trò này do Trưởng nhóm Hoàng Cường(dự kiến) đảm nhận. Scrum Master không phải là người quản lý truyền thống mà là người hỗ trợ, đảm bảo nhóm tuân thủ đúng quy trình Scrum, loại bỏ các trở ngại (impediments) và tạo điều kiện tốt nhất cho đội ngũ phát triển làm việc.
+○ Development Team: Bao gồm tất cả 4 thành viên của nhóm. Đây là một đội ngũ tự quản, liên chức năng, có đủ kỹ năng (backend, frontend, QA) để biến các hạng mục trong Product Backlog thành một phần sản phẩm có thể sử dụng được (Increment) vào cuối mỗi Sprint.
+1.3.1.2. Các sự kiện (Events) trong Scrum:
+○ Sprint: Là trái tim của Scrum, là những chu kỳ phát triển ngắn, có khung thời gian cố định. Dự án đề xuất mỗi Sprint kéo dài 2 tuần.
+○ Sprint Planning: Diễn ra vào đầu mỗi Sprint, nơi cả nhóm cùng nhau lên kế hoạch công việc. Nhóm sẽ chọn các hạng mục có độ ưu tiên cao nhất từ Product Backlog để đưa vào Sprint Backlog.
+○ Daily Scrum: Một cuộc họp ngắn (tối đa 15 phút) diễn ra hàng ngày để các thành viên đồng bộ hóa công việc và lên kế hoạch cho 24 giờ tiếp theo.
+○ Sprint Review: Diễn ra vào cuối mỗi Sprint, nơi nhóm trình diễn (demo) sản phẩm đã hoàn thành (Increment) cho Product Owner và các bên liên quan để nhận phản hồi.
+○ Sprint Retrospective: Là sự kiện cuối cùng trong Sprint, nơi nhóm tự nhìn lại quá trình làm việc của mình để tìm ra những điểm cần cải tiến cho Sprint tiếp theo.
+1.3.1.3. Các tạo tác (Artifacts) trong Scrum:
+○ Product Backlog: Một danh sách được sắp xếp theo thứ tự ưu tiên của tất cả các tính năng, yêu cầu, cải tiến cần có trong sản phẩm.
+○ Sprint Backlog: Một tập hợp các hạng mục từ Product Backlog được chọn để phát triển trong một Sprint, cùng với kế hoạch để hoàn thành chúng.
+○ Increment: Tổng hợp của tất cả các hạng mục Product Backlog đã được hoàn thành trong một Sprint và các Sprint trước đó. Vào cuối mỗi Sprint, Increment phải ở trạng thái "Done", nghĩa là có thể sử dụng được.
+
+1.3.2 Lộ Trình Phát Triển và Phân Rã Sprints (Development Roadmap & Sprints)
+Bảng  14 Bảng Lộ Trình Phát Triển Dự Kiến
+SprintThời gian (Tuần)Mục tiêu chính của SprintCác chức năng chính dự kiến hoàn thành (Increment)Sprint 0Tuần 1Thiết lập & Nền tảngCài đặt môi trường phát triển (IDE, DB, JDK). Khởi tạo project Spring Boot và React. Thiết lập GitHub repository. Xây dựng pipeline CI/CD cơ bản. Thiết kế chi tiết lược đồ cơ sở dữ liệu.Sprint 1Tuần 2-3Lõi Hệ thống & Quản lý Người dùngHoàn thành các API và giao diện cho chức năng Đăng ký, Đăng nhập, Đăng xuất. Triển khai phân quyền cơ bản cho 3 vai trò: Admin, Giảng viên, Học viên.Sprint 2Tuần 4-5Quản lý Khóa học & Tài liệuGiảng viên có thể tạo/sửa/xóa khóa học. Giảng viên có thể tải lên và quản lý tài liệu theo cấu trúc thư mục. Học viên có thể xem danh sách khóa học và truy cập tài liệu.Sprint 3Tuần 6-7Module Thi Trực Tuyến (Phần 1)Giảng viên tạo được ngân hàng câu hỏi và đề thi trắc nghiệm. Học viên có thể vào phòng thi và làm bài thi. Hệ thống tự động chấm điểm và lưu kết quả.Sprint 4Tuần 8-9Module Tương tác & Báo cáoHoàn thành chức năng Chat nhóm theo môn học. Xây dựng Diễn đàn Q&A cơ bản. Giảng viên xem được báo cáo thống kê điểm số của sinh viên.Sprint 5Tuần 10Hoàn thiện & Tích hợp Nâng caoTích hợp API Video Call cho chức năng học nhóm. Tinh chỉnh toàn bộ UI/UX dựa trên phản hồi. Sửa các lỗi còn tồn đọng và chuẩn bị sản phẩm cho buổi báo cáo cuối kỳ.
+1.3.2.1. Các Issues đã được tạo trên github\
+Tiến độ hoàn thành các nhiệm vụ được phân bổ (issues) được theo dõi và đánh giá định kỳ hàng tuần, chi tiết hóa trách nhiệm thực hiện cho từng cá nhân trong nhóm phát triển.
+Ảnh  11 Các Issues đã được solved
+
+1.3.3 Kế Hoạch Kiểm Thử Tích Hợp (Integrated Testing Plan)
+Trong Scrum, kiểm thử không phải là một giai đoạn cuối cùng mà là một hoạt động diễn ra liên tục và song song với quá trình phát triển trong mỗi Sprint. Kế hoạch kiểm thử của dự án sẽ sử dụng các công cụ được yêu cầu 1 để đảm bảo chất lượng ở nhiều cấp độ.
+1.3.3.1. Kiểm thử Đơn vị (Unit Testing) là giai đoạn kiểm thử cơ sở, tập trung vào việc xác minh tính đúng đắn của các thành phần mã nguồn riêng lẻ.
+• Công cụ: PHPUnit (Framework kiểm thử tự động chính cho PHP).
+• Mục tiêu: Đảm bảo từng thành phần nhỏ nhất của mã nguồn (hàm, phương thức trong Model, lớp Services) hoạt động đúng như thiết kế. Cụ thể:
+o Kiểm tra logic nghiệp vụ phức tạp (ví dụ: hàm tính điểm tự động của kỳ thi, quy tắc xếp hạng).
+o Kiểm tra tính năng của các lớp dịch vụ (Services) độc lập, bao gồm logic xử lý trong AIService.php (cho Gemini AI) và ZoomService.php (cho Video Call).
+o Xác minh tính đúng đắn của các ràng buộc và logic trong Eloquent Models (Models).
+• Quy trình:
+o Lập trình viên Backend chịu trách nhiệm viết Unit Test cho các logic nghiệp vụ mà mình phát triển.
+o Các bài kiểm thử được lưu trữ trong thư mục tests/Unit/ của dự án.
+o Độ bao phủ mã nguồn (code coverage) của các bài test phải đạt một ngưỡng tối thiểu đã thống nhất.
+• Lệnh chạy kiểm thử:
+Bash
+php artisan test --testsuite=Unit 
+1.3.3.2. Kiểm thử Tích hợp (Integration Testing):
+○ Công cụ: PHPUnit.
+○ Mục tiêu: Kiểm tra sự tương tác và luồng dữ liệu giữa các thành phần khác nhau của hệ thống, ví dụ như từ Controller layer xuống Service layer và tương tác với Database.
+○ Quy trình: Các bài test tích hợp sẽ được thực hiện để xác minh các luồng nghiệp vụ hoàn chỉnh, ví dụ như luồng đăng ký tài khoản mới từ API request đến việc lưu trữ thành công trong CSDL.
+1.3.3.3. Kiểm thử API (API Testing):
+○ Công cụ: Thunder Client
+○ Mục tiêu: Xác minh rằng tất cả các RESTful API endpoints hoạt động đúng như đặc tả (request format, response format, status codes, error handling).
+○ Quy trình: Kỹ sư QA (Nguyễn Thái Tuấn) sẽ tạo và duy trì một bộ sưu tập (collection) các bài test API trên Postman. Bộ test này sẽ được chạy tự động trong pipeline CI/CD để phát hiện lỗi sớm mỗi khi có thay đổi trong mã nguồn backend.
+1.3.3.4. Kiểm thử Giao diện Người dùng (UI Testing):
+○ Công cụ: Selenium WebDriver.
+○ Mục tiêu: Tự động hóa việc kiểm thử các kịch bản sử dụng của người dùng trên giao diện web để đảm bảo trải nghiệm người dùng không bị lỗi sau mỗi lần cập nhật.
+○ Quy trình: Kỹ sư QA sẽ viết các kịch bản test tự động cho các luồng quan trọng như đăng nhập, nộp bài thi, gửi tin nhắn chat. Các kịch bản này sẽ được thực thi trên nhiều trình duyệt khác nhau để đảm bảo tính tương thích.
+1.3.3.5. Kiểm thử Chấp nhận Người dùng (User Acceptance Test - UAT):
+○ Mục tiêu: Xác nhận rằng các chức năng được phát triển trong Sprint đáp ứng đúng yêu cầu và mong đợi của người dùng.
+○ Quy trình: Hoạt động này sẽ diễn ra trong buổi Sprint Review cuối mỗi Sprint. Nhóm sẽ demo sản phẩm cho Giảng viên (vai trò Product Owner) để nhận phản hồi trực tiếp. Phản hồi này sẽ được ghi nhận và đưa vào Product Backlog để lên kế hoạch cho các Sprint tiếp theo.
+
+1.4. KẾ HOẠCH NHÂN SỰ & CHI PHÍ
+1.4.1 Cơ Cấu Nhân Sự và Phân Công Vai Trò
+Cơ cấu nhân sự được xây dựng dựa trên các vai trò chuyên môn hóa cần thiết cho một đội ngũ phát triển phần mềm theo mô hình Agile. Việc phân công rõ ràng trách nhiệm giúp tối ưu hóa luồng công việc và đảm bảo mọi khía cạnh của dự án, từ phát triển đến đảm bảo chất lượng, đều được phụ trách bởi thành viên có chuyên môn phù hợp.
+Bảng Phân Công Vai Trò và Trách Nhiệm
+Bảng  15 Bảng Phân Công Vai Trò và Trách Nhiệm
+Họ và TênVai trò trong dự án(dự kiến)Nhiệm vụ chínhHoàng CườngProject Leader / Scrum MasterĐiều phối hoạt động chung của nhóm. Lên kế hoạch và điều hành các sự kiện Scrum (Sprint Planning, Daily Scrum, Review, Retrospective). Theo dõi tiến độ, giải quyết các rào cản. Quản lý GitHub repository và tài liệu dự án.Phùng Anh LựcBackend DeveloperChịu trách nhiệm chính về việc thiết kế, phát triển và bảo trì backend bằng Spring Boot. Xây dựng và triển khai các RESTful API. Thiết kế và làm việc với cơ sở dữ liệu MySQL. Viết Unit Test và Integration Test (sử dụng JUnit).Hoàng Quang MinhFrontend DeveloperChịu trách nhiệm chính về việc phát triển giao diện người dùng (UI) bằng React.js. Chuyển đổi các thiết kế UI/UX thành mã nguồn có thể tương tác. Tích hợp các API từ backend để hiển thị và gửi dữ liệu. Đảm bảo trải nghiệm người dùng tốt trên các thiết bị.Nguyễn Thái TuấnQA & DevOps EngineerXây dựng và thực thi kế hoạch kiểm thử tổng thể. Viết và duy trì các kịch bản kiểm thử tự động (Selenium, Postman). Thiết lập, cấu hình và duy trì pipeline Tích hợp/Triển khai Liên tục (CI/CD). Quản lý môi trường triển khai và giám sát hoạt động của ứng dụng.
+1.4.2 Ước Tính Chi Phí Dự Án
+Chi phí nhân công:
+Ước tính dựa trên mức lương giả định cho vị trí thực tập sinh (Intern) ngành Công nghệ thông tin.
+● Giả định mức lương: 30,000 VNĐ/giờ.
+● Tổng thời gian dự án: 10 tuần.
+● Ước tính giờ làm việc mỗi thành viên: 10 giờ/tuần.
+● Tổng số giờ công của dự án: 4 thành viên × 10 giờ/tuần × 10 tuần = 400 giờ.
+● Tổng chi phí nhân công: 400 giờ × 30,000 VNĐ/giờ = 12,000,000 VNĐ.
+Chi phí công cụ và hạ tầng:
+Dự án sẽ tận dụng tối đa các công cụ mã nguồn mở và các gói dịch vụ miễn phí dành cho sinh viên để tối ưu hóa chi phí.
+● Hosting & Database: Sử dụng các gói miễn phí cho sinh viên như Azure for Students, AWS Educate, hoặc Heroku free tier. Chi phí: 0 VNĐ.
+● Quản lý mã nguồn: Sử dụng gói miễn phí của GitHub cho các repository công khai. Chi phí: 0 VNĐ.
+● Công cụ phát triển: Các IDE và công cụ như VS Code, Spring Tool Suite, Postman đều có phiên bản miễn phí. Chi phí: 0 VNĐ.
+● Chi phí khác: Bao gồm các chi phí nhỏ phát sinh như in ấn tài liệu báo cáo, chi phí cho các buổi họp nhóm offline (nếu có). Ước tính: 500,000 VNĐ.
+Bảng Tổng Hợp Chi Phí Dự Án
+Bảng  16 Bảng Tổng Hợp Chi Phí Dự Án
+Loại chi phíSố tiền (VNĐ)Chi phí nhân công12,000,000Chi phí hạ tầng & công cụ500,000Tổng cộng (ước tính)12,500,000Nhận xét:
+Tất cả thành viên đều tham gia đồng đều trong suốt quá trình phát triển, không phân chia cứng vai trò. Tổng chi phí được xây dựng dựa trên mức lương intern thực tế và giả định sử dụng công cụ miễn phí cho sinh viên. Mức chi phí này hợp lý, phản ánh đúng khối lượng công việc và thời gian nhóm đầu tư cho dự án học phần.
+
+CHƯƠNG 2 MÔ HÌNH UML
+
+2.1. Use Case Diagram
+Trình bày vai trò và chức năng chính của từng đối tượng.
+
+Sơ đồ 22 Sơ đồ UC giáo viên
+
+
+Sơ đồ 23 Use Case Diagram (Admin + Hệ thống)
+
+2.2. Class Diagram
+Mô tả cấu trúc đối tượng và quan hệ giữa các class.
+
+2.3. Package Diagram
+Sơ đồ trên mô tả cấu trúc tổng thể của hệ thống MegaLearning được xây dựng theo mô hình phân tầng.
+Tầng trình bày (Presentation Layer) chịu trách nhiệm giao tiếp với người dùng thông qua giao diện web.
+Tầng ứng dụng (Application Layer) xử lý các yêu cầu nghiệp vụ thông qua các Controller tương ứng với từng vai trò.
+Tầng nghiệp vụ (Business Layer) chứa các Service xử lý logic phức tạp và tích hợp với các dịch vụ bên ngoài như Zoom API và Gemini AI.
+Tầng miền dữ liệu (Domain & Data Layer) quản lý dữ liệu, phân quyền và tương tác với cơ sở dữ liệu MySQL.
+Sơ đồ 24 Sơ đồ packages
+
+
+CHƯƠNG 3 DATABASE (CƠ SỞ DỮ LIỆU ĐỒ ÁN)
+3.1.  Mục Tiêu và Yêu Cầu (Objectives and Requirements)
+Phần này xác định vai trò, mục tiêu cụ thể, và các yêu cầu chức năng cũng như phi chức năng mà hệ thống Cơ sở Dữ liệu (CSDL) cần phải đáp ứng để vận hành nền tảng học tập trực tuyến MegaLearning.
+3.1.1 Mục Tiêu Của Hệ Thống CSDL
+Mục tiêu chính của hệ thống CSDL là cung cấp một giải pháp lưu trữ, truy xuất và quản lý dữ liệu ổn định, bảo mật và hiệu quả cho toàn bộ nền tảng MegaLearning. Cụ thể:
+• Đảm bảo Tính bền vững của Dữ liệu (Data Persistence): Lưu trữ lâu dài mọi thông tin quan trọng của hệ thống (từ tài khoản người dùng, cấu trúc khóa học, đề thi đến lịch sử giao tiếp).
+• Hỗ trợ Tương tác Thời gian thực (Real-time Support): Đảm bảo CSDL có thể xử lý các giao dịch dữ liệu với độ trễ thấp để hỗ trợ các tính năng động như Chat thời gian thực và Thông báo (Notifications).
+• Dễ dàng Quản lý và Phát triển: Cấu trúc CSDL phải dễ dàng mở rộng và bảo trì, tương thích hoàn hảo với Framework Laravel 12.x.
+3.1.2 Yêu Cầu Chức Năng Đối với CSDL (Functional Requirements)
+Hệ thống CSDL phải hỗ trợ toàn diện các tính năng cốt lõi của nền tảng, bao gồm khả năng lưu trữ và quản lý các loại dữ liệu sau:
+• Quản lý Tài khoản và Phân quyền: Lưu trữ thông tin chi tiết của người dùng và hỗ trợ kiểm soát truy cập dựa trên vai trò (Admin, Teacher, Student).
+• Quản lý Nội dung Học tập (CRUD): Hỗ trợ tạo, đọc, cập nhật và xóa (CRUD) các thực thể về Môn học, Chủ đề, và Thư viện Tài liệu học tập.
+• Quản lý Kỳ thi: Lưu trữ cấu trúc đề thi, các loại câu hỏi (trắc nghiệm, tự luận), đáp án, thời gian thi, và kết quả chấm điểm.
+• Quản lý Giao tiếp và Hợp tác:
+o Lưu trữ lịch sử hội nghị Video (thông tin cuộc gọi Zoom/Jitsi).
+o Lưu trữ tin nhắn và nhật ký hỏi đáp của Trợ lý Chat AI (Google Gemini AI).
+o Lưu trữ dữ liệu của Diễn đàn Q&A (bài viết, trả lời, hệ thống vote).
+• Quản lý Dữ liệu Thống kê: Lưu trữ dữ liệu về Điểm danh và Xếp hạng Học sinh để phục vụ việc tạo Leaderboards và theo dõi thành tích.
+3.1.3 Yêu Cầu Phi Chức năng (Non-Functional Requirements)
+• Hiệu năng (Performance):
+o Phải tối ưu hóa cho các truy vấn phức tạp và thường xuyên (ví dụ: tạo Leaderboard, tìm kiếm trên Diễn đàn, truy vấn dữ liệu Chat thời gian thực).
+o Phải duy trì tốc độ truy xuất nhanh chóng để hỗ trợ trải nghiệm người dùng không bị gián đoạn.
+• Bảo mật (Security):
+o Đảm bảo tính bảo mật và riêng tư của dữ liệu người dùng (ví dụ: mật khẩu phải được mã hóa).
+o Hỗ trợ cơ chế phân quyền chi tiết (Policies) để chỉ người dùng có quyền (ví dụ: Giáo viên) mới được truy cập dữ liệu nhạy cảm (ví dụ: đáp án, bài làm của học sinh).
+o Hỗ trợ Xác thực API dựa trên token Sanctum.
+• Tính toàn vẹn (Integrity):
+o Dữ liệu phải được chuẩn hóa (ví dụ: đạt chuẩn 3NF) để tránh dư thừa và mâu thuẫn dữ liệu.
+o Sử dụng các ràng buộc (Constraints) như Khóa ngoại (FK) để đảm bảo mối quan hệ giữa các bảng luôn hợp lệ.
+• Tính khả dụng và Công cụ:
+o Hệ thống CSDL phải hoạt động trên nền tảng MySQL >= 8.0.
+o Phải dễ dàng thiết lập và khởi tạo dữ liệu mẫu thông qua Database Seeding.
+
+
+3.2. ERD (Entity Relationship Diagram)
+
+1.1.1 
+3.2.1 Mô tả các bảng chính và quan hệ
+1. Users Gồm các trường: user_id (PK), user_name, user_email, user_password, user_role, created_at, status. Đại diện cho người dùng hệ thống (học sinh, giáo viên, admin).
+2. Subjects Gồm subject_id (PK), subject_name. Môn học, có thể chứa nhiều topic (chủ đề) và nhiều kỳ thi.
+3. Topics Gồm topic_id (PK), topic_name, topic_subject_id (FK → Subjects.subject_id). Mỗi môn học có nhiều chủ đề (1-n).
+4. Questions Gồm question_id (PK), question_text, question_topic_id (FK → Topics.topic_id), question_type_id (FK → QuestionTypes.question_type_id), question_difficulty. Câu hỏi được gắn với một topic và có một loại (MCQ, tự luận...).
+5. Answers Gồm answer_id (PK), answer_text, answer_question_id (FK → Questions.question_id), is_correct. Mỗi câu hỏi có nhiều đáp án (1-n).
+6. Exams Gồm exam_id (PK), exam_title, exam_subject_id (FK → Subjects.subject_id), exam_date, exam_duration, total_marks. Kỳ thi thuộc về một môn học.
+7. ExamQuestions (bảng trung gian) Gồm exam_question_id (PK), exam_question_exam_id (FK → Exams.exam_id), exam_question_question_id (FK → Questions.question_id). Thể hiện quan hệ n-n giữa Exams và Questions.
+8. UserExams Gồm user_exam_id (PK), user_exam_user_id (FK → Users.user_id), user_exam_exam_id (FK → Exams.exam_id), user_exam_score. Ghi nhận mỗi học sinh tham gia một kỳ thi.
+9. ExamResults Gồm exam_result_id (PK), exam_result_user_exam_id (FK → UserExams.user_exam_id), exam_result_question_id (FK → Questions.question_id), exam_result_selected_answer_id (FK → Answers.answer_id). Lưu chi tiết kết quả làm bài.
+Quan hệ chính
+• Users – UserExams – Exams: quan hệ n-n (nhiều học sinh có thể thi nhiều kỳ thi).
+• Exams – ExamQuestions – Questions: quan hệ n-n (một kỳ thi gồm nhiều câu hỏi, một câu hỏi có thể tái sử dụng ở nhiều kỳ thi).
+• Questions – Answers: quan hệ 1-n.
+• Subjects – Topics – Questions: quan hệ 1-n.
+• UserExams – ExamResults: quan hệ 1-n.
+
+3.3. CƠ SỞ DỮ LIỆU THỰC HIỆN HOÀN THÀNH TRONG DỰ ÁN
+Cơ sở Dữ liệu (CSDL) của nền tảng MegaLearning được xây dựng trên MySQL Server ( 8.0 ), với mô hình quan hệ phức tạp, được chuẩn hóa và tối ưu hóa để hỗ trợ các tính năng thời gian thực và quản lý nội dung lớn.
+Tổng thể CSDL bao gồm 45 bảng (tables), được tổ chức thành năm nhóm chức năng chính như sau:
+3.3.1  Phân Tích Tổng Quan Cấu Trúc CSDL
+3.3.2 Quy mô và Đặc điểm
+• Tổng số Bảng: 45 bảng (đã bao gồm các bảng cốt lõi, bảng trung gian/pivot, và các bảng phiên/cache).
+• Mô hình: Quan hệ (Relational), được quản lý bằng Eloquent ORM của Laravel.
+• Mục tiêu: Đảm bảo khả năng lưu trữ bền vững, truy vấn hiệu quả và toàn vẹn dữ liệu cho mọi luồng nghiệp vụ.
+3.3.3 Chuẩn hóa và Toàn vẹn Tham chiếu
+Cấu trúc CSDL đạt Chuẩn hóa Mức 3 (3NF). Toàn bộ các mối quan hệ nhiều-nhiều được giải quyết bằng các bảng trung gian (Pivot Tables).
+• Ràng buộc Toàn vẹn: Các ràng buộc Khóa Chính (PK) và Khóa Ngoại (FK) được định nghĩa rõ ràng trong các file Migration. Điều này đảm bảo tính nhất quán dữ liệu (ví dụ: một submission [bài làm] luôn phải liên kết đến một exam [kỳ thi] và một user [học sinh] hợp lệ).
+3.4. Cấu Trúc Bảng Theo Nhóm Chức năng
+45 bảng được phân chia và quản lý theo các nhóm logic, phản ánh các module chính của hệ thống.
+3.4.1.1. Nhóm 1: Quản lý Người dùng và Phân quyền (8 Bảng)
+Nhóm này quản lý danh tính, xác thực, và kiểm soát truy cập.
+• Các Bảng Cốt lõi: users, password_reset_tokens.
+• Các Bảng Phân quyền: roles, permissions và các bảng trung gian liên kết (sử dụng cơ chế RBAC).
+3.4.1.2. Nhóm 2: Quản lý Nội dung Học tập (12 Bảng)
+Nhóm này lưu trữ toàn bộ cấu trúc kiến thức và tài liệu học.
+• Cấu trúc Nội dung: categories, subjects, topics.
+• Tài liệu: documents (lưu trữ metadata các file trên S3), media (nếu có sử dụng thư viện quản lý tệp).
+• Forum & Q&A: posts, comments, votes (phục vụ hệ thống upvote/downvote kiểu Stack Overflow).
+3.4.1.3. Nhóm 3: Quản lý Kỳ thi và Đánh giá (10 Bảng)
+Đây là nhóm bảng phức tạp nhất, quản lý luồng tạo đề, làm bài và kết quả.
+• Cấu trúc Đề thi: exams, questions, question_options.
+• Thực thi: submissions (bài làm), answers (chi tiết câu trả lời).
+• Kết quả: student_rankings (leaderboards ), attendance (theo dõi điểm danh ).
+3.4.1.4. Nhóm 4: Giao tiếp và Tương tác Thời gian thực (8 Bảng)
+Nhóm này hỗ trợ các tính năng cộng tác và thông báo.
+• Chat: chat_messages (lưu trữ tin nhắn người dùng và tương tác AI ).
+• Video Call: video_calls (lưu trữ thông tin cuộc gọi Zoom/Jitsi).
+• Thông báo: notifications, failed_jobs.
+3.4.1.5. Nhóm 5: Hệ thống và Cấu hình (7 Bảng)
+Các bảng hỗ trợ chức năng vận hành, phiên làm việc, và tích hợp.
+• settings (lưu cấu hình hệ thống), cache, sessions, api_tokens (cho Sanctum API authentication 7).
+3.5. Ứng dụng CSDL trong Dự án Laravel
+Việc quản lý CSDL được thực hiện một cách tự động và nhất quán, tuân thủ quy trình phát triển Laravel chuẩn.
+• Quản lý Cấu trúc (Migrations): Toàn bộ 45 bảng được tạo và quản lý phiên bản thông qua các file Migration. Điều này đảm bảo cấu trúc CSDL luôn đồng bộ giữa các môi trường (Dev, AWS Production).
+o Lệnh thực thi: php artisan migrate.
+• Khởi tạo Dữ liệu Mẫu (Seeders): Dự án sử dụng Database Seeding để tự động điền dữ liệu demo (bao gồm các tài khoản test mặc định) vào các bảng.
+o Lệnh thực thi: php artisan migrate:fresh --seed (thường dùng để thiết lập lại CSDL).
+• Tương tác (Eloquent ORM): Lập trình viên tương tác với 45 bảng thông qua các Models (được lưu trữ trong thư mục app/Models/) và Eloquent ORM, giúp trừu tượng hóa các câu lệnh SQL và tăng tốc độ phát triển.
+
+
+Ảnh  31 Các Bảng trong cơ sở dữ liệu khi hoàn thành dự án
+
+
+
+
+CHƯƠNG 4 CHỨC NĂNG CỦA TRANG WEB VÀ LOGIC
+4.1. Môi Trường và Công Nghệ Triển Khai
+Mục này trình bày chi tiết về môi trường phát triển (Development Environment) và các công nghệ cốt lõi được sử dụng để xây dựng hệ thống MegaLearning.
+4.2. Công Nghệ Nền Tảng (Core Stack)
+Bảng  41 Công nghệ dùng chạy dự án +  môi trường
+Hạng mụcCông nghệPhiên bảnMô tảBackendLaravel Framework12.xFramework PHP mạnh mẽ, sử dụng kiến trúc MVC để xây dựng logic nghiệp vụ và API.Ngôn ngữ BackendPHP>= 8.2Ngôn ngữ lập trình chính cho logic máy chủ.Cơ sở Dữ liệu (DB)MySQL>=8.0Hệ quản trị CSDL quan hệ, được quản lý thông qua Eloquent ORM của Laravel.FrontendHTML/CSS/JSHiện đạiGiao diện người dùng, sử dụng Tailwind CSS v4 cho phong cách thiết kế hiện đại và linh hoạt.Quản lý Dựng (Build)Vite5.xCông cụ Bundler cho giao diện người dùng, cung cấp tốc độ phát triển nhanh.
+4.3. Môi Trường Phát triển và Công cụ Hỗ trợ
+Ứng dụng MegaLearning được triển khai và vận hành trên nền tảng Amazon Web Services (AWS) để đảm bảo tính sẵn sàng cao, khả năng mở rộng (Scalability) và hiệu suất ổn định trong môi trường thực tế.
+4.3.1 Dịch vụ AWS Cốt lõi
+• Amazon EC2 (Elastic Compute Cloud): Được sử dụng để cung cấp máy chủ ảo (Virtual Server) cho ứng dụng Laravel Backend. Máy chủ này chạy PHP ( 8.2) và Web Server (Nginx hoặc Apache).
+• Amazon RDS (Relational Database Service): Được sử dụng để vận hành cơ sở dữ liệu MySQL ( 8.0). RDS giúp tự động hóa các tác vụ quản lý CSDL phức tạp như sao lưu, vá lỗi và mở rộng, đảm bảo tính bền vững và sẵn sàng cao của dữ liệu.
+• Amazon S3 (Simple Storage Service): Được sử dụng để lưu trữ các tài liệu, hình ảnh và các tệp tĩnh khác của người dùng (ví dụ: tài liệu học tập, ảnh đại diện). Điều này giảm tải cho EC2 và tăng tốc độ truy xuất tệp.
+
+Ảnh  41 Trang web với đã được đưa lên internet
+
+4.3.2 Quy trình Triển khai (Deployment Workflow)
+Quá trình triển khai có thể được thực hiện thông qua CI/CD (Continuous Integration/Continuous Deployment) hoặc thủ công:
+1. Chuẩn bị Mã nguồn: Mã nguồn mới được kiểm thử và hợp nhất (Merge) vào nhánh main trên GitHub.
+2. Kích hoạt Triển khai: Sử dụng Git Hooks hoặc AWS CodeDeploy/CodePipeline (tùy thuộc vào thiết lập chi tiết) để tự động hóa việc kéo mã nguồn mới nhất từ GitHub về máy chủ EC2.
+3. Cập nhật Môi trường: Thực hiện các lệnh hậu triển khai (Post-Deployment Commands) trên máy chủ EC2:
+o Cập nhật các gói PHP: composer install.
+o Chạy Migrations CSDL: php artisan migrate.
+o Xóa cache ứng dụng: php artisan optimize:clear.
+o Tái tạo tài nguyên tĩnh (Assets): npm run build.
+4. Kiểm tra Khởi động: Kiểm tra ứng dụng sau khi triển khai để đảm bảo không có lỗi phát sinh.
+
+
+Bảng  42 Môi Trường và Công Nghệ Triển Khai
+Hạng mụcCông cụChức năngQuản lý Mã nguồnGit & GitHubHệ thống kiểm soát phiên bản (VCS), cho phép làm việc nhóm hiệu quả và quản lý các nhánh tính năng (ví dụ: feature/chat-system)Quản lý Gói (PHP)ComposerQuản lý các thư viện, dependencies của PHP (ví dụ: package cho Gemini AI).Kiểm thửPHPUnit & Laravel DuskFramework kiểm thử tự động, được sử dụng cho Unit Tests, Feature Tests và Browser Tests (Dusk).Triển khai (Deployment)Amazon Web Services (AWS)Nền tảng điện toán đám mây, được sử dụng để hosting và vận hành hệ thống MegaLearning trong môi trường Production
+CHƯƠNG 5 KẾT QUẢ TEST VÀ SPRINT REPORT
+5.1. Kết quả test
+• Unit test (Kiểm tra các module):
+o Hình ảnh: Kết quả Unit test
+
+• Integration test (Tương tác giữa backend – database – frontend):
+o Hình ảnh: Kết quả Integration test (Pass & Fail)
+
+5.2. Sprint Report
+• Số sprint đã thực hiện, công việc hoàn thành trong từng sprint và đánh giá tiến độ.
+o Hình ảnh: Bảng quản lý dự án trên Jira (ví dụ)
+
+CHƯƠNG 1 
+CHƯƠNG 6 KẾT QUẢ VÀ ĐỊNH HƯỚNG MỞ RỘNG
+6.1. Tổng kết và Hạn chế
+Mini App Hỗ trợ Học tập và Thi trực tuyến đã hoàn thành các mục tiêu cơ bản như hỗ trợ học tập, làm bài thi trực tuyến và quản lý học sinh – giáo viên. 
+Ưu điểm nổi bật của hệ thống bao gồm khả năng tổ chức các kỳ thi với ngân hàng câu hỏi linh hoạt, quy trình làm bài và nộp bài rõ ràng, cùng với chức năng chấm điểm tự động đối với các câu hỏi trắc nghiệm. Việc thiết lập các mô hình UML chi tiết (Use Case, Class, Sequence) và cơ sở dữ liệu (ERD) đã đảm bảo cấu trúc vững chắc cho ứng dụng. Hệ thống cũng đã được kiểm tra qua Unit test và Integration test để đảm bảo tính ổn định của các module và sự tương tác giữa backend, database và frontend.
+Tuy nhiên, hệ thống vẫn còn một số hạn chế hiện tại cần khắc phục. Cụ thể, giao diện người dùng cần được tối ưu hóa hơn để thân thiện và trực quan hơn. Về mặt kỹ thuật, cần tăng cường các biện pháp bảo mật hệ thống, đặc biệt là trong quá trình truyền tải và lưu trữ dữ liệu người dùng, và cần thực hiện thêm các bước tối ưu hóa database để đảm bảo hiệu suất tốt hơn khi số lượng người dùng và dữ liệu tăng lên.
+
+6.2. Đề xuất cải tiến và Định hướng mở rộng
+Để nâng cao chất lượng và mở rộng phạm vi sử dụng của hệ thống, nhóm đề xuất các định hướng phát triển sau. Thứ nhất, Thêm AI chấm tự động câu hỏi tự luận sẽ là một cải tiến lớn, giúp giảm tải công việc chấm bài cho giáo viên và cung cấp phản hồi nhanh chóng cho học sinh. Thứ hai, việc Thêm chức năng phòng thi ảo với giám thị online (online proctoring) sẽ tăng cường tính nghiêm túc và minh bạch của các kỳ thi trực tuyến. Thứ ba, Tích hợp ứng dụng di động (app mobile) sẽ giúp người dùng có thể học tập và làm bài thi mọi lúc, mọi nơi, nâng cao tính tiện dụng của hệ thống. Cuối cùng, việc Phân tích dữ liệu học tập để gợi ý cá nhân hóa sẽ cho phép hệ thống cung cấp lộ trình và tài liệu học tập phù hợp với năng lực và tiến độ của từng học sinh, tối đa hóa hiệu quả học tập.
+
+
+Ảnh  61
+
+Ảnh  62
+
+Ảnh  63
+
+Ảnh  64
+
+Ảnh  65
+
+Ảnh  66
+
+Ảnh  67
+
+Ảnh  68
+
+Ảnh  69
+
+Ảnh  610
+
+Ảnh  611
+
+Ảnh  612
+
+Ảnh  613
+Ảnh  614
+
+Ảnh  615
+
+Ảnh  616
+
+Ảnh  617
+
+Ảnh  618
+
+Ảnh  619
+
+Ảnh  620
+
+Ảnh  621
+
+Ảnh  622
+
+Ảnh  623
+
+Ảnh  624
+
+Ảnh  625
+
+Ảnh  626
+
+Ảnh  627
+
+Ảnh  628
+
+Ảnh  629
+
+Ảnh  630
+
+Ảnh  631
+
+Ảnh  632
+
+Ảnh  633
+
+Ảnh  634
+
+Ảnh  635
+
+Ảnh  636
+
+Ảnh  637
+
+Ảnh  638
+
+Ảnh  639
+
+Ảnh  640
+
+Ảnh  641
+
+Báo cáo Đồ án môn học Nhập môn công nghệ phần mềm(INT1340) – Nhóm 5
+
+3
+
+
+
+
+Báo cáo Đồ án môn học Nhập môn công nghệ phần mềm(INT1340) – Nhóm 5
+
