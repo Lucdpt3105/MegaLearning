@@ -34,19 +34,23 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="text-sm text-gray-600 mb-1">Đã chấm</div>
         <div class="text-3xl font-bold text-green-600">
-            {{ $submissions->where('grading_status', 'graded')->count() }}
+            {{ $submissions->whereIn('grading_status', ['graded', 'auto_graded'])->count() }}
         </div>
     </div>
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="text-sm text-gray-600 mb-1">Chờ chấm</div>
         <div class="text-3xl font-bold text-yellow-600">
-            {{ $submissions->where('grading_status', 'pending')->count() }}
+            {{ $submissions->where('grading_status', 'pending')->where('status', 'submitted')->count() }}
         </div>
     </div>
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div class="text-sm text-gray-600 mb-1">Điểm TB</div>
         <div class="text-3xl font-bold text-blue-600">
-            {{ $submissions->where('grading_status', 'graded')->avg('score') ? number_format($submissions->where('grading_status', 'graded')->avg('score'), 2) : 'N/A' }}
+            @php
+                $gradedSubmissions = $submissions->whereIn('grading_status', ['graded', 'auto_graded'])->whereNotNull('score');
+                $avgScore = $gradedSubmissions->avg('score');
+            @endphp
+            {{ $avgScore ? number_format($avgScore, 2) : 'N/A' }}
         </div>
     </div>
 </div>
@@ -124,13 +128,21 @@
                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                                 Đã chấm
                             </span>
-                        @elseif($submission->grading_status === 'pending')
+                        @elseif($submission->grading_status === 'auto_graded')
+                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                Chấm tự động
+                            </span>
+                        @elseif($submission->grading_status === 'pending' && $submission->status === 'submitted')
                             <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
                                 Chờ chấm
                             </span>
+                        @elseif($submission->status === 'in_progress')
+                            <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">
+                                Đang làm
+                            </span>
                         @else
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
-                                {{ $submission->grading_status }}
+                                {{ ucfirst($submission->grading_status) }}
                             </span>
                         @endif
                     </td>
