@@ -91,7 +91,7 @@ class ExamManagementController extends Controller
     public function edit(Exam $exam)
     {
         $subjects = Subject::all();
-        $classRooms = ClassRoom::all();
+        $classRooms = ClassRoom::with('subject')->get();
         $teachers = User::role('teacher')->get();
 
         return view('admin.exams.edit', compact('exam', 'subjects', 'classRooms', 'teachers'));
@@ -114,15 +114,17 @@ class ExamManagementController extends Controller
             'end_time' => 'nullable|date|after:start_time',
             'passing_score' => 'nullable|numeric|min:0',
             'status' => 'required|in:draft,published,archived',
-            'shuffle_questions' => 'boolean',
-            'shuffle_answers' => 'boolean',
-            'show_results_immediately' => 'boolean',
-            'allow_review' => 'boolean',
         ]);
+
+        // Handle checkboxes (they don't submit if unchecked)
+        $validated['shuffle_questions'] = $request->has('shuffle_questions');
+        $validated['shuffle_answers'] = $request->has('shuffle_answers');
+        $validated['show_results_immediately'] = $request->has('show_results_immediately');
+        $validated['allow_review'] = $request->has('allow_review');
 
         $exam->update($validated);
 
-        return redirect()->route('admin.exams.show', $exam)
+        return redirect()->route('admin.exams.index')
             ->with('success', 'Cập nhật đề thi thành công!');
     }
 
@@ -174,7 +176,7 @@ class ExamManagementController extends Controller
     public function results(Exam $exam)
     {
         $submissions = $exam->submissions()
-            ->with(['student', 'answers'])
+            ->with(['student', 'grader'])
             ->latest()
             ->paginate(50);
 
