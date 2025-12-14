@@ -134,6 +134,18 @@ class User extends Authenticatable
         return $this->hasMany(StudentRanking::class, 'student_id');
     }
 
+    // Alias for rankings
+    public function studentRankings()
+    {
+        return $this->rankings();
+    }
+
+    // Alias for enrolledClasses
+    public function classEnrollments()
+    {
+        return $this->hasMany(ClassEnrollment::class, 'student_id');
+    }
+
     // Forum relationships
     public function forumThreads()
     {
