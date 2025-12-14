@@ -129,6 +129,10 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
     
+    // Categories (Read-only)
+    Route::get('/categories', [App\Http\Controllers\Teacher\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/{category}', [App\Http\Controllers\Teacher\CategoryController::class, 'show'])->name('categories.show');
+    
     // Phase 1: Subject Management (UC-GV-010 to UC-GV-015)
     Route::resource('subjects', App\Http\Controllers\Teacher\SubjectController::class);
     Route::post('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'createChatRoom'])->name('subjects.chat-room.create');
