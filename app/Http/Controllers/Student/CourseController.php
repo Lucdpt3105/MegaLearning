@@ -57,7 +57,8 @@ class CourseController extends Controller
             'subject.topics.questions',
             'teacher',
             'enrollments' => fn($q) => $q->where('student_id', $student->id),
-            'videoCalls' => fn($q) => $q->orderBy('scheduled_at', 'desc')->take(5)
+            'videoCalls' => fn($q) => $q->orderBy('scheduled_at', 'desc')->take(5),
+            'students' => fn($q) => $q->wherePivot('status', 'active')
         ])
         ->withCount([
             'students as active_students_count' =>
