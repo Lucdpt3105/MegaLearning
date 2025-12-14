@@ -115,8 +115,8 @@
                         <p class="text-sm text-gray-600">Chủ Đề</p>
                     </div>
                     <div class="text-center p-4 bg-green-50 rounded-lg">
-                        <p class="text-2xl font-bold text-green-600">{{ $classRoom->active_students_count }}</p>
-                        <p class="text-sm text-gray-600">Sĩ Số</p>
+                        <p class="text-2xl font-bold text-green-600">{{ $classRoom->active_students_count }}/{{ $classRoom->max_students }}</p>
+                        <p class="text-sm text-gray-600">Học Viên</p>
                     </div>
                     <div class="text-center p-4 bg-purple-50 rounded-lg">
                         <p class="text-2xl font-bold text-purple-600">{{ $upcomingCalls->count() }}</p>
