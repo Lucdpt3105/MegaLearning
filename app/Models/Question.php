@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Question extends Model
@@ -67,5 +68,12 @@ class Question extends Model
     public function correctAnswer(): HasMany
     {
         return $this->hasMany(Answer::class)->where('is_correct', true);
+    }
+
+    public function exams(): BelongsToMany
+    {
+        return $this->belongsToMany(Exam::class, 'exam_questions')
+            ->withPivot('order', 'points')
+            ->withTimestamps();
     }
 }
