@@ -375,11 +375,13 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/forums/moderation', fn() => view('admin.forums.moderation'))->name('forums.moderation');
 
     // Meetings
-    Route::get('/meetings/rooms', fn() => view('admin.meetings.rooms'))->name('meetings.rooms');
-    Route::post('/meetings/rooms', fn() => redirect()->route('admin.meetings.rooms'))->name('meetings.rooms.create');
+    Route::get('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'rooms'])->name('meetings.rooms');
+    Route::post('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'store'])->name('meetings.rooms.create');
+    Route::patch('/meetings/{id}/status', [App\Http\Controllers\Admin\MeetingController::class, 'updateStatus'])->name('meetings.updateStatus');
+    Route::delete('/meetings/{id}', [App\Http\Controllers\Admin\MeetingController::class, 'destroy'])->name('meetings.destroy');
     Route::get('/meetings/schedule', fn() => view('admin.meetings.schedule'))->name('meetings.schedule');
     Route::post('/meetings/schedule', fn() => redirect()->route('admin.meetings.schedule'))->name('meetings.schedule.create');
-    Route::get('/meetings/history', fn() => view('admin.meetings.history'))->name('meetings.history');
+    Route::get('/meetings/history', [App\Http\Controllers\Admin\MeetingController::class, 'history'])->name('meetings.history');
 
     // Files
     Route::get('/files', fn() => view('admin.files.index'))->name('files.index');

@@ -30,23 +30,23 @@ class StatisticsController extends Controller
         $query = ActivityLog::with('user');
 
         // Filters
-        if ($request->has('action')) {
+        if ($request->filled('action')) {
             $query->where('action', $request->action);
         }
 
-        if ($request->has('user_id')) {
+        if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
-        if ($request->has('entity_type')) {
+        if ($request->filled('entity_type')) {
             $query->where('entity_type', $request->entity_type);
         }
 
-        if ($request->has('date_from')) {
+        if ($request->filled('date_from')) {
             $query->where('created_at', '>=', $request->date_from);
         }
 
-        if ($request->has('date_to')) {
+        if ($request->filled('date_to')) {
             $query->where('created_at', '<=', $request->date_to);
         }
 

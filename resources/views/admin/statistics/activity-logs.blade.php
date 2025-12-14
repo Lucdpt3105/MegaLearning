@@ -83,7 +83,7 @@
 </div>
 
 <!-- Filters -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+<div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
     <form action="{{ route('admin.statistics.activity-logs') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Loại hoạt động</label>
