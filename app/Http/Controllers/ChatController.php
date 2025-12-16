@@ -83,15 +83,6 @@ class ChatController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            $validated = $request->validate([
-                'room_name' => 'required|string|max:255',
-                'room_type' => 'required|in:group,private,subject',
-                'subject_id' => 'nullable|exists:subjects,subject_id',
-                'members' => 'nullable|array',
-                'members.*' => 'exists:users,id',
-                'include_ai' => 'nullable|boolean'
-            ]);
-
             // Use authenticated user ID - must be logged in
             if (!Auth::check()) {
                 return response()->json([
@@ -101,6 +92,39 @@ class ChatController extends Controller
             }
 
             $creatorId = Auth::id();
+
+            // Remove creator from members list BEFORE validation (can't add yourself)
+            // EXCEPT when user wants to chat with themselves (self-chat: only 1 member = creator)
+            $requestData = $request->all();
+            if (isset($requestData['members']) && is_array($requestData['members'])) {
+                // Allow self-chat: if members list only contains creator ID, keep it
+                $isSelfChat = count($requestData['members']) === 1 && 
+                             in_array($creatorId, $requestData['members']);
+                
+                if (!$isSelfChat) {
+                    // Normal case: remove creator from members list
+                    $requestData['members'] = array_values(array_filter($requestData['members'], function($memberId) use ($creatorId) {
+                        return $memberId != $creatorId;
+                    }));
+                }
+            }
+
+            \Log::info('After filtering members', [
+                'creator_id' => $creatorId,
+                'filtered_members' => $requestData['members'] ?? null,
+                'room_name' => $requestData['room_name'] ?? null,
+                'room_type' => $requestData['room_type'] ?? null
+            ]);
+
+            // Validate cleaned data
+            $validated = validator($requestData, [
+                'room_name' => 'required|string|max:255',
+                'room_type' => 'required|in:group,private,subject',
+                'subject_id' => 'nullable|exists:subjects,subject_id',
+                'members' => 'nullable|array',
+                'members.*' => 'exists:users,id',
+                'include_ai' => 'nullable|boolean'
+            ])->validate();
 
             $room = ChatRoom::create([
                 'room_name' => $validated['room_name'],
@@ -116,10 +140,11 @@ class ChatController extends Controller
                 'joined_at' => now()
             ]);
 
-            // Add other members
-            if (isset($validated['members']) && is_array($validated['members'])) {
+            // Add other members (or self for self-chat)
+            if (isset($validated['members']) && is_array($validated['members']) && count($validated['members']) > 0) {
                 foreach ($validated['members'] as $memberId) {
-                    if ($memberId != $creatorId) {
+                    // Skip if already added as creator (unless it's self-chat)
+                    if ($memberId != $creatorId || !$room->members->contains($memberId)) {
                         $room->members()->attach($memberId, [
                             'role' => 'member',
                             'joined_at' => now()
@@ -151,10 +176,19 @@ class ChatController extends Controller
                 'message' => 'Chat room created successfully'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error creating room', ['errors' => $e->errors()]);
+            \Log::error('Validation error creating room', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            
+            $errorMessages = [];
+            foreach ($e->errors() as $field => $messages) {
+                $errorMessages[] = implode(', ', $messages);
+            }
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Validation failed: ' . implode('; ', $errorMessages),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -627,6 +661,14 @@ class ChatController extends Controller
         
         $room = ChatRoom::findOrFail($roomId);
         
+        // Prevent user from adding themselves
+        if (Auth::check() && $validated['user_id'] == Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không thể tự thêm bản thân vào phòng chat'
+            ], 400);
+        }
+        
         // Check if already member
         if ($room->members->contains('id', $validated['user_id'])) {
             return response()->json([
@@ -837,26 +879,13 @@ class ChatController extends Controller
             $userId = Auth::id();
             $otherUserId = $validated['other_user_id'];
 
-            // Cannot chat with yourself
-            if ($userId == $otherUserId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Không thể tạo phòng chat với chính mình'
-                ], 422);
-            }
-
-            // Check if private room already exists between these two users
+            // Check if private room already exists (including self-chat)
             $existingRoom = ChatRoom::where('room_type', 'private')
                 ->whereHas('members', function($q) use ($userId) {
                     $q->where('user_id', $userId);
                 })
                 ->whereHas('members', function($q) use ($otherUserId) {
                     $q->where('user_id', $otherUserId);
-                })
-                ->where(function($query) {
-                    $query->whereHas('members', function($q) {
-                        $q->select(\DB::raw('COUNT(*)'));
-                    }, '=', 2);
                 })
                 ->with('members')
                 ->first();
@@ -878,22 +907,31 @@ class ChatController extends Controller
             $otherUser = \App\Models\User::findOrFail($otherUserId);
             
             $room = ChatRoom::create([
-                'room_name' => "Chat với {$otherUser->name}",
+                'room_name' => $userId == $otherUserId ? "Ghi chú cá nhân" : "Chat với {$otherUser->name}",
                 'room_type' => 'private',
                 'created_by' => $userId,
                 'is_active' => true
             ]);
 
-            // Add both users to the room
-            $room->members()->attach($userId, [
-                'role' => 'member',
-                'joined_at' => now()
-            ]);
-            
-            $room->members()->attach($otherUserId, [
-                'role' => 'member',
-                'joined_at' => now()
-            ]);
+            // Add members (handle self-chat case)
+            if ($userId == $otherUserId) {
+                // Self-chat: only attach once
+                $room->members()->attach($userId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+            } else {
+                // Normal private chat: attach both users
+                $room->members()->attach($userId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+                
+                $room->members()->attach($otherUserId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+            }
 
             // Reload with members
             $room->load('members');
