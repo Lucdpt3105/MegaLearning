@@ -1,49 +1,41 @@
-@extends('layouts.app')
+@extends('admin.layout')
 
 @section('title', 'Thông Báo')
 
-@push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-    body { font-family: 'Inter', sans-serif; }
-</style>
-@endpush
+@section('page-title', 'Thông Báo')
+@section('page-description', 'Tất cả thông báo của bạn')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 p-6">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Thông Báo</h1>
-                    <p class="text-gray-600 mt-2">Tất cả thông báo của bạn</p>
-                </div>
-                @if($notifications->where('read_at', null)->count() > 0)
-                <form action="{{ route('notifications.mark-all-read') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 bg-indigo-50 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition-colors">
-                        Đánh dấu tất cả đã đọc
-                    </button>
-                </form>
-                @endif
-            </div>
-        </div>
+<div class="space-y-6">
+    <!-- Header với nút quay về -->
+    <div class="flex items-center justify-between">
+        <a href="{{ url()->previous() }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition">
+            <i data-feather="arrow-left" class="w-4 h-4"></i>
+            <span class="font-medium">Quay về</span>
+        </a>
+        
+        @if($notifications->where('read_at', null)->count() > 0)
+        <form action="{{ route('notifications.mark-all-read') }}" method="POST">
+            @csrf
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                Đánh dấu tất cả đã đọc
+            </button>
+        </form>
+        @endif
+    </div>
 
         <!-- Notifications List -->
         @if($notifications->count() > 0)
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             @foreach($notifications as $notification)
-            <div class="border-b border-gray-100 last:border-b-0 {{ $notification->read_at ? 'bg-white' : 'bg-indigo-50' }}">
+            <div class="border-b border-slate-100 last:border-b-0 {{ $notification->read_at ? 'bg-white' : 'bg-blue-50' }}">
                 <a href="{{ $notification->data['url'] ?? '#' }}" 
                    onclick="event.preventDefault(); markAsReadAndRedirect('{{ $notification->id }}', '{{ $notification->data['url'] ?? '#' }}')"
-                   class="block p-6 hover:bg-gray-50 transition-colors">
+                   class="block p-6 hover:bg-slate-50 transition-colors">
                     <div class="flex items-start space-x-4">
                         <!-- Icon -->
                         <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center
-                            {{ $notification->type === 'exam_reminder' ? 'bg-indigo-100 text-indigo-600' : '' }}
+                            {{ $notification->type === 'exam_reminder' ? 'bg-blue-100 text-blue-600' : '' }}
                             {{ $notification->type === 'exam_update' ? 'bg-amber-100 text-amber-600' : '' }}
                             {{ $notification->type === 'general' ? 'bg-emerald-100 text-emerald-600' : '' }}">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,8 +47,8 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1">
-                                    <h3 class="text-base font-bold text-gray-900 mb-1">{{ $notification->data['title'] ?? 'Thông báo' }}</h3>
-                                    <p class="text-sm text-gray-600 mb-2">{{ $notification->data['message'] ?? '' }}</p>
+                                    <h3 class="text-base font-bold text-slate-900 mb-1">{{ $notification->data['title'] ?? 'Thông báo' }}</h3>
+                                    <p class="text-sm text-slate-600 mb-2">{{ $notification->data['message'] ?? '' }}</p>
                                     
                                     @if(isset($notification->data['exam_title']))
                                     <div class="inline-flex items-center px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700 mb-2">
@@ -67,7 +59,7 @@
                                     </div>
                                     @endif
 
-                                    <div class="flex items-center space-x-3 text-xs text-gray-500">
+                                    <div class="flex items-center space-x-3 text-xs text-slate-500">
                                         @if(isset($notification->data['teacher_name']))
                                         <span class="flex items-center">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +78,7 @@
                                 </div>
 
                                 @if(!$notification->read_at)
-                                <div class="w-3 h-3 bg-indigo-600 rounded-full flex-shrink-0"></div>
+                                <div class="w-3 h-3 bg-blue-600 rounded-full flex-shrink-0"></div>
                                 @endif
                             </div>
                         </div>
@@ -103,17 +95,16 @@
 
         @else
         <!-- Empty State -->
-        <div class="bg-white rounded-xl shadow-sm p-16 text-center">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl mb-6">
-                <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-16 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-100 rounded-2xl mb-6">
+                <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Chưa có thông báo nào</h3>
-            <p class="text-gray-500">Bạn sẽ nhận được thông báo ở đây khi có cập nhật mới</p>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Chưa có thông báo nào</h3>
+            <p class="text-slate-600">Bạn sẽ nhận được thông báo ở đây khi có cập nhật mới</p>
         </div>
         @endif
-    </div>
 </div>
 
 <script>
