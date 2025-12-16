@@ -269,11 +269,11 @@
                         <div class="py-16 px-6 text-center">
                             <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full mb-5">
                                 <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </div>
-                            <h4 class="text-base font-semibold text-gray-900 mb-2">Chưa có tin nhắn</h4>
-                            <p class="text-sm text-gray-500 mb-4">Bắt đầu trò chuyện ngay!</p>
+                            <h4 class="text-base font-semibold text-gray-900 mb-2">Không có tin nhắn mới</h4>
+                            <p class="text-sm text-gray-500 mb-4">Bạn đã đọc hết tất cả tin nhắn!</p>
                             <a href="{{ route('chat') }}" class="inline-block px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm">
                                 Mở Chat
                             </a>
@@ -510,8 +510,10 @@ function chatDropdown() {
                 const data = await response.json();
                 console.log('Chat rooms response:', data);
                 if (data.success) {
-                    this.rooms = data.data.slice(0, 5); // Show only 5 recent rooms
-                    console.log('Loaded rooms:', this.rooms);
+                    // Filter only rooms with unread messages
+                    const unreadRooms = data.data.filter(room => room.unread_count > 0);
+                    this.rooms = unreadRooms.slice(0, 5); // Show only 5 recent unread rooms
+                    console.log('Loaded unread rooms:', this.rooms);
                 }
             } catch (error) {
                 console.error('Error loading chat rooms:', error);
