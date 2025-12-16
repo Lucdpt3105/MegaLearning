@@ -787,4 +787,110 @@ class ChatController extends Controller
             'message' => 'Room deleted successfully'
         ]);
     }
+
+    /**
+     * Create or get private chat room between two users
+     */
+    public function createPrivateRoom(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'other_user_id' => 'required|exists:users,id'
+            ]);
+
+            // Must be authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để tạo phòng chat'
+                ], 401);
+            }
+
+            $userId = Auth::id();
+            $otherUserId = $validated['other_user_id'];
+
+            // Cannot chat with yourself
+            if ($userId == $otherUserId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không thể tạo phòng chat với chính mình'
+                ], 422);
+            }
+
+            // Check if private room already exists between these two users
+            $existingRoom = ChatRoom::where('room_type', 'private')
+                ->whereHas('members', function($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })
+                ->whereHas('members', function($q) use ($otherUserId) {
+                    $q->where('user_id', $otherUserId);
+                })
+                ->where(function($query) {
+                    $query->whereHas('members', function($q) {
+                        $q->select(\DB::raw('COUNT(*)'));
+                    }, '=', 2);
+                })
+                ->with('members')
+                ->first();
+
+            if ($existingRoom) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Phòng chat đã tồn tại',
+                    'room' => [
+                        'id' => $existingRoom->id,
+                        'room_name' => $existingRoom->room_name,
+                        'room_type' => $existingRoom->room_type,
+                        'members' => $existingRoom->members
+                    ]
+                ]);
+            }
+
+            // Create new private room
+            $otherUser = \App\Models\User::findOrFail($otherUserId);
+            
+            $room = ChatRoom::create([
+                'room_name' => "Chat với {$otherUser->name}",
+                'room_type' => 'private',
+                'created_by' => $userId,
+                'is_active' => true
+            ]);
+
+            // Add both users to the room
+            $room->members()->attach($userId, [
+                'role' => 'member',
+                'joined_at' => now()
+            ]);
+            
+            $room->members()->attach($otherUserId, [
+                'role' => 'member',
+                'joined_at' => now()
+            ]);
+
+            // Reload with members
+            $room->load('members');
+
+            return response()->json([
+                'success' => true,
+                'message' => "Đã tạo phòng chat với {$otherUser->name}",
+                'room' => [
+                    'id' => $room->id,
+                    'room_name' => $room->room_name,
+                    'room_type' => $room->room_type,
+                    'members' => $room->members
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error creating private room', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi tạo phòng chat: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
