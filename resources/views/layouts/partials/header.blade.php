@@ -552,8 +552,10 @@ function chatDropdown() {
         },
         
         getLastMessage(room) {
-            if (room.latest_message) {
-                const text = room.latest_message.message_text;
+            // Laravel returns camelCase: latestMessage
+            const latestMsg = room.latest_message || room.latestMessage;
+            if (latestMsg) {
+                const text = latestMsg.message_text || latestMsg.messageText || latestMsg.text || '';
                 return text.length > 50 ? text.substring(0, 50) + '...' : text;
             }
             return 'Chưa có tin nhắn';

@@ -382,6 +382,19 @@ class ChatController extends Controller
             // Add unread count for each room
             $rooms->each(function($room) use ($userId) {
                 $room->unread_count = $this->getUnreadCount($room->id, $userId);
+                
+                // Ensure latest_message is properly formatted
+                if ($room->latestMessage) {
+                    $room->latest_message = [
+                        'id' => $room->latestMessage->id,
+                        'message_text' => $room->latestMessage->message_text,
+                        'created_at' => $room->latestMessage->created_at,
+                        'user' => $room->latestMessage->user ? [
+                            'id' => $room->latestMessage->user->id,
+                            'name' => $room->latestMessage->user->name,
+                        ] : null
+                    ];
+                }
             });
             
             \Log::info('getRooms() - User authenticated', [
