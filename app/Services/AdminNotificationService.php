@@ -97,8 +97,10 @@ class AdminNotificationService
     /**
      * Thông báo khi giáo viên tạo lớp mới
      */
-    public function notifyNewClassCreated($classRoom, $teacher)
+    public function notifyNewClassCreated($classRoom)
     {
+        $teacher = $classRoom->teacher ?? auth()->user();
+        
         return $this->notifyAdmins(
             '📚 Lớp học mới',
             "Giáo viên {$teacher->name} vừa tạo lớp học \"{$classRoom->name}\"",
