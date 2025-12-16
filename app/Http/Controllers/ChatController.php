@@ -656,27 +656,79 @@ class ChatController extends Controller
     public function uploadFile(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'file' => 'required|file|max:51200', // 50MB max
-                'type' => 'required|in:image,file'
-            ]);
+            // Check if user is authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để upload file'
+                ], 401);
+            }
 
             $file = $request->file('file');
-            $userId = Auth::id();
             
-            // Validate file type
-            if ($validated['type'] === 'image') {
-                $request->validate([
-                    'file' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240' // 10MB for images
-                ]);
+            if (!$file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy file'
+                ], 400);
+            }
+
+            // Check file size (10MB for images, 50MB for other files)
+            $maxSize = $request->input('type') === 'image' ? 10240 : 51200; // KB
+            
+            if ($file->getSize() > $maxSize * 1024) {
+                $maxMB = $maxSize / 1024;
+                return response()->json([
+                    'success' => false,
+                    'message' => "File quá lớn. Kích thước tối đa: {$maxMB}MB"
+                ], 422);
+            }
+
+            // Validate file type based on upload type
+            $type = $request->input('type', 'file');
+            
+            if ($type === 'image') {
+                $allowedMimes = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (!in_array($extension, $allowedMimes)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Chỉ chấp nhận ảnh: JPG, PNG, GIF, WEBP'
+                    ], 422);
+                }
+            } else {
+                // Block dangerous file types
+                $blockedExtensions = ['exe', 'bat', 'sh', 'php', 'js', 'html', 'htm'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (in_array($extension, $blockedExtensions)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Loại file này không được phép upload'
+                    ], 422);
+                }
             }
             
+            $userId = Auth::id();
+            
             // Create unique filename
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '_' . uniqid() . '_' . $userId . '.' . $extension;
             
+            // Ensure storage directory exists
+            $storagePath = storage_path('app/public/chat_files');
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0755, true);
+            }
+            
             // Store in public/storage/chat_files
             $path = $file->storeAs('chat_files', $filename, 'public');
+            
+            if (!$path) {
+                throw new \Exception('Không thể lưu file');
+            }
             
             // Get full URL
             $url = asset('storage/' . $path);
@@ -684,25 +736,41 @@ class ChatController extends Controller
             return response()->json([
                 'success' => true,
                 'file_url' => $url,
+                'file_path' => $path,
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
-                'file_type' => $file->getMimeType()
+                'file_size_formatted' => $this->formatFileSize($file->getSize()),
+                'file_type' => $file->getMimeType(),
+                'message_type' => $type
             ]);
             
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File không hợp lệ',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
-            \Log::error('Error uploading file', [
-                'error' => $e->getMessage()
+            \Log::error('Error uploading chat file', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
             ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Lỗi khi upload file: ' . $e->getMessage()
             ], 500);
+        }
+    }
+    
+    /**
+     * Format file size for display
+     */
+    private function formatFileSize($bytes)
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' bytes';
         }
     }
     
