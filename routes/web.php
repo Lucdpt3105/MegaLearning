@@ -219,6 +219,10 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
+    // Admin Search Routes (cho thanh tìm kiếm trong admin panel)
+    Route::get('/search', [App\Http\Controllers\Admin\AdminSearchController::class, 'search'])->name('search');
+    Route::get('/search/full', [App\Http\Controllers\Admin\AdminSearchController::class, 'fullSearch'])->name('search.full');
+
     // ADMIN COURSES (THEO NEO UI)
     Route::prefix('courses')->name('courses.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
