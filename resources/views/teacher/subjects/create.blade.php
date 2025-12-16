@@ -73,7 +73,7 @@
         {{-- Mã môn học --}}
         <div>
             <label for="code" class="block text-sm font-medium text-slate-700 mb-2">
-                Mã môn học
+                Mã môn học <span class="text-slate-400 text-xs">(Tùy chọn)</span>
             </label>
             <input
                 type="text"
@@ -83,13 +83,14 @@
                 class="w-full rounded-xl border text-sm px-4 py-2.5
                        border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                        @error('code') border-rose-400 focus:ring-rose-500 @enderror"
-                placeholder="VD: MATH101, CS201..."
+                placeholder="VD: MATH101, CS201... (để trống để tự động tạo)"
             >
             @error('code')
                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-slate-500">
-                Nếu để trống, hệ thống sẽ tự sinh mã từ tên môn học. Mã phải là duy nhất.
+                💡 <strong>Để trống</strong> để hệ thống tự động sinh mã từ tên môn học.
+                <span id="code-preview" class="font-mono text-indigo-600"></span>
             </p>
         </div>
 
@@ -186,7 +187,7 @@
                 <p class="font-semibold">💡 Lưu ý:</p>
                 <ul class="list-disc list-inside space-y-1">
                     <li>Có thể tạo môn học ở trạng thái <strong>Nháp</strong> rồi chuyển sang <strong>Hoạt động</strong> sau.</li>
-                    <li>Nếu không nhập mã, hệ thống sẽ tự sinh từ tên môn học (ví dụ: <code>GIAI_TICH_1</code>).</li>
+                    <li><strong>Mã môn học</strong> sẽ tự động tạo từ tên nếu bỏ trống (VD: "Giải Tích 1" → "GT1")</li>
                     <li>Môn học ở trạng thái <strong>Hoạt động</strong> mới hiển thị cho học sinh / giáo viên.</li>
                 </ul>
             </div>
@@ -194,4 +195,56 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+// Auto-preview code khi nhập tên môn học
+document.getElementById('name').addEventListener('input', function(e) {
+    const name = e.target.value;
+    const codeInput = document.getElementById('code');
+    const codePreview = document.getElementById('code-preview');
+    
+    // Chỉ preview nếu field code đang trống
+    if (codeInput.value === '' && name.length > 0) {
+        // Tạo preview code (giống logic backend)
+        const words = name.toUpperCase().split(' ');
+        let code = '';
+        
+        for (let word of words) {
+            if (word.length > 0) {
+                // Loại bỏ dấu tiếng Việt đơn giản
+                const cleanWord = word
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd')
+                    .replace(/Đ/g, 'D');
+                code += cleanWord.charAt(0);
+            }
+        }
+        
+        if (code.length < 3) {
+            const cleanName = name.toUpperCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'D')
+                .replace(/\s+/g, '');
+            code = cleanName.substring(0, 6);
+        }
+        
+        codePreview.textContent = code ? '(Mã tự động: ' + code + ')' : '';
+    } else {
+        codePreview.textContent = '';
+    }
+});
+
+// Clear preview khi nhập code thủ công
+document.getElementById('code').addEventListener('input', function(e) {
+    if (e.target.value !== '') {
+        document.getElementById('code-preview').textContent = '';
+    }
+});
+</script>
+@endpush
+
 @endsection
