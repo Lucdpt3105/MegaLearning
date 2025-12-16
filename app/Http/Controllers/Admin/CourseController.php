@@ -6,10 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\ClassRoom;
 use App\Models\Subject;
 use App\Models\User;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    protected $adminNotificationService;
+
+    public function __construct(AdminNotificationService $adminNotificationService)
+    {
+        $this->adminNotificationService = $adminNotificationService;
+    }
+
     /** LIST COURSES (NEO UI) */
     public function index(Request $request)
     {
@@ -61,7 +69,7 @@ class CourseController extends Controller
             $validated['code'] = strtoupper(substr(preg_replace('/[^A-Z0-9]/i', '', $validated['name']), 0, 6)) . '-' . time();
         }
 
-        ClassRoom::create([
+        $classRoom = ClassRoom::create([
             'name' => $validated['name'],
             'code' => $validated['code'],
             'subject_id' => $validated['subject_id'],
@@ -72,6 +80,9 @@ class CourseController extends Controller
             'description' => $validated['description'],
             'status' => 'active',
         ]);
+
+        // Gửi thông báo cho admin về lớp học mới
+        $this->adminNotificationService->notifyNewClassCreated($classRoom);
 
         return redirect()->route('admin.courses.index')
                          ->with('success', 'Tạo lớp học thành công!');
