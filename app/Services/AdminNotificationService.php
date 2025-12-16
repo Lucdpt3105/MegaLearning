@@ -47,7 +47,7 @@ class AdminNotificationService
             '🎓 Học sinh mới đăng ký',
             "Học sinh {$student->name} ({$student->email}) vừa đăng ký tài khoản.",
             'user_registration',
-            route('admin.user.edit', $student->id),
+            route('admin.users.show', $student->id),
             [
                 'user_id' => $student->id,
                 'user_name' => $student->name,
@@ -65,7 +65,7 @@ class AdminNotificationService
             '👨‍🏫 Giáo viên mới đăng ký',
             "Giáo viên {$teacher->name} ({$teacher->email}) vừa đăng ký tài khoản.",
             'user_registration',
-            route('admin.user.edit', $teacher->id),
+            route('admin.users.show', $teacher->id),
             [
                 'user_id' => $teacher->id,
                 'user_name' => $teacher->name,
