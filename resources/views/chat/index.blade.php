@@ -816,10 +816,10 @@
                     throw new Error(data.message || 'Failed to load rooms');
                 }
                 
-                console.log('📋 Loaded', data.rooms?.length || 0, 'rooms');
-                
-                if (data.rooms && data.rooms.length > 0) {
-                    roomsList.innerHTML = data.rooms.map(room => {
+                console.log('📋 Loaded', data.data?.length || 0, 'rooms');
+
+                if (data.data && data.data.length > 0) {
+                    roomsList.innerHTML = data.data.map(room => {
                         // For private rooms, show the other user's name
                         let displayName = room.room_name;
                         if (room.room_type === 'private' && room.members && room.members.length > 0) {
@@ -956,7 +956,7 @@
                 const roomsData = await roomResponse.json();
                 const messagesData = await messagesResponse.json();
 
-                currentRoom = roomsData.rooms ? roomsData.rooms.find(r => r.id === roomId) : null;
+                currentRoom = roomsData.data ? roomsData.data.find(r => r.id === roomId) : null;
                 
                 if (!currentRoom) {
                     showNotification('Không tìm thấy phòng', 'error');
@@ -1107,8 +1107,8 @@
             fetch(`${API_URL}/rooms`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.rooms && data.rooms.length > 0) {
-                        data.rooms.forEach(room => {
+                    if (data.success && data.data && data.data.length > 0) {
+                        data.data.forEach(room => {
                             echoInstance.channel(`room-updates.${room.id}`)
                                 .listen('.room.updated', (e) => {
                                     console.log('🔔 Room updated:', e);
