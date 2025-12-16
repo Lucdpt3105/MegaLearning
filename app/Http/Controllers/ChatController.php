@@ -397,7 +397,7 @@ class ChatController extends Controller
         
         return response()->json([
             'success' => true,
-            'rooms' => $rooms
+            'data' => $rooms
         ]);
     }
     
@@ -428,7 +428,7 @@ class ChatController extends Controller
         if (!$userId) {
             return response()->json([
                 'success' => true,
-                'unread_count' => 0
+                'count' => 0
             ]);
         }
         
@@ -450,7 +450,7 @@ class ChatController extends Controller
         
         return response()->json([
             'success' => true,
-            'unread_count' => $totalUnread
+            'count' => $totalUnread
         ]);
     }
     

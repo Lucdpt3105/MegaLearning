@@ -504,11 +504,14 @@ function chatDropdown() {
                 const response = await fetch('/api/v1/chat/rooms', {
                     headers: {
                         'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     }
                 });
                 const data = await response.json();
+                console.log('Chat rooms response:', data);
                 if (data.success) {
                     this.rooms = data.data.slice(0, 5); // Show only 5 recent rooms
+                    console.log('Loaded rooms:', this.rooms);
                 }
             } catch (error) {
                 console.error('Error loading chat rooms:', error);
@@ -522,9 +525,11 @@ function chatDropdown() {
                 const response = await fetch('/api/v1/chat/unread-count', {
                     headers: {
                         'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     }
                 });
                 const data = await response.json();
+                console.log('Unread count response:', data);
                 if (data.success) {
                     this.unreadCount = data.count || 0;
                 }
