@@ -235,11 +235,88 @@
                 </div>
             </div>
 
-            <!-- Auto Generate Section -->
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 border-2 border-green-200">
+            <!-- Question Management Method -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">📝 Quản lý câu hỏi đề thi</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Option 1: Auto Generate -->
+                    <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer" onclick="selectMethod('auto')">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <input type="radio" name="question_method" id="method_auto" value="auto" 
+                                   class="w-5 h-5 text-green-600" {{ old('question_method', 'auto') == 'auto' ? 'checked' : '' }}>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Tự động từ Ngân hàng 🎯</h3>
+                        <p class="text-sm text-gray-600">Hệ thống tự chọn câu hỏi theo mức độ và chủ đề</p>
+                    </div>
+
+                    <!-- Option 2: Manual Selection -->
+                    <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer" onclick="selectMethod('manual')">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <input type="radio" name="question_method" id="method_manual" value="manual" 
+                                   class="w-5 h-5 text-blue-600" {{ old('question_method') == 'manual' ? 'checked' : '' }}>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Chọn thủ công 🖱️</h3>
+                        <p class="text-sm text-gray-600">Tự chọn từng câu hỏi từ ngân hàng câu hỏi</p>
+                    </div>
+
+                    <!-- Option 3: Upload File -->
+                    <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-purple-500 hover:shadow-md transition-all cursor-pointer" onclick="selectMethod('upload')">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                            </div>
+                            <input type="radio" name="question_method" id="method_upload" value="upload" 
+                                   class="w-5 h-5 text-purple-600" {{ old('question_method') == 'upload' ? 'checked' : '' }}>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Tải lên File 📄</h3>
+                        <p class="text-sm text-gray-600">Import đề thi từ Word/Excel/PDF</p>
+                    </div>
+                </div>
+
+                <!-- Info box for each method -->
+                <div id="info_auto" class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 method-info">
+                    <p class="text-sm text-green-800">
+                        ✅ <strong>Tự động:</strong> Hệ thống sẽ chọn câu hỏi ngẫu nhiên theo mức độ và chủ đề bạn cấu hình bên dưới.
+                    </p>
+                </div>
+
+                <div id="info_manual" class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4 method-info hidden">
+                    <p class="text-sm text-blue-800">
+                        ℹ️ <strong>Thủ công:</strong> Sau khi tạo đề thi, bạn sẽ được chuyển đến trang chọn câu hỏi từ ngân hàng.
+                    </p>
+                </div>
+
+                <div id="info_upload" class="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-4 method-info hidden">
+                    <p class="text-sm text-purple-800">
+                        📤 <strong>Tải lên:</strong> Hỗ trợ định dạng .docx, .xlsx, .pdf. Hệ thống sẽ tự động phân tích và tạo câu hỏi.
+                    </p>
+                    <div class="mt-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Chọn file đề thi:</label>
+                        <input type="file" name="exam_file" id="exam_file" accept=".doc,.docx,.xls,.xlsx,.pdf"
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                        <p class="mt-1 text-xs text-gray-500">Định dạng: Word (.docx), Excel (.xlsx), PDF (.pdf) - Tối đa 10MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto Generate Section (chỉ hiện khi chọn method auto) -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 border-2 border-green-200" id="auto_generate_section">
                 <div class="flex items-start gap-3 mb-6">
                     <input type="checkbox" name="auto_generate" id="auto_generate" value="1"
-                           {{ old('auto_generate') ? 'checked' : '' }}
+                           {{ old('auto_generate', true) ? 'checked' : '' }}
                            onchange="toggleAutoGenerate()"
                            class="w-6 h-6 mt-1 text-green-600 rounded focus:ring-2 focus:ring-green-500">
                     <div>
@@ -247,9 +324,9 @@
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
-                            Tạo đề tự động 🔥
+                            Cấu hình tạo đề tự động 🔥
                         </h2>
-                        <p class="text-sm text-gray-600 mt-1">Hệ thống sẽ tự động chọn câu hỏi từ ngân hàng theo tiêu chí của bạn</p>
+                        <p class="text-sm text-gray-600 mt-1">Chỉ định cách hệ thống chọn câu hỏi từ ngân hàng</p>
                     </div>
                 </div>
 
@@ -353,6 +430,46 @@
 </div>
 
 <script>
+// Method selection
+function selectMethod(method) {
+    // Update radio buttons
+    document.getElementById('method_auto').checked = (method === 'auto');
+    document.getElementById('method_manual').checked = (method === 'manual');
+    document.getElementById('method_upload').checked = (method === 'upload');
+    
+    // Show/hide info boxes
+    document.querySelectorAll('.method-info').forEach(el => el.classList.add('hidden'));
+    document.getElementById('info_' + method).classList.remove('hidden');
+    
+    // Show/hide auto generate section
+    const autoSection = document.getElementById('auto_generate_section');
+    if (method === 'auto') {
+        autoSection.classList.remove('hidden');
+        document.getElementById('auto_generate').checked = true;
+        toggleAutoGenerate();
+    } else {
+        autoSection.classList.add('hidden');
+        document.getElementById('auto_generate').checked = false;
+    }
+    
+    // Enable/disable file upload
+    const fileInput = document.getElementById('exam_file');
+    if (fileInput) {
+        fileInput.disabled = (method !== 'upload');
+        if (method !== 'upload') {
+            fileInput.value = '';
+        }
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const checkedMethod = document.querySelector('input[name="question_method"]:checked');
+    if (checkedMethod) {
+        selectMethod(checkedMethod.value);
+    }
+});
+
 function toggleAutoGenerate() {
     const checkbox = document.getElementById('auto_generate');
     const options = document.getElementById('auto_generate_options');
