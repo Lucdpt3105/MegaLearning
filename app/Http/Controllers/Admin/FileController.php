@@ -88,7 +88,14 @@ class FileController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents/' . $validated['folder'], $fileName, 'public');
+            
+            // Quyết định path: nếu có subject_id thì lưu vào documents/{subject_id}/
+            // nếu không thì lưu vào documents/{folder}/
+            $storagePath = $validated['subject_id'] 
+                ? 'documents/' . $validated['subject_id']
+                : 'documents/' . $validated['folder'];
+            
+            $filePath = $file->storeAs($storagePath, $fileName, 'public');
 
             $document = Document::create([
                 'title' => $validated['title'],

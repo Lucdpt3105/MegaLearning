@@ -112,10 +112,10 @@ class DocumentController extends Controller
         try {
             DB::beginTransaction();
 
-            // Store file
+            // Store file - lưu vào thư mục của subject
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents', $fileName, 'public');
+            $filePath = $file->storeAs('documents/' . $validated['subject_id'], $fileName, 'public');
 
             // Determine approval status
             $approvalStatus = 'pending';

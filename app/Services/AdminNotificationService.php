@@ -176,8 +176,10 @@ class AdminNotificationService
     /**
      * Thông báo khi có tài liệu mới được upload
      */
-    public function notifyNewDocumentUploaded($document, $uploader)
+    public function notifyNewDocumentUploaded($document)
     {
+        $uploader = $document->uploader ?? auth()->user();
+        
         return $this->notifyAdmins(
             '📄 Tài liệu mới',
             "{$uploader->name} vừa upload tài liệu \"{$document->title}\"",

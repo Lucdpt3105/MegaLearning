@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('layouts.app')
 
 @section('title', 'Thêm Môn học')
 @section('page-title', 'Thêm Môn học Mới')
@@ -10,7 +10,7 @@
     {{-- Header --}}
     <div class="mb-8">
         <div class="flex items-center gap-4 mb-4">
-            <a href="{{ route('admin.course-categories.index') }}"
+            <a href="{{ route('teacher.subjects.index') }}"
                class="text-slate-500 hover:text-slate-900">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -45,7 +45,7 @@
     @endif
 
     {{-- Form --}}
-    <form action="{{ route('admin.course-categories.store') }}" method="POST"
+    <form action="{{ route('teacher.subjects.store') }}" method="POST"
           class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 space-y-6">
         @csrf
 
@@ -168,7 +168,7 @@
                 <span>Tạo Môn học</span>
             </button>
 
-            <a href="{{ route('admin.course-categories.index') }}"
+            <a href="{{ route('teacher.subjects.index') }}"
                class="px-6 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50">
                 Hủy bỏ
             </a>

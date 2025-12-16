@@ -47,4 +47,20 @@ class Document extends Model
     {
         $this->increment('download_count');
     }
+
+    /**
+     * Check if the physical file exists on disk
+     */
+    public function fileExists(): bool
+    {
+        return file_exists(storage_path('app/public/' . $this->file_path));
+    }
+
+    /**
+     * Get the full file path
+     */
+    public function getFullFilePath(): string
+    {
+        return storage_path('app/public/' . $this->file_path);
+    }
 }
