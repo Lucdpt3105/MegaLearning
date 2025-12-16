@@ -1,12 +1,4 @@
-<!-- Toggle Button -->
-<button id="sidebarToggle" class="fixed top-4 left-4 z-50 w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-all duration-300 shadow-lg">
-    <div class="hamburger-icon">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-    </div>
-</button>
-
-<aside id="sidebar" class="sidebar-container bg-gray-900 border-r border-gray-800 shrink-0 overflow-visible transition-all duration-500 ease-in-out flex flex-col">
+<aside id="sidebar" class="sidebar-container bg-gray-900 border-r border-gray-800 shrink-0 overflow-y-auto transition-all duration-300 flex flex-col sticky top-0 h-screen w-56">
     <!-- Logo -->
     @php
         $dashboardUrl = route('login'); // Default to login if not authenticated

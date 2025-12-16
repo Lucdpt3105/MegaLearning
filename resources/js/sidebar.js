@@ -1,6 +1,6 @@
 /**
  * Collapsible Sidebar Component
- * React-inspired sidebar with smooth animations
+ * Simple show/hide toggle for sidebar
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -10,41 +10,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileToggle = document.getElementById('profileToggle');
     const profileMenu = document.getElementById('profileMenu');
     
-    // Load saved state from localStorage
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    let isCollapsed = savedState === 'true';
-    
-    // Apply initial state
-    if (isCollapsed) {
-        sidebar.classList.add('collapsed');
-        sidebarToggle.classList.add('collapsed');
-    }
-    
     // Sidebar Toggle Function
     function toggleSidebar() {
-        isCollapsed = !isCollapsed;
-        
-        sidebar.classList.toggle('collapsed');
-        sidebarToggle.classList.toggle('collapsed');
-        
-        // Save state to localStorage
-        localStorage.setItem('sidebarCollapsed', isCollapsed);
-        
-        // Close profile menu if sidebar is being collapsed
-        if (isCollapsed && profileMenu.classList.contains('active')) {
-            profileMenu.classList.remove('active');
+        if (sidebar) {
+            sidebar.classList.toggle('hidden');
         }
-        
-        // Dispatch custom event for other components
-        window.dispatchEvent(new CustomEvent('sidebarToggle', { 
-            detail: { collapsed: isCollapsed } 
-        }));
     }
     
     // Profile Menu Toggle Function
     function toggleProfileMenu(event) {
         event.stopPropagation();
-        profileMenu.classList.toggle('active');
+        if (profileMenu) {
+            profileMenu.classList.toggle('active');
+        }
     }
     
     // Click outside to close profile menu
@@ -65,15 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (profileToggle) {
         profileToggle.addEventListener('click', toggleProfileMenu);
     }
-    
-    // Add tooltips to nav items for collapsed state
-    const navItems = document.querySelectorAll('.sidebar-nav-item');
-    navItems.forEach(item => {
-        const navText = item.querySelector('.nav-text');
-        if (navText) {
-            item.setAttribute('data-tooltip', navText.textContent.trim());
-        }
-    });
     
     // ===========================
     // DROPDOWN FUNCTIONALITY

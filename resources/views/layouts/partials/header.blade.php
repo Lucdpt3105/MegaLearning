@@ -1,6 +1,14 @@
-<header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-    <!-- Search Bar -->
-    <div class="flex-1 max-w-2xl" x-data="globalSearch()" @click.away="showSuggestions = false">
+<header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+    <div class="flex items-center gap-4 flex-1 max-w-2xl">
+        <!-- Hamburger Toggle Button -->
+        <button id="sidebarToggle" class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors shrink-0">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Search Bar -->
+        <div class="flex-1" x-data="globalSearch()" @click.away="showSuggestions = false">
         <form action="{{ route('search.index') }}" method="GET" class="relative">
             <input 
                 type="text" 
@@ -82,8 +90,7 @@
                 </template>
             </div>
         </form>
-    </div>
-
+    </div>    </div>
     <!-- Right Section -->
     <div class="flex items-center space-x-4 ml-6">
         <!-- Video Call Notifications -->
