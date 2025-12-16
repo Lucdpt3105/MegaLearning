@@ -6,9 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Services\AdminNotificationService;
 
 class AuthController extends Controller
 {
+    protected $adminNotificationService;
+
+    public function __construct(AdminNotificationService $adminNotificationService)
+    {
+        $this->adminNotificationService = $adminNotificationService;
+    }
+
     /**
      * Show login form
      */
@@ -77,6 +85,9 @@ class AuthController extends Controller
 
         // Default role: student
         $user->assignRole('student');
+
+        // Gửi thông báo cho admin về người dùng mới
+        $this->adminNotificationService->notifyNewStudentRegistration($user);
 
         Auth::login($user);
 

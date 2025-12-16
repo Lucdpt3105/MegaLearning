@@ -6,11 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Subject;
 use App\Models\User;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
+    protected $adminNotificationService;
+
+    public function __construct(AdminNotificationService $adminNotificationService)
+    {
+        $this->adminNotificationService = $adminNotificationService;
+    }
+
     /**
      * Display a listing of documents
      */
@@ -82,7 +90,7 @@ class FileController extends Controller
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('documents/' . $validated['folder'], $fileName, 'public');
 
-            Document::create([
+            $document = Document::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'subject_id' => $validated['subject_id'],
@@ -96,6 +104,9 @@ class FileController extends Controller
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
             ]);
+
+            // Gửi thông báo cho admin về tài liệu mới
+            $this->adminNotificationService->notifyNewDocumentUploaded($document);
 
             return redirect()->route('admin.files.index')
                 ->with('success', 'Tải lên file thành công!');

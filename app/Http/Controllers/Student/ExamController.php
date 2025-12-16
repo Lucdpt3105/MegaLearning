@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\ExamSubmission;
 use App\Models\ClassRoom;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,13 @@ use Carbon\Carbon;
 
 class ExamController extends Controller
 {
+    protected $adminNotificationService;
+
+    public function __construct(AdminNotificationService $adminNotificationService)
+    {
+        $this->adminNotificationService = $adminNotificationService;
+    }
+
     /**
      * Display a list of available exams for the student
      */
@@ -248,7 +256,10 @@ class ExamController extends Controller
             'score' => $score,
             'grading_status' => $gradingStatus
         ]);
-        
+
+        // Gửi thông báo cho admin về bài nộp mới
+        $this->adminNotificationService->notifyNewExamSubmission($submission);
+
         // Always show results for auto-graded exams (including partial auto-grade)
         if ($gradingStatus === 'auto_graded' || $hasMC) {
             return redirect()->route('student.exams.result', $submission->id)

@@ -433,6 +433,83 @@ Route::prefix('forum')->middleware(['auth'])->group(function () {
     Route::delete('/{forumQuestion}/answers/{forumAnswer}', [ForumQuestionController::class, 'destroyAnswer'])->name('forum.answer.destroy');
 });
 
+// ============================================
+// TEST ROUTES - CHỈ DÙNG KHI DEVELOP
+// ============================================
+Route::middleware(['auth', 'role:admin'])->prefix('test')->name('test.')->group(function () {
+    // Test Admin Notifications - Cơ bản
+    Route::get('/admin-notification', function() {
+        $service = app(\App\Services\AdminNotificationService::class);
+        
+        $count = $service->notifyAdmins(
+            '🧪 Test Thông báo',
+            'Đây là thông báo test từ route /test/admin-notification. Nếu bạn thấy thông báo này, nghĩa là hệ thống đang hoạt động!',
+            'general',
+            route('admin.dashboard')
+        );
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Đã gửi {$count} thông báo cho admin!",
+            'count' => $count,
+            'instructions' => 'Kiểm tra chuông thông báo ở góc trên bên phải admin panel'
+        ]);
+    })->name('notification');
+
+    // Test với nhiều loại thông báo
+    Route::get('/admin-notification/fake-data', function() {
+        $service = app(\App\Services\AdminNotificationService::class);
+        
+        // Tạo các thông báo test khác nhau
+        $notifications = [
+            [
+                'title' => '🎓 Học sinh mới đăng ký',
+                'message' => 'Nguyễn Văn A (nguyenvana@test.com) vừa đăng ký tài khoản.',
+                'type' => 'user_registration'
+            ],
+            [
+                'title' => '👨‍🏫 Giáo viên mới đăng ký', 
+                'message' => 'Trần Thị B (tranthib@test.com) vừa đăng ký tài khoản.',
+                'type' => 'user_registration'
+            ],
+            [
+                'title' => '📝 Bài nộp mới',
+                'message' => 'Học sinh Lê Văn C vừa nộp bài thi "Kiểm tra giữa kỳ"',
+                'type' => 'exam_submission'
+            ],
+            [
+                'title' => '📚 Lớp học mới',
+                'message' => 'Giáo viên Phạm Thị D vừa tạo lớp học "Toán 12A1"',
+                'type' => 'class_created'
+            ],
+            [
+                'title' => '📄 Tài liệu mới',
+                'message' => 'GV Hoàng Văn E vừa upload tài liệu "Đề cương ôn tập.pdf"',
+                'type' => 'document_uploaded'
+            ],
+        ];
+        
+        $totalCount = 0;
+        foreach ($notifications as $notif) {
+            $count = $service->notifyAdmins(
+                $notif['title'],
+                $notif['message'],
+                $notif['type'],
+                route('admin.dashboard')
+            );
+            $totalCount += $count;
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Đã tạo {$totalCount} thông báo test với nhiều loại khác nhau!",
+            'total_notifications' => $totalCount,
+            'notifications_sent' => count($notifications),
+            'instructions' => 'Kiểm tra chuông thông báo và trang /notifications'
+        ]);
+    })->name('notification.fake');
+});
+
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

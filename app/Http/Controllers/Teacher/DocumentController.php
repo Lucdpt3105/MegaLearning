@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Subject;
+use App\Services\AdminNotificationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,13 @@ use Illuminate\Support\Facades\Storage;
 class DocumentController extends Controller
 {
     use AuthorizesRequests;
+
+    protected $adminNotificationService;
+
+    public function __construct(AdminNotificationService $adminNotificationService)
+    {
+        $this->adminNotificationService = $adminNotificationService;
+    }
 
     /**
      * Display a listing of documents
@@ -137,6 +145,9 @@ class DocumentController extends Controller
                 'approved_at' => $approvedAt,
                 'download_count' => 0,
             ]);
+
+            // Gửi thông báo cho admin về tài liệu mới
+            $this->adminNotificationService->notifyNewDocumentUploaded($document);
 
             DB::commit();
 
