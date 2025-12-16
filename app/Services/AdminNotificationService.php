@@ -77,8 +77,11 @@ class AdminNotificationService
     /**
      * Thông báo khi có bài nộp mới
      */
-    public function notifyNewExamSubmission($submission, $exam, $student)
+    public function notifyNewExamSubmission($submission)
     {
+        $exam = $submission->exam;
+        $student = $submission->student ?? auth()->user();
+        
         return $this->notifyAdmins(
             '📝 Bài nộp mới',
             "Học sinh {$student->name} vừa nộp bài thi \"{$exam->title}\"",
