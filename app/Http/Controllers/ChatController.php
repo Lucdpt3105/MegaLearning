@@ -6,6 +6,7 @@ use App\Models\ChatRoom;
 use App\Models\ChatMessage;
 use App\Services\AIService;
 use App\Events\MessageSent;
+use App\Events\NewChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -223,11 +224,25 @@ class ChatController extends Controller
             // Update room's updated_at
             $room->touch();
 
-            // Broadcast event
+            // Broadcast event to room
             try {
                 broadcast(new MessageSent($message))->toOthers();
             } catch (\Exception $e) {
                 \Log::warning('Broadcast failed (Pusher not configured)', ['error' => $e->getMessage()]);
+            }
+            
+            // Broadcast NewChatMessage event to all room members (for header dropdown)
+            try {
+                $recipientIds = $room->members()
+                    ->where('user_id', '!=', $userId)
+                    ->pluck('user_id')
+                    ->toArray();
+                    
+                if (!empty($recipientIds)) {
+                    broadcast(new NewChatMessage($message, $recipientIds));
+                }
+            } catch (\Exception $e) {
+                \Log::warning('NewChatMessage broadcast failed', ['error' => $e->getMessage()]);
             }
 
             // Trigger AI response if configured and AI is a member

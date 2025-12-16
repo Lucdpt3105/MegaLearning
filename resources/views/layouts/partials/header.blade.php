@@ -238,43 +238,43 @@
                  x-transition:leave="transition ease-in duration-150"
                  x-transition:leave-start="opacity-100 scale-100"
                  x-transition:leave-end="opacity-0 scale-95"
-                 class="absolute right-0 mt-2 w-[380px] bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
+                 class="absolute right-0 mt-2 w-[420px] bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
                  style="display: none;">
                 
                 <!-- Header -->
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-base font-bold text-white">Tin Nhắn</h3>
-                        <a href="{{ route('chat') }}" class="text-xs font-medium text-white/90 hover:text-white transition-colors">
+                        <h3 class="text-lg font-bold text-white">Tin Nhắn</h3>
+                        <a href="{{ route('chat') }}" class="text-sm font-medium text-white/90 hover:text-white transition-colors">
                             Xem tất cả
                         </a>
                     </div>
                 </div>
 
                 <!-- Chat Rooms List -->
-                <div class="max-h-[420px] overflow-y-auto">
+                <div class="max-h-[480px] overflow-y-auto">
                     <template x-if="loading">
-                        <div class="py-8 px-6 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
-                                <svg class="animate-spin h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24">
+                        <div class="py-12 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-14 h-14 bg-gray-100 rounded-full mb-4">
+                                <svg class="animate-spin h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </div>
-                            <p class="text-sm font-medium text-gray-500">Đang tải...</p>
+                            <p class="text-base font-medium text-gray-500">Đang tải...</p>
                         </div>
                     </template>
 
                     <template x-if="!loading && rooms.length === 0">
-                        <div class="py-12 px-6 text-center">
-                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
-                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="py-16 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full mb-5">
+                                <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                                 </svg>
                             </div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-1">Chưa có tin nhắn</h4>
-                            <p class="text-xs text-gray-500">Bắt đầu trò chuyện ngay!</p>
-                            <a href="{{ route('chat') }}" class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition">
+                            <h4 class="text-base font-semibold text-gray-900 mb-2">Chưa có tin nhắn</h4>
+                            <p class="text-sm text-gray-500 mb-4">Bắt đầu trò chuyện ngay!</p>
+                            <a href="{{ route('chat') }}" class="inline-block px-6 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm">
                                 Mở Chat
                             </a>
                         </div>
@@ -284,10 +284,10 @@
                         <div class="divide-y divide-gray-100">
                             <template x-for="room in rooms" :key="room.id">
                                 <a :href="`{{ route('chat') }}?room=${room.id}`" 
-                                   class="flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors cursor-pointer">
+                                   class="flex items-start gap-3 px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer">
                                     <!-- Avatar -->
                                     <div class="flex-shrink-0 relative">
-                                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-base">
                                             <span x-text="getRoomInitial(room)"></span>
                                         </div>
                                         <template x-if="room.unread_count > 0">
@@ -298,11 +298,11 @@
                                     </div>
                                     <!-- Content -->
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-start justify-between gap-2 mb-1">
-                                            <p class="text-sm font-semibold text-gray-900 truncate" x-text="getRoomName(room)"></p>
-                                            <span class="text-[11px] text-gray-500 flex-shrink-0" x-text="formatChatTime(room.updated_at)"></span>
+                                        <div class="flex items-start justify-between gap-2 mb-1.5">
+                                            <p class="text-base font-semibold text-gray-900 truncate" x-text="getRoomName(room)"></p>
+                                            <span class="text-xs text-gray-500 flex-shrink-0" x-text="formatChatTime(room.updated_at)"></span>
                                         </div>
-                                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed" x-text="getLastMessage(room)"></p>
+                                        <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed" x-text="getLastMessage(room)"></p>
                                     </div>
                                 </a>
                             </template>
@@ -482,6 +482,20 @@ function chatDropdown() {
                     this.loadRooms();
                 }
             }, 10000);
+            
+            // Listen for real-time chat messages via Laravel Echo
+            if (typeof window.Echo !== 'undefined' && this.currentUserId > 0) {
+                window.Echo.private(`chat.user.${this.currentUserId}`)
+                    .listen('NewChatMessage', (e) => {
+                        console.log('New chat message received:', e);
+                        // Update unread count immediately
+                        this.loadUnreadCount();
+                        // Reload rooms if dropdown is open
+                        if (this.open) {
+                            this.loadRooms();
+                        }
+                    });
+            }
         },
         
         async loadRooms() {

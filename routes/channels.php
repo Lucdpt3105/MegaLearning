@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
+// Private channel for user to receive chat notifications
+Broadcast::channel('chat.user.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
+
 // Example: Authenticate user for private chat room channels
 Broadcast::channel('chat-room.{roomId}', function ($user, $roomId) {
     // For now, return true to allow all authenticated users
