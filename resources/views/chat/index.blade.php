@@ -1224,42 +1224,13 @@
                     </a>
                 `;
             } else {
-                messageContent = `
-                    <p class="text-sm ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'} whitespace-pre-wrap break-words">
-                        ${escapeHtml(msg.message_text)}
-                    </p>
-                `;
+                messageContent = `<p class="text-[17px] ${isCurrentUser && !isAI ? 'text-white' : 'text-gray-800'} whitespace-pre-wrap break-all overflow-wrap-anywhere m-0 p-0">${escapeHtml(msg.message_text)}</p>`;
             }
             
             // Determine padding based on message type - no padding for images
-            const bubblePadding = msg.message_type === 'image' ? 'p-0 overflow-hidden' : 'px-4 py-3';
+            const bubblePadding = msg.message_type === 'image' ? 'p-0 overflow-hidden' : 'px-1.5 py-1.5';
             
-            return `
-                <div data-message-id="${msgId}" class="chat-message flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
-                    <div class="flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2 max-w-2xl">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full ${isAI ? 'bg-gradient-to-r from-purple-500 to-pink-500' : isCurrentUser ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-400'} flex items-center justify-center text-white text-sm font-medium shadow-md">
-                            ${isAI ? '🤖' : (msg.user?.name?.charAt(0) || 'U')}
-                        </div>
-                        <div class="${isCurrentUser ? 'ml-2' : 'mr-2'}">
-                            <div class="flex items-baseline ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} space-x-2 mb-1">
-                                <span class="text-xs font-semibold ${isAI ? 'text-purple-600' : 'text-gray-700'}">
-                                    ${escapeHtml(msg.user?.name || 'Unknown')}
-                                </span>
-                                <span class="text-xs text-gray-400">
-                                    ${formatTime(msg.created_at)}
-                                </span>
-                            </div>
-                            <div class="${bubblePadding} rounded-2xl shadow-md ${
-                                isAI ? 'bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200' :
-                                isCurrentUser ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 
-                                'bg-white border border-gray-200'
-                            }">
-                                ${messageContent}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            return `<div data-message-id="${msgId}" class="chat-message flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2"><div class="flex ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} items-end gap-1.5 max-w-[65%]"><div class="flex-shrink-0 w-7 h-7 rounded-full ${isAI ? 'bg-gradient-to-r from-purple-500 to-pink-500' : isCurrentUser ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium shadow-sm">${isAI ? '🤖' : (msg.user?.name?.charAt(0) || 'U')}</div><div class="flex-1 min-w-0"><div class="flex items-baseline ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'} gap-1.5 mb-0.5"><span class="text-[11px] font-medium ${isAI ? 'text-purple-600' : 'text-gray-600'}">${escapeHtml(msg.user?.name || 'Unknown')}</span><span class="text-[10px] text-gray-400">${formatTime(msg.created_at)}</span></div><div class="${bubblePadding} rounded-xl shadow-sm max-w-full ${isAI ? 'bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200' : isCurrentUser ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 'bg-white border border-gray-200'}">${messageContent}</div></div></div></div>`;
         }
 
         // Append new message

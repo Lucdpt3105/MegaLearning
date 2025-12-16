@@ -222,12 +222,102 @@
         </div>
 
         <!-- Messages -->
-        <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-            </svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-green-500 rounded-full"></span>
-        </button>
+        <div x-data="chatDropdown()" @click.away="open = false" class="relative">
+            <button @click="open = !open; if(open) loadRooms()" class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+                <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-green-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1"></span>
+            </button>
+
+            <!-- Chat Dropdown -->
+            <div x-show="open" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="absolute right-0 mt-2 w-[380px] bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
+                 style="display: none;">
+                
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold text-white">Tin Nhắn</h3>
+                        <a href="{{ route('chat') }}" class="text-xs font-medium text-white/90 hover:text-white transition-colors">
+                            Xem tất cả
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Chat Rooms List -->
+                <div class="max-h-[420px] overflow-y-auto">
+                    <template x-if="loading">
+                        <div class="py-8 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-3">
+                                <svg class="animate-spin h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-medium text-gray-500">Đang tải...</p>
+                        </div>
+                    </template>
+
+                    <template x-if="!loading && rooms.length === 0">
+                        <div class="py-12 px-6 text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-50 rounded-full mb-4">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-semibold text-gray-900 mb-1">Chưa có tin nhắn</h4>
+                            <p class="text-xs text-gray-500">Bắt đầu trò chuyện ngay!</p>
+                            <a href="{{ route('chat') }}" class="inline-block mt-3 px-4 py-2 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition">
+                                Mở Chat
+                            </a>
+                        </div>
+                    </template>
+
+                    <template x-if="!loading && rooms.length > 0">
+                        <div class="divide-y divide-gray-100">
+                            <template x-for="room in rooms" :key="room.id">
+                                <a :href="`{{ route('chat') }}?room=${room.id}`" 
+                                   class="flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <!-- Avatar -->
+                                    <div class="flex-shrink-0 relative">
+                                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                                            <span x-text="getRoomInitial(room)"></span>
+                                        </div>
+                                        <template x-if="room.unread_count > 0">
+                                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                                <span x-text="room.unread_count > 9 ? '9+' : room.unread_count"></span>
+                                            </span>
+                                        </template>
+                                    </div>
+                                    <!-- Content -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-2 mb-1">
+                                            <p class="text-sm font-semibold text-gray-900 truncate" x-text="getRoomName(room)"></p>
+                                            <span class="text-[11px] text-gray-500 flex-shrink-0" x-text="formatChatTime(room.updated_at)"></span>
+                                        </div>
+                                        <p class="text-xs text-gray-600 line-clamp-2 leading-relaxed" x-text="getLastMessage(room)"></p>
+                                    </div>
+                                </a>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-gray-50 px-5 py-3 border-t border-gray-200">
+                    <a href="{{ route('chat') }}" class="block text-center text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                        Mở ứng dụng Chat
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- Divider -->
         <div class="w-px h-8 bg-gray-200"></div>
@@ -369,6 +459,104 @@ function notificationDropdown() {
                 day: '2-digit', 
                 month: '2-digit', 
                 year: 'numeric' 
+            });
+        }
+    }
+}
+
+// Chat Dropdown Component
+function chatDropdown() {
+    return {
+        open: false,
+        loading: false,
+        rooms: [],
+        unreadCount: 0,
+        currentUserId: {{ auth()->id() ?? 0 }},
+        
+        init() {
+            this.loadUnreadCount();
+            // Poll for new messages every 10 seconds
+            setInterval(() => {
+                this.loadUnreadCount();
+                if (this.open) {
+                    this.loadRooms();
+                }
+            }, 10000);
+        },
+        
+        async loadRooms() {
+            this.loading = true;
+            try {
+                const response = await fetch('/api/v1/chat/rooms', {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.rooms = data.data.slice(0, 5); // Show only 5 recent rooms
+                }
+            } catch (error) {
+                console.error('Error loading chat rooms:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        async loadUnreadCount() {
+            try {
+                const response = await fetch('/api/v1/chat/unread-count', {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.unreadCount = data.count || 0;
+                }
+            } catch (error) {
+                console.error('Error loading unread count:', error);
+            }
+        },
+        
+        getRoomName(room) {
+            if (room.room_type === 'private' && room.members && room.members.length > 0) {
+                const otherUser = room.members.find(m => m.id !== this.currentUserId);
+                return otherUser ? otherUser.name : room.room_name;
+            }
+            return room.room_name || 'Chat';
+        },
+        
+        getRoomInitial(room) {
+            const name = this.getRoomName(room);
+            return name.charAt(0).toUpperCase();
+        },
+        
+        getLastMessage(room) {
+            if (room.latest_message) {
+                const text = room.latest_message.message_text;
+                return text.length > 50 ? text.substring(0, 50) + '...' : text;
+            }
+            return 'Chưa có tin nhắn';
+        },
+        
+        formatChatTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Vừa xong';
+            if (diffMins < 60) return `${diffMins}p`;
+            if (diffHours < 24) return `${diffHours}h`;
+            if (diffDays < 7) return `${diffDays}d`;
+            
+            return date.toLocaleDateString('vi-VN', { 
+                day: '2-digit', 
+                month: '2-digit'
             });
         }
     }
