@@ -47,12 +47,17 @@ class SubjectController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:subjects,code',
+            'code' => 'nullable|string|max:50|unique:subjects,code',
             'description' => 'nullable|string',
             'status' => 'required|in:draft,active,archived',
         ]);
 
         $teacher = Auth::user();
+
+        // Tự động generate code nếu không có
+        if (empty($validated['code'])) {
+            $validated['code'] = $this->generateSubjectCode($validated['name']);
+        }
 
         DB::beginTransaction();
         try {
@@ -442,5 +447,63 @@ class SubjectController extends Controller
 
         return response()->json($topics);
     }
-}
 
+    /**
+     * Tự động generate mã môn học duy nhất
+     */
+    private function generateSubjectCode($name)
+    {
+        // Lấy chữ cái đầu của mỗi từ
+        $words = explode(' ', strtoupper($name));
+        $code = '';
+        
+        foreach ($words as $word) {
+            if (!empty($word)) {
+                // Loại bỏ dấu tiếng Việt
+                $word = $this->removeVietnameseTones($word);
+                $code .= substr($word, 0, 1);
+            }
+        }
+        
+        // Nếu code quá ngắn, lấy thêm ký tự
+        if (strlen($code) < 3) {
+            $cleanName = $this->removeVietnameseTones(strtoupper(str_replace(' ', '', $name)));
+            $code = substr($cleanName, 0, 6);
+        }
+        
+        // Kiểm tra trùng và thêm số nếu cần
+        $originalCode = $code;
+        $counter = 1;
+        
+        while (Subject::where('code', $code)->exists()) {
+            $code = $originalCode . $counter;
+            $counter++;
+        }
+        
+        return $code;
+    }
+
+    /**
+     * Loại bỏ dấu tiếng Việt
+     */
+    private function removeVietnameseTones($str)
+    {
+        $str = preg_replace("/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/", 'a', $str);
+        $str = preg_replace("/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/", 'e', $str);
+        $str = preg_replace("/(ì|í|ị|ỉ|ĩ)/", 'i', $str);
+        $str = preg_replace("/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/", 'o', $str);
+        $str = preg_replace("/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/", 'u', $str);
+        $str = preg_replace("/(ỳ|ý|ỵ|ỷ|ỹ)/", 'y', $str);
+        $str = preg_replace("/(đ)/", 'd', $str);
+        
+        $str = preg_replace("/(À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ)/", 'A', $str);
+        $str = preg_replace("/(È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ)/", 'E', $str);
+        $str = preg_replace("/(Ì|Í|Ị|Ỉ|Ĩ)/", 'I', $str);
+        $str = preg_replace("/(Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ)/", 'O', $str);
+        $str = preg_replace("/(Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ)/", 'U', $str);
+        $str = preg_replace("/(Ỳ|Ý|Ỵ|Ỷ|Ỹ)/", 'Y', $str);
+        $str = preg_replace("/(Đ)/", 'D', $str);
+        
+        return $str;
+    }
+}

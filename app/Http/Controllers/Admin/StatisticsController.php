@@ -10,7 +10,6 @@ use App\Models\Exam;
 use App\Models\ExamSubmission;
 use App\Models\Document;
 use App\Models\ClassRoom;
-use App\Models\StudentRanking;
 use App\Models\VideoCall;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,96 +22,36 @@ use Carbon\Carbon;
 class StatisticsController extends Controller
 {
     /**
-     * Dashboard Thống kê chính
-     * Display the main statistics dashboard
-     */
-    public function index()
-    {
-        // Log đăng nhập (luôn hiển thị - <<include>>)
-        $loginStats = $this->getLoginStats();
-
-        // Thống kê tổng quan
-        $overviewStats = $this->getOverviewStats();
-
-        return view('admin.statistics.index', compact('loginStats', 'overviewStats'));
-    }
-
-    /**
-     * Log đăng nhập
-     * Get login statistics (24 hours)
-     */
-    public function getLoginStats()
-    {
-        $last24Hours = Carbon::now()->subDay();
-
-        $successfulLogins = ActivityLog::where('action', 'login')
-            ->where('created_at', '>=', $last24Hours)
-            ->whereNull('description') // Successful login has no error description
-            ->count();
-
-        $failedLogins = ActivityLog::where('action', 'login_failed')
-            ->where('created_at', '>=', $last24Hours)
-            ->count();
-
-        // Lượt đăng nhập theo giờ (24 giờ qua)
-        $hourlyLogins = ActivityLog::where('action', 'login')
-            ->where('created_at', '>=', $last24Hours)
-            ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as count'))
-            ->groupBy('hour')
-            ->orderBy('hour')
-            ->get();
-
-        // Top users đăng nhập nhiều nhất
-        $topUsers = ActivityLog::where('action', 'login')
-            ->where('created_at', '>=', $last24Hours)
-            ->select('user_id', DB::raw('COUNT(*) as login_count'))
-            ->groupBy('user_id')
-            ->orderByDesc('login_count')
-            ->limit(10)
-            ->with('user:id,name,email')
-            ->get();
-
-        return [
-            'successful' => $successfulLogins,
-            'failed' => $failedLogins,
-            'hourly' => $hourlyLogins,
-            'top_users' => $topUsers,
-            'total' => $successfulLogins + $failedLogins,
-            'success_rate' => $successfulLogins + $failedLogins > 0 
-                ? round(($successfulLogins / ($successfulLogins + $failedLogins)) * 100, 2) 
-                : 0,
-        ];
-    }
-
-    /**
      * Log hoạt động (<<extend>>)
      * Detailed activity logs
      */
     public function activityLogs(Request $request)
     {
-        $query = ActivityLog::with('user')
-            ->orderByDesc('created_at');
+        $query = ActivityLog::with('user');
 
         // Filters
-        if ($request->has('action')) {
+        if ($request->filled('action')) {
             $query->where('action', $request->action);
         }
 
-        if ($request->has('user_id')) {
+        if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
-        if ($request->has('entity_type')) {
+        if ($request->filled('entity_type')) {
             $query->where('entity_type', $request->entity_type);
         }
 
-        if ($request->has('date_from')) {
+        if ($request->filled('date_from')) {
             $query->where('created_at', '>=', $request->date_from);
         }
 
-        if ($request->has('date_to')) {
+        if ($request->filled('date_to')) {
             $query->where('created_at', '<=', $request->date_to);
         }
+
+        // Sắp xếp theo thời gian mới nhất
+        $query->orderBy('created_at', 'DESC')->orderBy('id', 'DESC');
 
         $logs = $query->paginate(50);
 
@@ -129,68 +68,6 @@ class StatisticsController extends Controller
             ->pluck('entity_type');
 
         return view('admin.statistics.activity-logs', compact('logs', 'actionTypes', 'entityTypes'));
-    }
-
-    /**
-     * Thống kê thời lượng (<<extend>>)
-     * Average usage duration statistics
-     */
-    public function usageDuration(Request $request)
-    {
-        $period = $request->get('period', '7days'); // 7days, 30days, 90days
-
-        $days = match($period) {
-            '7days' => 7,
-            '30days' => 30,
-            '90days' => 90,
-            default => 7,
-        };
-
-        $startDate = Carbon::now()->subDays($days);
-
-        // Thống kê thời gian sử dụng trung bình theo vai trò
-        $usageByRole = User::select('users.id', 'users.name', 'users.email', 'model_has_roles.role_id')
-            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->leftJoin('activity_logs', function($join) use ($startDate) {
-                $join->on('users.id', '=', 'activity_logs.user_id')
-                     ->where('activity_logs.created_at', '>=', $startDate);
-            })
-            ->select(
-                'roles.name as role_name',
-                DB::raw('COUNT(DISTINCT users.id) as user_count'),
-                DB::raw('COUNT(activity_logs.id) as total_actions'),
-                DB::raw('ROUND(COUNT(activity_logs.id) / COUNT(DISTINCT users.id), 2) as avg_actions_per_user')
-            )
-            ->groupBy('roles.name')
-            ->get();
-
-        // Thời gian sử dụng theo ngày
-        $dailyUsage = ActivityLog::where('created_at', '>=', $startDate)
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as total_actions'),
-                DB::raw('COUNT(DISTINCT user_id) as active_users')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        // Top active users
-        $topActiveUsers = ActivityLog::where('created_at', '>=', $startDate)
-            ->select('user_id', DB::raw('COUNT(*) as action_count'))
-            ->groupBy('user_id')
-            ->orderByDesc('action_count')
-            ->limit(20)
-            ->with('user:id,name,email')
-            ->get();
-
-        return view('admin.statistics.usage-duration', compact(
-            'usageByRole', 
-            'dailyUsage', 
-            'topActiveUsers', 
-            'period'
-        ));
     }
 
     /**
@@ -262,65 +139,5 @@ class StatisticsController extends Controller
             'examParticipation',
             'completionRate'
         ));
-    }
-
-    /**
-     * Overview statistics for dashboard
-     */
-    private function getOverviewStats()
-    {
-        return [
-            'total_users' => User::count(),
-            'total_teachers' => User::role('teacher')->count(),
-            'total_students' => User::role('student')->count(),
-            'total_subjects' => Subject::count(),
-            'total_classes' => ClassRoom::count(),
-            'total_exams' => Exam::count(),
-            'total_documents' => Document::count(),
-            'total_submissions' => ExamSubmission::count(),
-            'active_users_today' => ActivityLog::whereDate('created_at', today())
-                ->distinct('user_id')
-                ->count('user_id'),
-        ];
-    }
-
-    /**
-     * Get student rankings
-     * Related to Thống kê điểm số và xếp hạng
-     */
-    public function rankings(Request $request)
-    {
-        $query = StudentRanking::with(['student:id,name,email', 'classRoom:id,name', 'subject:id,name'])
-            ->orderByDesc('gpa');
-
-        // Filters
-        if ($request->has('class_room_id')) {
-            $query->where('class_room_id', $request->class_room_id);
-        }
-
-        if ($request->has('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-
-        $rankings = $query->paginate(50);
-
-        $classRooms = ClassRoom::select('id', 'name')->orderBy('name')->get();
-        $subjects = Subject::select('id', 'name')->orderBy('name')->get();
-
-        return view('admin.statistics.rankings', compact('rankings', 'classRooms', 'subjects'));
-    }
-
-    /**
-     * Export statistics to Excel/PDF
-     */
-    public function export(Request $request)
-    {
-        $type = $request->get('type', 'overview');
-        
-        // TODO: Implement export functionality using Laravel Excel
-        return response()->json([
-            'message' => 'Export functionality will be implemented',
-            'type' => $type
-        ]);
     }
 }

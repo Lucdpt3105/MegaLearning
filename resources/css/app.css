@@ -533,17 +533,16 @@
 
 /* Sidebar Container */
 .sidebar-container {
-    position: fixed;
-    left: 0;
+    position: sticky;
     top: 0;
     height: 100vh;
     width: 14rem;
-    z-index: 40;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.3s ease;
 }
 
 .sidebar-container.collapsed {
-    width: 3.5rem;
+    width: 0;
+    overflow: hidden;
 }
 
 /* Hamburger Toggle Button */

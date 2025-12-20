@@ -129,10 +129,6 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 Route::prefix('teacher')->name('teacher.')->middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('dashboard');
     
-    // Categories (Read-only)
-    Route::get('/categories', [App\Http\Controllers\Teacher\CategoryController::class, 'index'])->name('categories.index');
-    Route::get('/categories/{category}', [App\Http\Controllers\Teacher\CategoryController::class, 'show'])->name('categories.show');
-    
     // Phase 1: Subject Management (UC-GV-010 to UC-GV-015)
     Route::resource('subjects', App\Http\Controllers\Teacher\SubjectController::class);
     Route::post('/subjects/{subject}/chat-room', [App\Http\Controllers\Teacher\SubjectController::class, 'createChatRoom'])->name('subjects.chat-room.create');
@@ -223,6 +219,10 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
+    // Admin Search Routes (cho thanh tìm kiếm trong admin panel)
+    Route::get('/search', [App\Http\Controllers\Admin\AdminSearchController::class, 'search'])->name('search');
+    Route::get('/search/full', [App\Http\Controllers\Admin\AdminSearchController::class, 'fullSearch'])->name('search.full');
+
     // ADMIN COURSES (THEO NEO UI)
     Route::prefix('courses')->name('courses.')->group(function () {
         Route::get('/', [App\Http\Controllers\Admin\CourseController::class, 'index'])
@@ -299,14 +299,8 @@ Route::post('/profile/avatar', [App\Http\Controllers\Admin\ProfileController::cl
     | 📌 4. ADMIN → VIEW USERS BY ROLE
     |--------------------------------------------------------------------------
     */
- Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])
-    ->name('students.index');
+    // Routes moved to section 5 below
 
-Route::get('/teachers', [App\Http\Controllers\Admin\UserManagementController::class, 'teachers'])
-    ->name('teachers.index');
-
-Route::get('/admins', [App\Http\Controllers\Admin\UserManagementController::class, 'admins'])
-    ->name('admins.index');
 
     Route::get('/profile', function () {
     return view('admin.profile');
@@ -326,31 +320,28 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     |--------------------------------------------------------------------------
     */
 
-    // Statistics Dashboard
-    Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('statistics.index');
+    // Statistics
     Route::get('/statistics/activity-logs', [App\Http\Controllers\Admin\StatisticsController::class, 'activityLogs'])->name('statistics.activity-logs');
-    Route::get('/statistics/usage-duration', [App\Http\Controllers\Admin\StatisticsController::class, 'usageDuration'])->name('statistics.usage-duration');
     Route::get('/statistics/participation', [App\Http\Controllers\Admin\StatisticsController::class, 'participation'])->name('statistics.participation');
-    Route::get('/statistics/rankings', [App\Http\Controllers\Admin\StatisticsController::class, 'rankings'])->name('statistics.rankings');
-    Route::get('/statistics/export', [App\Http\Controllers\Admin\StatisticsController::class, 'export'])->name('statistics.export');
 
-
-    // User Management (resource)
-    Route::resource('users', App\Http\Controllers\Admin\UserManagementController::class);
-    Route::post('users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
-    Route::post('users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
+    // User Management - Students, Teachers, Admins
+    Route::get('/students', [App\Http\Controllers\Admin\UserManagementController::class, 'students'])->name('students.index');
+    Route::get('/teachers', [App\Http\Controllers\Admin\UserManagementController::class, 'teachers'])->name('teachers.index');
+    Route::get('/admins', [App\Http\Controllers\Admin\UserManagementController::class, 'admins'])->name('admins.index');
+    
+    // User CRUD operations
+    Route::get('/users/create', [App\Http\Controllers\Admin\UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('users.destroy');
+    Route::patch('/users/{user}/toggle-lock', [App\Http\Controllers\Admin\UserManagementController::class, 'toggleLock'])->name('users.toggle-lock');
+    Route::post('/users/{user}/permissions', [App\Http\Controllers\Admin\UserManagementController::class, 'updatePermissions'])->name('users.permissions');
 
 
     // Subjects
     Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class);
-
-    // Categories
-    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
-
-    // Lessons
-    Route::get('/lessons', fn() => view('admin.lessons.index'))->name('lessons.index');
-    Route::get('/lessons/create', fn() => view('admin.lessons.create'))->name('lessons.create');
-    Route::post('/lessons', fn() => redirect()->route('admin.lessons.index'))->name('lessons.store');
 
     // Topics
     Route::get('/topics', fn() => view('admin.topics.index'))->name('topics.index');
@@ -358,52 +349,62 @@ Route::post('/settings/update-security', [App\Http\Controllers\Admin\SettingsCon
     Route::get('/topics/{id}/edit', fn($id) => view('admin.topics.edit', ['id' => $id]))->name('topics.edit');
 
     // Questions Management (Link với Teacher's Questions)
-    Route::resource('questions', App\Http\Controllers\Admin\QuestionManagementController::class);
+    Route::get('/questions/subjects/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'bySubject'])->name('questions.by-subject');
+    Route::get('/questions/export/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'export'])->name('questions.export');
+    Route::post('/questions/import/{subject}', [App\Http\Controllers\Admin\QuestionManagementController::class, 'import'])->name('questions.import');
+    Route::get('/questions/download-template', [App\Http\Controllers\Admin\QuestionManagementController::class, 'downloadTemplate'])->name('questions.download-template');
     Route::post('/questions/bulk-delete', [App\Http\Controllers\Admin\QuestionManagementController::class, 'bulkDestroy'])->name('questions.bulk-delete');
+    Route::resource('questions', App\Http\Controllers\Admin\QuestionManagementController::class);
 
     // Exams Management (Link với Teacher's Exams)
-    Route::get('/exams/{exam}/questions', [App\Http\Controllers\Admin\ExamManagementController::class, 'questions'])->name('exams.questions');
+    Route::post('/exams/{exam}/questions/add', [App\Http\Controllers\Admin\ExamManagementController::class, 'addQuestions'])->name('exams.questions.add');
+    Route::post('/exams/{exam}/questions/create', [App\Http\Controllers\Admin\ExamManagementController::class, 'createQuestion'])->name('exams.questions.create');
+    Route::delete('/exams/{exam}/questions/{examQuestion}', [App\Http\Controllers\Admin\ExamManagementController::class, 'removeQuestion'])->name('exams.questions.remove');
+    Route::put('/exams/{exam}/questions/reorder', [App\Http\Controllers\Admin\ExamManagementController::class, 'reorderQuestions'])->name('exams.questions.reorder');
+    Route::post('/exams/{exam}/publish', [App\Http\Controllers\Admin\ExamManagementController::class, 'publish'])->name('exams.publish');
+    Route::post('/exams/{exam}/notify', [App\Http\Controllers\Admin\ExamManagementController::class, 'sendNotification'])->name('exams.notify');
+    Route::post('/exams/import', [App\Http\Controllers\Admin\ExamManagementController::class, 'importFromExcel'])->name('exams.import');
     Route::get('/exams/{exam}/results', [App\Http\Controllers\Admin\ExamManagementController::class, 'results'])->name('exams.results');
     Route::post('/exams/{exam}/status', [App\Http\Controllers\Admin\ExamManagementController::class, 'updateStatus'])->name('exams.update-status');
     Route::resource('exams', App\Http\Controllers\Admin\ExamManagementController::class);
 
     // Exam Results
-    Route::get('/exam-results', fn() => view('admin.exam-results.index'))->name('exam-results.index');
+    Route::get('/exam-results', [App\Http\Controllers\Admin\ExamResultsController::class, 'index'])->name('exam-results.index');
+    Route::get('/exam-results/{submission}', [App\Http\Controllers\Admin\ExamResultsController::class, 'show'])->name('exam-results.show');
 
     // Forums
-    Route::get('/forums/topics', fn() => view('admin.forums.topics'))->name('forums.topics');
-    Route::post('/forums/topics', fn() => redirect()->route('admin.forums.topics'))->name('forums.topics.create');
-    Route::get('/forums/posts', fn() => view('admin.forums.posts'))->name('forums.posts');
-    Route::get('/forums/moderation', fn() => view('admin.forums.moderation'))->name('forums.moderation');
+    Route::get('/forums/topics', [App\Http\Controllers\Admin\ForumController::class, 'topics'])->name('forums.topics');
+    Route::post('/forums/threads/{id}/approve', [App\Http\Controllers\Admin\ForumController::class, 'approveThread'])->name('forums.threads.approve');
+    Route::post('/forums/threads/{id}/reject', [App\Http\Controllers\Admin\ForumController::class, 'rejectThread'])->name('forums.threads.reject');
+    Route::delete('/forums/threads/{id}', [App\Http\Controllers\Admin\ForumController::class, 'deleteThread'])->name('forums.threads.delete');
+    Route::post('/forums/threads/{id}/toggle-pin', [App\Http\Controllers\Admin\ForumController::class, 'togglePin'])->name('forums.threads.toggle-pin');
+    Route::post('/forums/threads/{id}/toggle-lock', [App\Http\Controllers\Admin\ForumController::class, 'toggleLock'])->name('forums.threads.toggle-lock');
+    
+    Route::get('/forums/posts', [App\Http\Controllers\Admin\ForumController::class, 'posts'])->name('forums.posts');
+    Route::post('/forums/posts/{id}/approve', [App\Http\Controllers\Admin\ForumController::class, 'approvePost'])->name('forums.posts.approve');
+    Route::post('/forums/posts/{id}/reject', [App\Http\Controllers\Admin\ForumController::class, 'rejectPost'])->name('forums.posts.reject');
+    Route::delete('/forums/posts/{id}', [App\Http\Controllers\Admin\ForumController::class, 'deletePost'])->name('forums.posts.delete');
+    
+    Route::get('/forums/moderation', [App\Http\Controllers\Admin\ForumController::class, 'moderation'])->name('forums.moderation');
 
     // Meetings
-    Route::get('/meetings/rooms', fn() => view('admin.meetings.rooms'))->name('meetings.rooms');
-    Route::post('/meetings/rooms', fn() => redirect()->route('admin.meetings.rooms'))->name('meetings.rooms.create');
+    Route::get('/meetings', [App\Http\Controllers\Admin\MeetingController::class, 'index'])->name('meetings.index');
+    Route::get('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'rooms'])->name('meetings.rooms');
+    Route::post('/meetings', [App\Http\Controllers\Admin\MeetingController::class, 'store'])->name('meetings.store');
+    Route::post('/meetings/rooms', [App\Http\Controllers\Admin\MeetingController::class, 'store'])->name('meetings.rooms.create');
+    Route::patch('/meetings/{id}/status', [App\Http\Controllers\Admin\MeetingController::class, 'updateStatus'])->name('meetings.updateStatus');
+    Route::delete('/meetings/{id}', [App\Http\Controllers\Admin\MeetingController::class, 'destroy'])->name('meetings.destroy');
     Route::get('/meetings/schedule', fn() => view('admin.meetings.schedule'))->name('meetings.schedule');
     Route::post('/meetings/schedule', fn() => redirect()->route('admin.meetings.schedule'))->name('meetings.schedule.create');
-    Route::get('/meetings/history', fn() => view('admin.meetings.history'))->name('meetings.history');
+    Route::get('/meetings/history', [App\Http\Controllers\Admin\MeetingController::class, 'history'])->name('meetings.history');
 
     // Files
-    Route::get('/files', fn() => view('admin.files.index'))->name('files.index');
-    Route::get('/files/upload', fn() => view('admin.files.upload'))->name('files.upload');
-    Route::post('/files', fn() => redirect()->route('admin.files.index'))->name('files.store');
-
-    // Reports
-    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
-    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
-    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
-
-    // Reports
-    Route::get('/reports/students', fn() => view('admin.reports.students'))->name('reports.students');
-    Route::get('/reports/courses', fn() => view('admin.reports.courses'))->name('reports.courses');
-    Route::get('/reports/exams', fn() => view('admin.reports.exams'))->name('reports.exams');
-
-    // Statistics (detailed analytics)
-    Route::get('/statistics', fn() => view('admin.statistics.index'))->name('statistics.index');
-    Route::get('/statistics/activity-logs', fn() => view('admin.statistics.activity-logs'))->name('statistics.activity-logs');
-    Route::get('/statistics/usage-duration', fn() => view('admin.statistics.usage-duration'))->name('statistics.usage-duration');
-    Route::get('/statistics/participation', fn() => view('admin.statistics.participation'))->name('statistics.participation');
-    Route::get('/statistics/rankings', fn() => view('admin.statistics.rankings'))->name('statistics.rankings');
+    Route::get('/files', [App\Http\Controllers\Admin\FileController::class, 'index'])->name('files.index');
+    Route::get('/files/create', [App\Http\Controllers\Admin\FileController::class, 'create'])->name('files.create');
+    Route::get('/files/upload', [App\Http\Controllers\Admin\FileController::class, 'create'])->name('files.upload');
+    Route::post('/files', [App\Http\Controllers\Admin\FileController::class, 'store'])->name('files.store');
+    Route::get('/files/{id}/download', [App\Http\Controllers\Admin\FileController::class, 'download'])->name('files.download');
+    Route::delete('/files/{id}', [App\Http\Controllers\Admin\FileController::class, 'destroy'])->name('files.destroy');
 
     // Settings
     Route::get('/settings/email', fn() => view('admin.settings.email'))->name('settings.email');
@@ -430,6 +431,83 @@ Route::prefix('forum')->middleware(['auth'])->group(function () {
     Route::post('/{forumQuestion}/answers/{forumAnswer}/vote/up', [ForumQuestionController::class, 'voteAnswerUp'])->name('forum.answer.vote.up');
     Route::post('/{forumQuestion}/answers/{forumAnswer}/vote/down', [ForumQuestionController::class, 'voteAnswerDown'])->name('forum.answer.vote.down');
     Route::delete('/{forumQuestion}/answers/{forumAnswer}', [ForumQuestionController::class, 'destroyAnswer'])->name('forum.answer.destroy');
+});
+
+// ============================================
+// TEST ROUTES - CHỈ DÙNG KHI DEVELOP
+// ============================================
+Route::middleware(['auth', 'role:admin'])->prefix('test')->name('test.')->group(function () {
+    // Test Admin Notifications - Cơ bản
+    Route::get('/admin-notification', function() {
+        $service = app(\App\Services\AdminNotificationService::class);
+        
+        $count = $service->notifyAdmins(
+            '🧪 Test Thông báo',
+            'Đây là thông báo test từ route /test/admin-notification. Nếu bạn thấy thông báo này, nghĩa là hệ thống đang hoạt động!',
+            'general',
+            route('admin.dashboard')
+        );
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Đã gửi {$count} thông báo cho admin!",
+            'count' => $count,
+            'instructions' => 'Kiểm tra chuông thông báo ở góc trên bên phải admin panel'
+        ]);
+    })->name('notification');
+
+    // Test với nhiều loại thông báo
+    Route::get('/admin-notification/fake-data', function() {
+        $service = app(\App\Services\AdminNotificationService::class);
+        
+        // Tạo các thông báo test khác nhau
+        $notifications = [
+            [
+                'title' => '🎓 Học sinh mới đăng ký',
+                'message' => 'Nguyễn Văn A (nguyenvana@test.com) vừa đăng ký tài khoản.',
+                'type' => 'user_registration'
+            ],
+            [
+                'title' => '👨‍🏫 Giáo viên mới đăng ký', 
+                'message' => 'Trần Thị B (tranthib@test.com) vừa đăng ký tài khoản.',
+                'type' => 'user_registration'
+            ],
+            [
+                'title' => '📝 Bài nộp mới',
+                'message' => 'Học sinh Lê Văn C vừa nộp bài thi "Kiểm tra giữa kỳ"',
+                'type' => 'exam_submission'
+            ],
+            [
+                'title' => '📚 Lớp học mới',
+                'message' => 'Giáo viên Phạm Thị D vừa tạo lớp học "Toán 12A1"',
+                'type' => 'class_created'
+            ],
+            [
+                'title' => '📄 Tài liệu mới',
+                'message' => 'GV Hoàng Văn E vừa upload tài liệu "Đề cương ôn tập.pdf"',
+                'type' => 'document_uploaded'
+            ],
+        ];
+        
+        $totalCount = 0;
+        foreach ($notifications as $notif) {
+            $count = $service->notifyAdmins(
+                $notif['title'],
+                $notif['message'],
+                $notif['type'],
+                route('admin.dashboard')
+            );
+            $totalCount += $count;
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Đã tạo {$totalCount} thông báo test với nhiều loại khác nhau!",
+            'total_notifications' => $totalCount,
+            'notifications_sent' => count($notifications),
+            'instructions' => 'Kiểm tra chuông thông báo và trang /notifications'
+        ]);
+    })->name('notification.fake');
 });
 
 // Authentication Routes

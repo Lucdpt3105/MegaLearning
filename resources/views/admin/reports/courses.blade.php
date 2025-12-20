@@ -1,11 +1,11 @@
 @extends('admin.layout')
 
-@section('title', 'Thống kê khóa học')
+@section('title', 'Thống kê lớp học')
 
 @section('content')
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Thống kê khóa học</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Thống kê lớp học</h1>
         <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
             <i data-feather="download" class="w-4 h-4 inline"></i> Xuất báo cáo
         </button>
@@ -13,9 +13,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white rounded-lg shadow p-6">
-            <div class="text-sm text-gray-500">Tổng số khóa học</div>
+            <div class="text-sm text-gray-500">Tổng số lớp học</div>
             <div class="text-3xl font-bold text-blue-600 mt-2">35</div>
-            <div class="text-xs text-green-600 mt-1">↑ 5 khóa mới</div>
+            <div class="text-xs text-green-600 mt-1">↑ 5 lớp mới</div>
         </div>
         <div class="bg-white rounded-lg shadow p-6">
             <div class="text-sm text-gray-500">Đang diễn ra</div>

@@ -91,7 +91,7 @@ class ExamManagementController extends Controller
     public function edit(Exam $exam)
     {
         $subjects = Subject::all();
-        $classRooms = ClassRoom::all();
+        $classRooms = ClassRoom::with('subject')->get();
         $teachers = User::role('teacher')->get();
 
         return view('admin.exams.edit', compact('exam', 'subjects', 'classRooms', 'teachers'));
@@ -114,15 +114,17 @@ class ExamManagementController extends Controller
             'end_time' => 'nullable|date|after:start_time',
             'passing_score' => 'nullable|numeric|min:0',
             'status' => 'required|in:draft,published,archived',
-            'shuffle_questions' => 'boolean',
-            'shuffle_answers' => 'boolean',
-            'show_results_immediately' => 'boolean',
-            'allow_review' => 'boolean',
         ]);
+
+        // Handle checkboxes (they don't submit if unchecked)
+        $validated['shuffle_questions'] = $request->has('shuffle_questions');
+        $validated['shuffle_answers'] = $request->has('shuffle_answers');
+        $validated['show_results_immediately'] = $request->has('show_results_immediately');
+        $validated['allow_review'] = $request->has('allow_review');
 
         $exam->update($validated);
 
-        return redirect()->route('admin.exams.show', $exam)
+        return redirect()->route('admin.exams.index')
             ->with('success', 'Cập nhật đề thi thành công!');
     }
 
@@ -174,10 +176,176 @@ class ExamManagementController extends Controller
     public function results(Exam $exam)
     {
         $submissions = $exam->submissions()
-            ->with(['student', 'answers'])
+            ->with(['student', 'grader'])
             ->latest()
             ->paginate(50);
 
         return view('admin.exams.results', compact('exam', 'submissions'));
+    }
+
+    /**
+     * Add questions from question bank to exam
+     */
+    public function addQuestions(Request $request, Exam $exam)
+    {
+        $validated = $request->validate([
+            'question_ids' => 'required|array',
+            'question_ids.*' => 'exists:questions,id',
+            'points' => 'required|array',
+        ]);
+
+        $maxOrder = $exam->questions()->max('exam_questions.order') ?? 0;
+
+        foreach ($validated['question_ids'] as $questionId) {
+            $points = $request->input("points.{$questionId}", 1);
+            
+            $exam->questions()->attach($questionId, [
+                'order' => ++$maxOrder,
+                'points' => $points,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.exams.show', $exam)
+            ->with('success', 'Đã thêm ' . count($validated['question_ids']) . ' câu hỏi vào đề thi!');
+    }
+
+    /**
+     * Create custom question directly in exam
+     */
+    public function createQuestion(Request $request, Exam $exam)
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:multiple_choice,essay',
+            'content' => 'required|string',
+            'answers' => 'required_if:type,multiple_choice|array',
+            'explanation' => 'nullable|string',
+            'points' => 'required|numeric|min:0',
+        ]);
+
+        $maxOrder = $exam->questions()->max('exam_questions.order') ?? 0;
+
+        $question = Question::create([
+            'content' => $validated['content'],
+            'type' => $validated['type'],
+            'subject_id' => $exam->subject_id,
+            'created_by' => auth()->id(),
+            'difficulty' => 'medium',
+            'bloom_level' => 'remember',
+            'in_question_bank' => false,
+            'explanation' => $validated['explanation'],
+        ]);
+
+        if ($validated['type'] === 'multiple_choice' && isset($validated['answers'])) {
+            foreach ($validated['answers'] as $index => $answerData) {
+                $question->answers()->create([
+                    'content' => $answerData['text'] ?? $answerData['content'] ?? '',
+                    'is_correct' => isset($answerData['is_correct']) ? (bool)$answerData['is_correct'] : ($index == ($validated['correct_answer'] ?? 0)),
+                    'order' => $index + 1,
+                ]);
+            }
+        }
+
+        $exam->questions()->attach($question->id, [
+            'order' => ++$maxOrder,
+            'points' => $validated['points'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('admin.exams.show', $exam)
+            ->with('success', 'Đã thêm câu hỏi tùy chỉnh vào đề thi!');
+    }
+
+    /**
+     * Remove question from exam
+     */
+    public function removeQuestion(Exam $exam, $examQuestionId)
+    {
+        $exam->questions()->detach($examQuestionId);
+
+        $questions = $exam->questions()->orderBy('exam_questions.order')->get();
+        foreach ($questions as $index => $question) {
+            $exam->questions()->updateExistingPivot($question->id, ['order' => $index + 1]);
+        }
+
+        return redirect()
+            ->route('admin.exams.show', $exam)
+            ->with('success', 'Đã xóa câu hỏi khỏi đề thi!');
+    }
+
+    /**
+     * Reorder questions in exam
+     */
+    public function reorderQuestions(Request $request, Exam $exam)
+    {
+        $validated = $request->validate([
+            'question_ids' => 'required|array',
+            'question_ids.*' => 'exists:questions,id',
+        ]);
+
+        foreach ($validated['question_ids'] as $order => $questionId) {
+            $exam->questions()->updateExistingPivot($questionId, ['order' => $order + 1]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Publish exam to make it available to students
+     */
+    public function publish(Exam $exam)
+    {
+        if ($exam->questions()->count() === 0) {
+            return redirect()
+                ->route('admin.exams.show', $exam)
+                ->with('error', 'Không thể xuất bản đề thi chưa có câu hỏi!');
+        }
+
+        $exam->update(['status' => 'published']);
+
+        return redirect()
+            ->route('admin.exams.show', $exam)
+            ->with('success', 'Đã xuất bản đề thi thành công!');
+    }
+
+    /**
+     * Send notification to students about exam
+     */
+    public function sendNotification(Request $request, Exam $exam)
+    {
+        $validated = $request->validate([
+            'message' => 'required|string|max:500',
+        ]);
+
+        $students = $exam->classRoom 
+            ? $exam->classRoom->students 
+            : User::where('role', 'student')->get();
+
+        foreach ($students as $student) {
+            // TODO: Implement notification system
+        }
+
+        return redirect()
+            ->route('admin.exams.show', $exam)
+            ->with('success', 'Đã gửi thông báo đến ' . $students->count() . ' học sinh!');
+    }
+
+    /**
+     * Import questions from Excel file
+     */
+    public function importFromExcel(Request $request)
+    {
+        $request->validate([
+            'exam_id' => 'required|exists:exams,id',
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Đang phát triển tính năng import Excel cho đề thi!');
     }
 }

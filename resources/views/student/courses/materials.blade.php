@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Khóa Học Của Tôi</a></li>
+            <li><a href="{{ route('student.courses.index') }}" class="hover:text-indigo-600">Lớp Học Của Tôi</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
             <li><a href="{{ route('student.courses.show', $classRoom->id) }}" class="hover:text-indigo-600">{{ $classRoom->name }}</a></li>
             <li><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
@@ -18,7 +18,7 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Tài Liệu Học Tập</h1>
-        <p class="text-gray-600">{{ $classRoom->name }} - {{ $classRoom->subject->name }}</p>
+        <p class="text-gray-600">{{ $classRoom->name }} - {{ $classRoom->subject ? $classRoom->subject->name : 'N/A' }}</p>
     </div>
 
     <!-- Navigation Tabs -->
@@ -108,13 +108,24 @@
                             </div>
 
                             <!-- Download Button -->
-                            <a href="{{ route('student.documents.download', $document->id) }}" 
-                               class="block w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-center group-hover:shadow-lg">
-                                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                </svg>
-                                Tải Xuống
-                            </a>
+                            @if($document->fileExists())
+                                <a href="{{ route('student.documents.download', $document->id) }}" 
+                                   class="block w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-center group-hover:shadow-lg">
+                                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Tải Xuống
+                                </a>
+                            @else
+                                <button disabled 
+                                   class="block w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed text-center">
+                                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    File không tồn tại
+                                </button>
+                                <p class="text-xs text-red-500 mt-1 text-center">Vui lòng liên hệ giảng viên</p>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -125,7 +136,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-900 mb-2">Chưa có tài liệu</h3>
-                <p class="text-gray-600">Giảng viên chưa upload tài liệu học tập cho khóa học này.</p>
+                <p class="text-gray-600">Giảng viên chưa upload tài liệu học tập cho lớp học này.</p>
                 <p class="text-sm text-gray-500 mt-2">Tài liệu sẽ được hiển thị sau khi giảng viên upload và quản trị viên phê duyệt.</p>
             </div>
         @endif

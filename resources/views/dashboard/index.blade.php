@@ -57,7 +57,7 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-medium text-gray-900">Khóa học</h3>
+                    <h3 class="font-medium text-gray-900">Lớp học</h3>
                     <p class="text-sm text-gray-500">Khám phá kiến thức mới</p>
                 </div>
             </div>

@@ -22,7 +22,7 @@
         <!-- Tags -->
         <div class="flex items-center gap-2 mb-6">
             <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                📚 {{ $question->subject->name }}
+                📚 {{ $question->subject ? $question->subject->name : 'N/A' }}
             </span>
             @if($question->topic)
                 <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 text-purple-800">

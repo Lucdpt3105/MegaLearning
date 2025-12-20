@@ -194,22 +194,22 @@
 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Tổng điểm (Tối đa: {{ $submission->exam->total_points }} điểm)
+                            Tổng điểm (Tối đa: 10 điểm)
                         </label>
                         <input type="number" 
                                name="final_score" 
                                min="0" 
-                               max="{{ $submission->exam->total_points }}" 
+                               max="10" 
                                step="0.1"
                                value="{{ $submission->score ?? $autoScore }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-2xl font-bold"
-                               placeholder="Nhập điểm từ 0 đến {{ $submission->exam->total_points }}..."
+                               placeholder="Nhập điểm từ 0 đến 10..."
                                required>
                         <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p class="text-sm text-blue-800">
                                 💡 <strong>Điểm tự động:</strong> {{ number_format($autoScore, 1) }}/{{ $totalAutoPoints }} (trắc nghiệm)
                             </p>
-                            <p class="text-xs text-blue-600 mt-1">Giáo viên có thể nhập bất kỳ điểm nào từ 0 đến {{ $submission->exam->total_points }}</p>
+                            <p class="text-xs text-blue-600 mt-1">Giáo viên có thể nhập bất kỳ điểm nào từ 0 đến 10</p>
                         </div>
                     </div>
 
@@ -260,7 +260,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Tổng điểm</p>
-                        <p class="text-2xl font-bold text-indigo-600">{{ $submission->exam->total_points }}</p>
+                        <p class="text-2xl font-bold text-indigo-600">10</p>
                     </div>
                 </div>
             </div>

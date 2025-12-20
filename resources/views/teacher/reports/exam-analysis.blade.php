@@ -17,7 +17,7 @@
                 </svg>
                 Phân tích bài thi
             </h2>
-            <p class="text-muted mb-0">{{ $exam->title }} - {{ $exam->subject->name }}</p>
+            <p class="text-muted mb-0">{{ $exam->title }} - {{ $exam->subject ? $exam->subject->name : 'N/A' }}</p>
         </div>
         <a href="{{ route('teacher.exams.edit', $exam->id) }}" class="btn btn-outline-primary">
             <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;">

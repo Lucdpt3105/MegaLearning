@@ -29,18 +29,10 @@
 </head>
 <body class="min-h-screen bg-slate-50 font-['Poppins',system-ui,sans-serif] text-slate-800 antialiased">
 
-    {{-- TOGGLE BUTTON (Hamburger) --}}
-    <button id="sidebarToggle" class="fixed top-4 left-4 z-[100] text-gray-400 hover:text-white focus:outline-none p-2 rounded-md transition-colors duration-200">
-        <div class="hamburger-icon">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </div>
-    </button>
-
     <div class="min-h-screen flex">
 
         {{-- SIDEBAR MODERN DESIGN (matching teacher/student style) --}}
-        <aside id="sidebar" class="sidebar-container bg-gray-900 border-r border-gray-800 shrink-0 overflow-hidden flex flex-col">
+        <aside id="sidebar" class="bg-gray-900 border-r border-gray-800 flex flex-col h-screen w-56 shrink-0 overflow-y-auto transition-all duration-300 sticky top-0">
             {{-- Logo --}}
             <a href="{{ route('admin.dashboard') }}" class="block p-4 mt-12 hover:bg-transparent">
                 <div class="logo-container">
@@ -81,31 +73,21 @@
                 </a>
 
                 {{-- Divider --}}
-                <div class="sidebar-divider">Khóa học</div>
+                <div class="sidebar-divider">Lớp học</div>
                 
                 <a href="{{ route('admin.courses.index') }}" class="sidebar-nav-item {{ request()->is('admin/courses*') && !request()->is('admin/courses/create') ? 'active' : '' }}">
                     <i data-feather="book" class="w-5 h-5"></i>
-                    <span class="nav-text">Danh sách khóa học</span>
+                    <span class="nav-text">Danh sách lớp học</span>
                 </a>
                 
                 <a href="{{ route('admin.courses.create') }}" class="sidebar-nav-item {{ request()->is('admin/courses/create') ? 'active' : '' }}">
                     <i data-feather="plus-circle" class="w-5 h-5"></i>
-                    <span class="nav-text">Thêm khóa học</span>
-                </a>
-                
-                <a href="{{ route('admin.categories.index') }}" class="sidebar-nav-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
-                    <i data-feather="folder" class="w-5 h-5"></i>
-                    <span class="nav-text">Danh mục</span>
+                    <span class="nav-text">Thêm lớp học</span>
                 </a>
                 
                 <a href="{{ route('admin.subjects.index') }}" class="sidebar-nav-item {{ request()->is('admin/subjects*') ? 'active' : '' }}">
                     <i data-feather="layers" class="w-5 h-5"></i>
                     <span class="nav-text">Môn học</span>
-                </a>
-                
-                <a href="{{ route('admin.lessons.index') }}" class="sidebar-nav-item {{ request()->is('admin/lessons*') ? 'active' : '' }}">
-                    <i data-feather="book-open" class="w-5 h-5"></i>
-                    <span class="nav-text">Bài học</span>
                 </a>
 
                 {{-- Divider --}}
@@ -127,21 +109,16 @@
                 </a>
 
                 {{-- Divider --}}
-                <div class="sidebar-divider">Báo cáo</div>
-                
-                <a href="{{ route('admin.reports.students') }}" class="sidebar-nav-item {{ request()->is('admin/reports/students*') ? 'active' : '' }}">
-                    <i data-feather="users" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê học sinh</span>
+                <div class="sidebar-divider">Thống kê</div>
+
+                <a href="{{ route('admin.statistics.participation') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/participation*') ? 'active' : '' }}">
+                    <i data-feather="activity" class="w-5 h-5"></i>
+                    <span class="nav-text">Tham gia hoạt động</span>
                 </a>
-                
-                <a href="{{ route('admin.reports.courses') }}" class="sidebar-nav-item {{ request()->is('admin/reports/courses*') ? 'active' : '' }}">
-                    <i data-feather="book-open" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê khóa học</span>
-                </a>
-                
-                <a href="{{ route('admin.statistics.index') }}" class="sidebar-nav-item {{ request()->is('admin/statistics*') ? 'active' : '' }}">
-                    <i data-feather="pie-chart" class="w-5 h-5"></i>
-                    <span class="nav-text">Thống kê chi tiết</span>
+
+                <a href="{{ route('admin.statistics.activity-logs') }}" class="sidebar-nav-item {{ request()->is('admin/statistics/activity-logs*') ? 'active' : '' }}">
+                    <i data-feather="file-text" class="w-5 h-5"></i>
+                    <span class="nav-text">Log hoạt động</span>
                 </a>
 
                 {{-- Divider --}}
@@ -202,46 +179,181 @@
         </aside>
 
         {{-- MAIN CONTENT --}}
-        <div id="main-content" class="flex-1 flex flex-col min-h-screen transition-all duration-500 ease-in-out ml-56">
+        <div id="main-content" class="flex-1 flex flex-col min-h-screen w-full transition-all duration-300">
 
             {{-- HEADER --}}
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8">
-                <div class="flex flex-col">
-                    <h1 class="text-base md:text-lg font-semibold text-slate-900">
-                        @yield('page-title', 'Bảng điều khiển')
-                    </h1>
-                    @hasSection('page-description')
-                        <p class="text-xs text-slate-500 mt-0.5">
-                            @yield('page-description')
-                        </p>
-                    @endif
+            <header class="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm">
+                <div class="flex items-center gap-4">
+                    {{-- Hamburger Menu Button --}}
+                    <button id="hamburgerToggle" class="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+
+                    <div class="flex flex-col">
+                        <h1 class="text-base md:text-lg font-semibold text-slate-900">
+                            @yield('page-title', 'Bảng điều khiển')
+                        </h1>
+                        @hasSection('page-description')
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                @yield('page-description')
+                            </p>
+                        @endif
+                    </div>
                 </div>
 
             <div class="flex items-center gap-4">
 
-                {{-- Search --}}
-                <form class="hidden md:block w-72">
-                    <div class="flex items-center gap-2 bg-slate-900 rounded-full px-3 py-1.5">
-                        <span class="text-slate-400">
-                            <i data-feather="search" class="w-4 h-4"></i>
-                        </span>
-                        <input
-                            type="text"
-                            name="q"
-                            placeholder="Tìm kiếm..."
-                            class="w-full bg-transparent border-none outline-none text-xs text-slate-100 placeholder:text-slate-400"
-                        >
-                    </div>
-                </form>
+                {{-- Search với Alpine.js --}}
+                <div class="hidden md:block w-72 relative" x-data="adminSearch()" @click.away="showResults = false">
+                    <form @submit.prevent="goToFullSearch()" class="relative">
+                        <div class="flex items-center gap-2 bg-slate-900 rounded-full px-3 py-1.5">
+                            <span class="text-slate-400">
+                                <i data-feather="search" class="w-4 h-4"></i>
+                            </span>
+                            <input
+                                type="text"
+                                name="q"
+                                x-model="query"
+                                @input.debounce.300ms="search()"
+                                @focus="showResults = true"
+                                placeholder="Tìm kiếm..."
+                                class="w-full bg-transparent border-none outline-none text-xs text-slate-100 placeholder:text-slate-400"
+                                autocomplete="off"
+                            >
+                            <template x-if="loading">
+                                <svg class="animate-spin h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </template>
+                        </div>
+                    </form>
 
-                {{-- Notification --}}
-                <button type="button"
-                        class="relative inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-900 text-slate-100 hover:bg-slate-800 transition">
-                    <i data-feather="bell" class="w-4 h-4"></i>
-                    <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] leading-none px-1.5 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold">
-                        3
-                    </span>
-                </button>
+                    {{-- Dropdown kết quả tìm kiếm --}}
+                    <div x-show="showResults && results.length > 0"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute top-full mt-2 w-96 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
+                         style="display: none;">
+                        
+                        <div class="max-h-96 overflow-y-auto">
+                            <template x-for="result in results" :key="result.url">
+                                <a :href="result.url" class="block px-4 py-3 hover:bg-slate-50 transition">
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                            <i :data-feather="result.icon" class="w-4 h-4 text-slate-600"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <p class="text-sm font-medium text-slate-900 truncate" x-text="result.title"></p>
+                                                <span class="flex-shrink-0 text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded" x-text="result.badge"></span>
+                                            </div>
+                                            <p class="text-xs text-slate-500 truncate mt-0.5" x-text="result.subtitle"></p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </template>
+                        </div>
+
+                        <div class="border-t border-slate-100 px-4 py-2 bg-slate-50">
+                            <button @click="goToFullSearch()" class="text-xs text-slate-600 hover:text-slate-900 font-medium">
+                                Xem tất cả kết quả →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Notification với Alpine.js --}}
+                <div class="relative" x-data="adminNotification()" x-init="init()">
+                    <button type="button" @click="toggleDropdown()"
+                            class="relative inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-900 text-slate-100 hover:bg-slate-800 transition">
+                        <i data-feather="bell" class="w-4 h-4"></i>
+                        <span x-show="unreadCount > 0" 
+                              x-text="unreadCount"
+                              class="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] leading-none px-1.5 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold">
+                        </span>
+                    </button>
+
+                    {{-- Dropdown thông báo --}}
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         @click.away="open = false"
+                         class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50"
+                         style="display: none;">
+                        
+                        {{-- Header --}}
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-slate-900">Thông báo</h3>
+                            <button @click="markAllAsRead()" class="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                                Đánh dấu đã đọc
+                            </button>
+                        </div>
+
+                        {{-- Loading --}}
+                        <template x-if="loading">
+                            <div class="py-8 text-center">
+                                <svg class="animate-spin h-6 w-6 text-slate-400 mx-auto" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </template>
+
+                        {{-- Danh sách thông báo --}}
+                        <div class="max-h-96 overflow-y-auto">
+                            <template x-if="!loading && notifications.length === 0">
+                                <div class="py-8 px-4 text-center">
+                                    <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i data-feather="bell" class="w-6 h-6 text-slate-400"></i>
+                                    </div>
+                                    <p class="text-sm text-slate-600">Không có thông báo mới</p>
+                                </div>
+                            </template>
+
+                            <template x-if="!loading && notifications.length > 0">
+                                <div>
+                                    <template x-for="notification in notifications" :key="notification.id">
+                                        <div @click="markAsRead(notification.id, notification.data?.url)"
+                                             :class="notification.read_at ? 'bg-white' : 'bg-blue-50'"
+                                             class="px-4 py-3 hover:bg-slate-50 cursor-pointer transition border-b border-slate-100">
+                                            <div class="flex items-start gap-3">
+                                                <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                                    <i data-feather="bell" class="w-4 h-4 text-blue-600"></i>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-slate-900" x-text="notification.data?.title || 'Thông báo'"></p>
+                                                    <p class="text-xs text-slate-600 mt-0.5 line-clamp-2" x-text="notification.data?.message || ''"></p>
+                                                    <p class="text-xs text-slate-400 mt-1" x-text="formatTime(notification.created_at)"></p>
+                                                </div>
+                                                <template x-if="!notification.read_at">
+                                                    <div class="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="px-4 py-2 border-t border-slate-100 bg-slate-50">
+                            <a href="{{ route('notifications.index') }}" class="block text-center text-xs text-slate-600 hover:text-slate-900 font-medium">
+                                Xem tất cả thông báo
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Avatar --}}
 {{-- PROFILE DROPDOWN --}}
@@ -316,6 +428,180 @@
     {{-- JS: Feather + custom admin --}}
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="{{ asset('assets/js/admin.js') }}"></script>
+
+    {{-- Alpine.js Components --}}
+    <script>
+        // Admin Search Component
+        function adminSearch() {
+            return {
+                query: '',
+                results: [],
+                showResults: false,
+                loading: false,
+
+                search() {
+                    if (this.query.length < 2) {
+                        this.results = [];
+                        return;
+                    }
+
+                    this.loading = true;
+
+                    fetch(`/admin/search?q=${encodeURIComponent(this.query)}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.results = data.results || [];
+                        this.loading = false;
+                        // Re-initialize feather icons for new results
+                        this.$nextTick(() => feather.replace());
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        this.loading = false;
+                    });
+                },
+
+                goToFullSearch() {
+                    if (this.query.length > 0) {
+                        window.location.href = `/admin/search/full?q=${encodeURIComponent(this.query)}`;
+                    }
+                }
+            }
+        }
+
+        // Admin Notification Component
+        function adminNotification() {
+            return {
+                open: false,
+                loading: false,
+                notifications: [],
+                unreadCount: 0,
+
+                init() {
+                    this.loadUnreadCount();
+                    // Poll every 30 seconds
+                    setInterval(() => {
+                        this.loadUnreadCount();
+                    }, 30000);
+                },
+
+                toggleDropdown() {
+                    this.open = !this.open;
+                    if (this.open && this.notifications.length === 0) {
+                        this.loadNotifications();
+                    }
+                },
+
+                loadUnreadCount() {
+                    fetch('/notifications/unread-count', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.unreadCount = data.count || 0;
+                    })
+                    .catch(error => console.error('Error loading unread count:', error));
+                },
+
+                loadNotifications() {
+                    this.loading = true;
+
+                    fetch('/notifications?json=1', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.notifications = data.data || [];
+                        this.loading = false;
+                        // Re-initialize feather icons
+                        this.$nextTick(() => feather.replace());
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                        this.loading = false;
+                    });
+                },
+
+                markAsRead(id, url) {
+                    fetch(`/notifications/${id}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update notification status
+                            const notification = this.notifications.find(n => n.id === id);
+                            if (notification) {
+                                notification.read_at = new Date().toISOString();
+                            }
+                            this.loadUnreadCount();
+                            
+                            // Redirect if URL exists
+                            if (url) {
+                                setTimeout(() => {
+                                    window.location.href = url;
+                                }, 100);
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error marking as read:', error));
+                },
+
+                markAllAsRead() {
+                    fetch('/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.notifications.forEach(n => {
+                                n.read_at = new Date().toISOString();
+                            });
+                            this.unreadCount = 0;
+                        }
+                    })
+                    .catch(error => console.error('Error marking all as read:', error));
+                },
+
+                formatTime(dateString) {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMs / 3600000);
+                    const diffDays = Math.floor(diffMs / 86400000);
+
+                    if (diffMins < 1) return 'Vừa xong';
+                    if (diffMins < 60) return `${diffMins} phút trước`;
+                    if (diffHours < 24) return `${diffHours} giờ trước`;
+                    if (diffDays < 7) return `${diffDays} ngày trước`;
+                    
+                    return date.toLocaleDateString('vi-VN');
+                }
+            }
+        }
+    </script>
 
     @stack('scripts')
 </body>

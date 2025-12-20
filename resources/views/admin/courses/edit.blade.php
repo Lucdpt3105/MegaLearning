@@ -1,14 +1,14 @@
 @extends('admin.layout')
 
-@section('title', 'Chỉnh sửa khóa học')
+@section('title', 'Chỉnh sửa lớp học')
 
 @section('content')
 <div class="p-6">
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Chỉnh sửa khóa học</h1>
-                <p class="text-gray-600 mt-1">Cập nhật thông tin khóa học: {{ $course->name }}</p>
+                <h1 class="text-2xl font-bold text-gray-900">Chỉnh sửa lớp học</h1>
+                <p class="text-gray-600 mt-1">Cập nhật thông tin lớp học: {{ $course->name }}</p>
             </div>
             <a href="{{ route('admin.courses.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                 <i data-feather="arrow-left" class="w-4 h-4 inline"></i> Quay lại
@@ -29,10 +29,10 @@
             @method('PUT')
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Tên khóa học --}}
+                {{-- Tên lớp học --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Tên khóa học <span class="text-red-500">*</span>
+                        Tên lớp học <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="name" value="{{ old('name', $course->name) }}" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('name') border-red-500 @enderror" 
@@ -43,16 +43,16 @@
                     @enderror
                 </div>
 
-                {{-- Mã khóa học --}}
+                {{-- Mã lớp học --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Mã khóa học <span class="text-red-500">*</span>
+                        Mã lớp học <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="code" value="{{ old('code', $course->code) }}" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('code') border-red-500 @enderror" 
                         placeholder="Ví dụ: MATH10-2025"
                         required>
-                    <p class="mt-1 text-xs text-gray-500">Mã duy nhất để định danh khóa học</p>
+                    <p class="mt-1 text-xs text-gray-500">Mã duy nhất để định danh lớp học</p>
                     @error('code')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -156,11 +156,11 @@
                 {{-- Mô tả --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Mô tả khóa học
+                        Mô tả lớp học
                     </label>
                     <textarea name="description" rows="4" 
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('description') border-red-500 @enderror" 
-                        placeholder="Nhập mô tả chi tiết về khóa học...">{{ old('description', $course->description) }}</textarea>
+                        placeholder="Nhập mô tả chi tiết về lớp học...">{{ old('description', $course->description) }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -169,7 +169,7 @@
 
             {{-- Stats Info --}}
             <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 class="text-sm font-semibold text-blue-900 mb-2">Thông tin khóa học</h3>
+                <h3 class="text-sm font-semibold text-blue-900 mb-2">Thông tin lớp học</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <span class="text-blue-600">Học viên đã đăng ký:</span>
@@ -189,7 +189,7 @@
             {{-- Actions --}}
             <div class="flex gap-3 mt-6 pt-6 border-t">
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                    <i data-feather="save" class="w-4 h-4 inline"></i> Cập nhật khóa học
+                    <i data-feather="save" class="w-4 h-4 inline"></i> Cập nhật lớp học
                 </button>
                 <a href="{{ route('admin.courses.index') }}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
                     Hủy

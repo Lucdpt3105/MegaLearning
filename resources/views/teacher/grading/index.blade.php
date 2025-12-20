@@ -79,7 +79,7 @@
                     <option value="">Tất cả</option>
                     @foreach($exams as $exam)
                         <option value="{{ $exam->id }}" {{ request('exam_id') == $exam->id ? 'selected' : '' }}>
-                            {{ $exam->title }} - {{ $exam->subject->name }}
+                            {{ $exam->title }} - {{ $exam->subject ? $exam->subject->name : 'N/A' }}
                         </option>
                     @endforeach
                 </select>
@@ -138,7 +138,7 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-sm font-medium text-gray-900">{{ $submission->exam->title }}</div>
-                            <div class="text-sm text-gray-500">{{ $submission->exam->subject->name }}</div>
+                            <div class="text-sm text-gray-500">{{ $submission->exam->subject ? $submission->exam->subject->name : 'N/A' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $submission->submitted_at->format('d/m/Y H:i') }}
@@ -167,7 +167,7 @@
                                 <span class="text-lg font-bold text-indigo-600">
                                     {{ number_format($submission->score, 1) }}
                                 </span>
-                                <span class="text-sm text-gray-500">/{{ $submission->exam->total_points }}</span>
+                                <span class="text-sm text-gray-500">/10</span>
                             @else
                                 <span class="text-gray-400">Chưa chấm</span>
                             @endif

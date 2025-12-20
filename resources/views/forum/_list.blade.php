@@ -146,14 +146,14 @@
         <!-- Comments Section -->
         <div id="comments-section-{{ $q->forum_question_id }}" class="hidden border-t border-gray-100 pt-4 mt-3">
             <div id="comments-list-{{ $q->forum_question_id }}" class="space-y-3 mb-3">
-                @foreach($q->answers()->whereNull('parent_id')->latest()->take(3)->get() as $answer)
+                @foreach($q->answers as $answer)
                     <div class="flex gap-2">
                         <img src="https://randomuser.me/api/portraits/{{ $answer->user_id % 2 == 0 ? 'women' : 'men' }}/{{ $answer->user_id }}.jpg" 
-                             alt="{{ $answer->user->name }}" 
+                             alt="{{ $answer->user ? $answer->user->name : 'Unknown User' }}" 
                              class="w-8 h-8 rounded-full shrink-0 object-cover">
                         <div class="flex-1 bg-gray-50 rounded-lg px-3 py-2">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-sm font-semibold text-gray-900">{{ $answer->user->name }}</span>
+                                <span class="text-sm font-semibold text-gray-900">{{ $answer->user ? $answer->user->name : 'Unknown User' }}</span>
                                 <span class="text-xs text-gray-500">{{ $answer->created_at->diffForHumans() }}</span>
                             </div>
                             <p class="text-sm text-gray-700">{{ $answer->answer_content }}</p>

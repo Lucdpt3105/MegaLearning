@@ -16,7 +16,7 @@
                     <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                     <span class="text-white font-semibold">{{ $videoCall->title }}</span>
                 </div>
-                <span class="text-gray-400 text-sm">{{ $videoCall->classRoom->name }}</span>
+                <span class="text-gray-400 text-sm">{{ $videoCall->classRoom ? $videoCall->classRoom->name : 'N/A' }}</span>
             </div>
             
             <div class="flex items-center space-x-2">
@@ -49,7 +49,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <h3 class="text-white text-xl font-semibold mb-2">{{ $videoCall->host->name }}</h3>
+                                <h3 class="text-white text-xl font-semibold mb-2">{{ $videoCall->host ? $videoCall->host->name : 'Host' }}</h3>
                                 <p class="text-gray-400">Đang trình chiếu...</p>
                             </div>
                         </div>

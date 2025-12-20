@@ -5,12 +5,19 @@
 @section('page-description', 'Sửa thông tin người dùng')
 
 @section('content')
+@if(!$user || !isset($user->id))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Lỗi!</strong>
+        <span class="block sm:inline">Không tìm thấy thông tin người dùng.</span>
+    </div>
+    <a href="{{ route('admin.students.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Quay lại</a>
+@else
     <div class="flex justify-between items-center mb-6">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">✏️ Sửa: {{ $user->name }}</h2>
             <p class="text-gray-600 text-sm mt-1">ID: #{{ $user->id }}</p>
         </div>
-        <a href="{{ route('admin.users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+        <a href="{{ route('admin.students.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
@@ -22,7 +29,7 @@
         <!-- Form -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <form method="POST" action="{{ route('admin.users.update', $user) }}">
+                <form method="POST" action="/admin/users/{{ $user->id }}">
                     @csrf
                     @method('PUT')
 
@@ -115,7 +122,7 @@
                             </svg>
                             Lưu thay đổi
                         </button>
-                        <a href="{{ route('admin.users.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">
+                        <a href="{{ route('admin.students.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition">
                             Hủy
                         </a>
                     </div>
@@ -167,4 +174,5 @@
             </div>
         </div>
     </div>
+@endif
 @endsection
