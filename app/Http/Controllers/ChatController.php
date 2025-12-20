@@ -6,6 +6,7 @@ use App\Models\ChatRoom;
 use App\Models\ChatMessage;
 use App\Services\AIService;
 use App\Events\MessageSent;
+use App\Events\NewChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -82,15 +83,6 @@ class ChatController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            $validated = $request->validate([
-                'room_name' => 'required|string|max:255',
-                'room_type' => 'required|in:group,private,subject',
-                'subject_id' => 'nullable|exists:subjects,subject_id',
-                'members' => 'nullable|array',
-                'members.*' => 'exists:users,id',
-                'include_ai' => 'nullable|boolean'
-            ]);
-
             // Use authenticated user ID - must be logged in
             if (!Auth::check()) {
                 return response()->json([
@@ -100,6 +92,39 @@ class ChatController extends Controller
             }
 
             $creatorId = Auth::id();
+
+            // Remove creator from members list BEFORE validation (can't add yourself)
+            // EXCEPT when user wants to chat with themselves (self-chat: only 1 member = creator)
+            $requestData = $request->all();
+            if (isset($requestData['members']) && is_array($requestData['members'])) {
+                // Allow self-chat: if members list only contains creator ID, keep it
+                $isSelfChat = count($requestData['members']) === 1 && 
+                             in_array($creatorId, $requestData['members']);
+                
+                if (!$isSelfChat) {
+                    // Normal case: remove creator from members list
+                    $requestData['members'] = array_values(array_filter($requestData['members'], function($memberId) use ($creatorId) {
+                        return $memberId != $creatorId;
+                    }));
+                }
+            }
+
+            \Log::info('After filtering members', [
+                'creator_id' => $creatorId,
+                'filtered_members' => $requestData['members'] ?? null,
+                'room_name' => $requestData['room_name'] ?? null,
+                'room_type' => $requestData['room_type'] ?? null
+            ]);
+
+            // Validate cleaned data
+            $validated = validator($requestData, [
+                'room_name' => 'required|string|max:255',
+                'room_type' => 'required|in:group,private,subject',
+                'subject_id' => 'nullable|exists:subjects,subject_id',
+                'members' => 'nullable|array',
+                'members.*' => 'exists:users,id',
+                'include_ai' => 'nullable|boolean'
+            ])->validate();
 
             $room = ChatRoom::create([
                 'room_name' => $validated['room_name'],
@@ -115,10 +140,11 @@ class ChatController extends Controller
                 'joined_at' => now()
             ]);
 
-            // Add other members
-            if (isset($validated['members']) && is_array($validated['members'])) {
+            // Add other members (or self for self-chat)
+            if (isset($validated['members']) && is_array($validated['members']) && count($validated['members']) > 0) {
                 foreach ($validated['members'] as $memberId) {
-                    if ($memberId != $creatorId) {
+                    // Skip if already added as creator (unless it's self-chat)
+                    if ($memberId != $creatorId || !$room->members->contains($memberId)) {
                         $room->members()->attach($memberId, [
                             'role' => 'member',
                             'joined_at' => now()
@@ -150,10 +176,19 @@ class ChatController extends Controller
                 'message' => 'Chat room created successfully'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error creating room', ['errors' => $e->errors()]);
+            \Log::error('Validation error creating room', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            
+            $errorMessages = [];
+            foreach ($e->errors() as $field => $messages) {
+                $errorMessages[] = implode(', ', $messages);
+            }
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Validation failed: ' . implode('; ', $errorMessages),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -223,11 +258,25 @@ class ChatController extends Controller
             // Update room's updated_at
             $room->touch();
 
-            // Broadcast event
+            // Broadcast event to room
             try {
                 broadcast(new MessageSent($message))->toOthers();
             } catch (\Exception $e) {
                 \Log::warning('Broadcast failed (Pusher not configured)', ['error' => $e->getMessage()]);
+            }
+            
+            // Broadcast NewChatMessage event to all room members (for header dropdown)
+            try {
+                $recipientIds = $room->members()
+                    ->where('user_id', '!=', $userId)
+                    ->pluck('user_id')
+                    ->toArray();
+                    
+                if (!empty($recipientIds)) {
+                    broadcast(new NewChatMessage($message, $recipientIds));
+                }
+            } catch (\Exception $e) {
+                \Log::warning('NewChatMessage broadcast failed', ['error' => $e->getMessage()]);
             }
 
             // Trigger AI response if configured and AI is a member
@@ -367,6 +416,19 @@ class ChatController extends Controller
             // Add unread count for each room
             $rooms->each(function($room) use ($userId) {
                 $room->unread_count = $this->getUnreadCount($room->id, $userId);
+                
+                // Ensure latest_message is properly formatted
+                if ($room->latestMessage) {
+                    $room->latest_message = [
+                        'id' => $room->latestMessage->id,
+                        'message_text' => $room->latestMessage->message_text,
+                        'created_at' => $room->latestMessage->created_at,
+                        'user' => $room->latestMessage->user ? [
+                            'id' => $room->latestMessage->user->id,
+                            'name' => $room->latestMessage->user->name,
+                        ] : null
+                    ];
+                }
             });
             
             \Log::info('getRooms() - User authenticated', [
@@ -382,7 +444,7 @@ class ChatController extends Controller
         
         return response()->json([
             'success' => true,
-            'rooms' => $rooms
+            'data' => $rooms
         ]);
     }
     
@@ -413,7 +475,7 @@ class ChatController extends Controller
         if (!$userId) {
             return response()->json([
                 'success' => true,
-                'unread_count' => 0
+                'count' => 0
             ]);
         }
         
@@ -435,7 +497,7 @@ class ChatController extends Controller
         
         return response()->json([
             'success' => true,
-            'unread_count' => $totalUnread
+            'count' => $totalUnread
         ]);
     }
     
@@ -599,6 +661,14 @@ class ChatController extends Controller
         
         $room = ChatRoom::findOrFail($roomId);
         
+        // Prevent user from adding themselves
+        if (Auth::check() && $validated['user_id'] == Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn không thể tự thêm bản thân vào phòng chat'
+            ], 400);
+        }
+        
         // Check if already member
         if ($room->members->contains('id', $validated['user_id'])) {
             return response()->json([
@@ -656,27 +726,79 @@ class ChatController extends Controller
     public function uploadFile(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'file' => 'required|file|max:51200', // 50MB max
-                'type' => 'required|in:image,file'
-            ]);
+            // Check if user is authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để upload file'
+                ], 401);
+            }
 
             $file = $request->file('file');
-            $userId = Auth::id();
             
-            // Validate file type
-            if ($validated['type'] === 'image') {
-                $request->validate([
-                    'file' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240' // 10MB for images
-                ]);
+            if (!$file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không tìm thấy file'
+                ], 400);
+            }
+
+            // Check file size (10MB for images, 50MB for other files)
+            $maxSize = $request->input('type') === 'image' ? 10240 : 51200; // KB
+            
+            if ($file->getSize() > $maxSize * 1024) {
+                $maxMB = $maxSize / 1024;
+                return response()->json([
+                    'success' => false,
+                    'message' => "File quá lớn. Kích thước tối đa: {$maxMB}MB"
+                ], 422);
+            }
+
+            // Validate file type based on upload type
+            $type = $request->input('type', 'file');
+            
+            if ($type === 'image') {
+                $allowedMimes = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (!in_array($extension, $allowedMimes)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Chỉ chấp nhận ảnh: JPG, PNG, GIF, WEBP'
+                    ], 422);
+                }
+            } else {
+                // Block dangerous file types
+                $blockedExtensions = ['exe', 'bat', 'sh', 'php', 'js', 'html', 'htm'];
+                $extension = strtolower($file->getClientOriginalExtension());
+                
+                if (in_array($extension, $blockedExtensions)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Loại file này không được phép upload'
+                    ], 422);
+                }
             }
             
+            $userId = Auth::id();
+            
             // Create unique filename
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '_' . uniqid() . '_' . $userId . '.' . $extension;
             
+            // Ensure storage directory exists
+            $storagePath = storage_path('app/public/chat_files');
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0755, true);
+            }
+            
             // Store in public/storage/chat_files
             $path = $file->storeAs('chat_files', $filename, 'public');
+            
+            if (!$path) {
+                throw new \Exception('Không thể lưu file');
+            }
             
             // Get full URL
             $url = asset('storage/' . $path);
@@ -684,25 +806,41 @@ class ChatController extends Controller
             return response()->json([
                 'success' => true,
                 'file_url' => $url,
+                'file_path' => $path,
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
-                'file_type' => $file->getMimeType()
+                'file_size_formatted' => $this->formatFileSize($file->getSize()),
+                'file_type' => $file->getMimeType(),
+                'message_type' => $type
             ]);
             
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File không hợp lệ',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
-            \Log::error('Error uploading file', [
-                'error' => $e->getMessage()
+            \Log::error('Error uploading chat file', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
             ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Lỗi khi upload file: ' . $e->getMessage()
             ], 500);
+        }
+    }
+    
+    /**
+     * Format file size for display
+     */
+    private function formatFileSize($bytes)
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' bytes';
         }
     }
     
@@ -718,5 +856,107 @@ class ChatController extends Controller
             'success' => true,
             'message' => 'Room deleted successfully'
         ]);
+    }
+
+    /**
+     * Create or get private chat room between two users
+     */
+    public function createPrivateRoom(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'other_user_id' => 'required|exists:users,id'
+            ]);
+
+            // Must be authenticated
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vui lòng đăng nhập để tạo phòng chat'
+                ], 401);
+            }
+
+            $userId = Auth::id();
+            $otherUserId = $validated['other_user_id'];
+
+            // Check if private room already exists (including self-chat)
+            $existingRoom = ChatRoom::where('room_type', 'private')
+                ->whereHas('members', function($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })
+                ->whereHas('members', function($q) use ($otherUserId) {
+                    $q->where('user_id', $otherUserId);
+                })
+                ->with('members')
+                ->first();
+
+            if ($existingRoom) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Phòng chat đã tồn tại',
+                    'room' => [
+                        'id' => $existingRoom->id,
+                        'room_name' => $existingRoom->room_name,
+                        'room_type' => $existingRoom->room_type,
+                        'members' => $existingRoom->members
+                    ]
+                ]);
+            }
+
+            // Create new private room
+            $otherUser = \App\Models\User::findOrFail($otherUserId);
+            
+            $room = ChatRoom::create([
+                'room_name' => $userId == $otherUserId ? "Ghi chú cá nhân" : "Chat với {$otherUser->name}",
+                'room_type' => 'private',
+                'created_by' => $userId,
+                'is_active' => true
+            ]);
+
+            // Add members (handle self-chat case)
+            if ($userId == $otherUserId) {
+                // Self-chat: only attach once
+                $room->members()->attach($userId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+            } else {
+                // Normal private chat: attach both users
+                $room->members()->attach($userId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+                
+                $room->members()->attach($otherUserId, [
+                    'role' => 'member',
+                    'joined_at' => now()
+                ]);
+            }
+
+            // Reload with members
+            $room->load('members');
+
+            return response()->json([
+                'success' => true,
+                'message' => "Đã tạo phòng chat với {$otherUser->name}",
+                'room' => [
+                    'id' => $room->id,
+                    'room_name' => $room->room_name,
+                    'room_type' => $room->room_type,
+                    'members' => $room->members
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error creating private room', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi tạo phòng chat: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('class_rooms', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable()->after('id')->constrained('categories')->onDelete('set null');
+        Schema::table('video_calls', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('class_rooms', function (Blueprint $table) {
-            $table->dropForeign(['category_id']);
-            $table->dropColumn('category_id');
+        Schema::table('video_calls', function (Blueprint $table) {
+            //
         });
     }
 };

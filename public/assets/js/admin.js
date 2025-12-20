@@ -1,51 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const hamburgerToggle = document.getElementById('hamburgerToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const profileToggle = document.getElementById('profileToggle');
+    const profileMenu = document.getElementById('profileMenu');
+
+    // Toggle sidebar visibility
+    function toggleSidebar() {
+        if (sidebar) {
+            sidebar.classList.toggle('hidden');
+        }
+    }
+
+    // Hamburger button click
+    if (hamburgerToggle) {
+        hamburgerToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+    }
+
     // Initialize Feather Icons
     if (window.feather) {
         feather.replace();
-    }
-
-    // Elements
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('main-content');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const profileToggle = document.getElementById('profileToggle');
-    const profileMenu = document.getElementById('profileMenu');
-    
-    // Sidebar Toggle Logic
-    if (sidebarToggle && sidebar) {
-        // Check localStorage
-        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
-        if (isCollapsed) {
-            sidebar.classList.add('collapsed');
-            if (mainContent) {
-                mainContent.classList.remove('ml-56');
-                mainContent.classList.add('ml-14');
-            }
-        }
-
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            const collapsed = sidebar.classList.contains('collapsed');
-            
-            // Update Main Content Margin
-            if (mainContent) {
-                if (collapsed) {
-                    mainContent.classList.remove('ml-56');
-                    mainContent.classList.add('ml-14');
-                } else {
-                    mainContent.classList.remove('ml-14');
-                    mainContent.classList.add('ml-56');
-                }
-            }
-
-            // Save state
-            localStorage.setItem('sidebar-collapsed', collapsed);
-            
-            // Refresh Feather Icons
-            if (window.feather) {
-                feather.replace();
-            }
-        });
     }
 
     // Profile Menu Toggle
@@ -63,4 +41,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-

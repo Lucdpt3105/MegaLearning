@@ -43,7 +43,7 @@
                     </div>
                     <div class="text-indigo-600 text-xs font-bold">Môn Học</div>
                 </div>
-                <div class="font-bold text-gray-900 text-lg">{{ $exam->subject->name }}</div>
+                <div class="font-bold text-gray-900 text-lg">{{ $exam->subject ? $exam->subject->name : 'Chưa có môn học' }}</div>
             </div>
             <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border-2 border-purple-200">
                 <div class="flex items-center gap-2 mb-2">

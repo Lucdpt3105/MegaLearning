@@ -257,7 +257,7 @@
 
                             <!-- Subject Badge -->
                             <span class="inline-flex items-center px-3 py-1.5 text-xs font-semibold bg-indigo-50 text-indigo-700 rounded-full">
-                                {{ $question->subject->name }}
+                                {{ $question->subject ? $question->subject->name : 'N/A' }}
                             </span>
 
                             <!-- Points Badge -->

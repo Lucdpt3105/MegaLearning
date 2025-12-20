@@ -28,7 +28,7 @@
             @if(auth()->user()->hasRole('student'))
             <a href="{{ route('search.index', ['q' => $query, 'type' => 'courses']) }}" 
                class="border-b-2 {{ $type === 'courses' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} py-4 px-1 text-sm font-medium">
-                Khóa học ({{ $courses->count() }})
+                Lớp học ({{ $courses->count() }})
             </a>
             @endif
             <a href="{{ route('search.index', ['q' => $query, 'type' => 'documents']) }}" 
@@ -49,7 +49,7 @@
         <section>
             <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
                 <span class="text-3xl mr-3">📚</span>
-                Khóa học
+                Lớp học
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($courses as $course)

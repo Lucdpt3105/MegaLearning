@@ -92,7 +92,7 @@ class UserManagementController extends Controller
             'new_values' => $user->toArray(),
         ]);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.students.index')
             ->with('success', 'Tạo tài khoản thành công!');
     }
 
@@ -160,7 +160,7 @@ class UserManagementController extends Controller
             'new_values' => $user->fresh()->toArray(),
         ]);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.students.index')
             ->with('success', 'Cập nhật thông tin người dùng thành công!' . (!empty($validated['password']) ? ' Mật khẩu đã được thay đổi.' : ''));
     }
 
@@ -190,7 +190,7 @@ class UserManagementController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route('admin.students.index')
             ->with('success', 'Xóa tài khoản thành công!');
     }
 
@@ -201,10 +201,7 @@ class UserManagementController extends Controller
     {
         // Không cho phép khóa chính mình
         if ($user->id === auth()->id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể khóa tài khoản của chính bạn!'
-            ], 403);
+            return back()->with('error', 'Không thể khóa tài khoản của chính bạn!');
         }
 
         $user->is_locked = !$user->is_locked;
@@ -221,11 +218,8 @@ class UserManagementController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => $user->is_locked ? 'Đã khóa tài khoản!' : 'Đã mở khóa tài khoản!',
-            'is_locked' => $user->is_locked
-        ]);
+        $message = $user->is_locked ? 'Đã khóa tài khoản thành công!' : 'Đã mở khóa tài khoản thành công!';
+        return back()->with('success', $message);
     }
 
     /**

@@ -48,7 +48,7 @@
                 </span>
             </div>
 
-            <h2 class="text-xl font-bold">{{ $question->subject->name }}</h2>
+            <h2 class="text-xl font-bold">{{ $question->subject ? $question->subject->name : 'N/A' }}</h2>
             <p class="text-sm mt-1 opacity-90">Tạo bởi {{ $question->creator->name }} • {{ $question->created_at->format('d/m/Y H:i') }}</p>
         </div>
 

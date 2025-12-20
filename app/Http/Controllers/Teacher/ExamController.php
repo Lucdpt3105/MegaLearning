@@ -85,17 +85,6 @@ class ExamController extends Controller
             'shuffle_answers' => 'boolean',
             'show_results_immediately' => 'boolean',
             'allow_review' => 'boolean',
-            // Security fields
-            'require_access_code' => 'boolean',
-            'access_code' => 'nullable|string|max:20',
-            'restrict_to_class' => 'boolean',
-            'detect_cheating' => 'boolean',
-            'detect_tab_switch' => 'boolean',
-            'detect_device_change' => 'boolean',
-            'lock_on_exit' => 'boolean',
-            'max_exit_time' => 'nullable|integer|min:5|max:300',
-            'require_camera' => 'boolean',
-            'require_screen_recording' => 'boolean',
             // Auto-generate fields
             'auto_generate' => 'boolean',
             'auto_gen_level_1' => 'nullable|integer|min:0',
@@ -117,24 +106,31 @@ class ExamController extends Controller
             $totalByType = ($request->input('auto_gen_multiple_choice', 0) ?? 0) + 
                           ($request->input('auto_gen_essay', 0) ?? 0);
 
-            // Check if total questions by type exceeds total by level
-            if ($totalByType > $totalByLevel) {
+            // Check if totals are equal (REQUIRED)
+            if ($totalByType !== $totalByLevel) {
+                $level1 = $request->input('auto_gen_level_1', 0);
+                $level2 = $request->input('auto_gen_level_2', 0);
+                $level3 = $request->input('auto_gen_level_3', 0);
+                $level4 = $request->input('auto_gen_level_4', 0);
+                $multipleChoice = $request->input('auto_gen_multiple_choice', 0);
+                $essay = $request->input('auto_gen_essay', 0);
+                
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\nTổng số câu theo loại: {$totalByType} câu\n(Trắc nghiệm: {$request->input('auto_gen_multiple_choice', 0)} + Tự luận: {$request->input('auto_gen_essay', 0)})\n\nTổng số câu theo mức độ: {$totalByLevel} câu\n(Mức 1: {$request->input('auto_gen_level_1', 0)} + Mức 2: {$request->input('auto_gen_level_2', 0)} + Mức 3: {$request->input('auto_gen_level_3', 0)} + Mức 4: {$request->input('auto_gen_level_4', 0)})\n\n❌ Số câu theo loại KHÔNG ĐƯỢC vượt quá số câu theo mức độ!\n\nVui lòng điều chỉnh lại số lượng.");
+                    ->with('error_popup', "⚠️ Lỗi số lượng câu hỏi!\n\n📊 Tổng số câu theo LOẠI: {$totalByType} câu\n   • Trắc nghiệm: {$multipleChoice} câu\n   • Tự luận: {$essay} câu\n\n📈 Tổng số câu theo MỨC ĐỘ: {$totalByLevel} câu\n   • Mức 1 (Nhận biết): {$level1} câu\n   • Mức 2 (Thông hiểu): {$level2} câu\n   • Mức 3 (Vận dụng): {$level3} câu\n   • Mức 4 (Vận dụng cao): {$level4} câu\n\n❌ HAI TỔNG SỐ PHẢI BẰNG NHAU!\n\nTổng câu theo loại ({$totalByType}) " . ($totalByType > $totalByLevel ? '>' : '<') . " Tổng câu theo mức độ ({$totalByLevel})\n\n💡 Mẹo: Nếu muốn {$totalByLevel} câu, hãy điều chỉnh:\n   • Trắc nghiệm + Tự luận = {$totalByLevel} câu");
             }
 
             // Check if total is valid
             if ($totalByLevel == 0) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo mức độ (Mức 1, 2, 3, hoặc 4).');
+                    ->with('error_popup', '❌ Vui lòng chọn ít nhất một câu hỏi theo mức độ (Mức 1, 2, 3, hoặc 4).\n\nBạn phải nhập số lượng câu hỏi cho ít nhất một mức độ!');
             }
 
             if ($totalByType == 0) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error_popup', 'Vui lòng chọn ít nhất một câu hỏi theo loại (Trắc nghiệm hoặc Tự luận).');
+                    ->with('error_popup', '❌ Vui lòng chọn ít nhất một câu hỏi theo loại (Trắc nghiệm hoặc Tự luận).\n\nBạn phải nhập số lượng câu hỏi cho ít nhất một loại!');
             }
         }
 
@@ -161,17 +157,6 @@ class ExamController extends Controller
             'show_results_immediately' => $request->boolean('show_results_immediately', true),
             'allow_review' => $request->boolean('allow_review', true),
             'status' => 'draft',
-            // Security settings
-            'require_access_code' => $request->boolean('require_access_code'),
-            'access_code' => $request->boolean('require_access_code') ? $validated['access_code'] : null,
-            'restrict_to_class' => $request->boolean('restrict_to_class', true),
-            'detect_cheating' => $request->boolean('detect_cheating'),
-            'detect_tab_switch' => $request->boolean('detect_tab_switch'),
-            'detect_device_change' => $request->boolean('detect_device_change'),
-            'lock_on_exit' => $request->boolean('lock_on_exit'),
-            'max_exit_time' => $request->boolean('lock_on_exit') ? $validated['max_exit_time'] : null,
-            'require_camera' => $request->boolean('require_camera'),
-            'require_screen_recording' => $request->boolean('require_screen_recording'),
         ]);
 
         // Auto-generate questions if requested
@@ -594,45 +579,147 @@ class ExamController extends Controller
             }
         }
 
-        // Calculate points to distribute evenly to reach 10 total
+        // Check if NO questions were selected
+        if (empty($selectedQuestions)) {
+            // Get total available questions for debugging
+            $totalAvailable = Question::where('subject_id', $exam->subject_id)
+                ->where('in_question_bank', true)
+                ->count();
+            
+            $byType = Question::where('subject_id', $exam->subject_id)
+                ->where('in_question_bank', true)
+                ->select('type', DB::raw('count(*) as count'))
+                ->groupBy('type')
+                ->pluck('count', 'type')
+                ->toArray();
+            
+            $byLevel = Question::where('subject_id', $exam->subject_id)
+                ->where('in_question_bank', true)
+                ->select('bloom_level', DB::raw('count(*) as count'))
+                ->groupBy('bloom_level')
+                ->pluck('count', 'bloom_level')
+                ->toArray();
+            
+            $errorMsg = "❌ KHÔNG TÌM THẤY CÂU HỎI NÀO!\n\n";
+            $errorMsg .= "📊 Thống kê ngân hàng câu hỏi:\n";
+            $errorMsg .= "   • Tổng số câu: {$totalAvailable} câu\n\n";
+            
+            if (!empty($byType)) {
+                $errorMsg .= "📝 Theo loại:\n";
+                foreach ($byType as $type => $count) {
+                    $typeName = $type === 'multiple_choice' ? 'Trắc nghiệm' : ($type === 'essay' ? 'Tự luận' : $type);
+                    $errorMsg .= "   • {$typeName}: {$count} câu\n";
+                }
+                $errorMsg .= "\n";
+            }
+            
+            if (!empty($byLevel)) {
+                $errorMsg .= "📈 Theo mức độ:\n";
+                foreach ([1, 2, 3, 4] as $level) {
+                    $count = $byLevel[$level] ?? 0;
+                    $errorMsg .= "   • Mức {$level}: {$count} câu\n";
+                }
+                $errorMsg .= "\n";
+            }
+            
+            $errorMsg .= "💡 GIẢI PHÁP:\n";
+            if ($totalAvailable == 0) {
+                $errorMsg .= "   1. Vào Ngân hàng câu hỏi và tạo câu hỏi mới\n";
+                $errorMsg .= "   2. Đảm bảo câu hỏi được đánh dấu 'Thêm vào ngân hàng'\n";
+            } else {
+                $errorMsg .= "   1. Kiểm tra lại số lượng câu bạn yêu cầu\n";
+                $errorMsg .= "   2. Đảm bảo có đủ câu hỏi theo từng loại và mức độ\n";
+                $errorMsg .= "   3. Thử bỏ chọn 'Chương/Bài' để lấy từ tất cả chương\n";
+            }
+            
+            \Log::error('No questions selected for exam', [
+                'exam_id' => $exam->id,
+                'subject_id' => $exam->subject_id,
+                'criteria' => $criteria,
+                'available' => $totalAvailable,
+                'by_type' => $byType,
+                'by_level' => $byLevel
+            ]);
+            
+            return redirect()->back()
+                ->with('error_popup', $errorMsg)
+                ->withInput();
+        }
+
+        // Calculate points to distribute based on exam's total_points and question difficulty
         if (!empty($selectedQuestions)) {
             $totalQuestions = count($selectedQuestions);
-            $totalPoints = 10; // Target total points
+            $totalPoints = $exam->total_points; // Use exam's actual total points
             
-            // Calculate base points per question
-            $basePoints = floor(($totalPoints * 10) / $totalQuestions) / 10; // Round to 1 decimal
-            $remainder = round($totalPoints - ($basePoints * $totalQuestions), 1);
+            // Get bloom level for each question to calculate weighted points
+            $questionObjects = Question::whereIn('id', array_keys($selectedQuestions))->get()->keyBy('id');
             
-            // Distribute points
-            $questionIndex = 0;
-            $finalQuestions = [];
+            // Calculate weight based on bloom level (higher level = more points)
+            // Level 1 (Remember): 1.0x, Level 2 (Understand): 1.2x, Level 3 (Apply): 1.5x, Level 4+ (Analyze/Create): 2.0x
+            $levelWeights = [1 => 1.0, 2 => 1.2, 3 => 1.5, 4 => 2.0];
+            $totalWeight = 0;
+            $questionWeights = [];
             
             foreach ($selectedQuestions as $qId => $qData) {
-                $points = $basePoints;
+                $question = $questionObjects->get($qId);
+                $bloomLevel = $question ? min($question->bloom_level, 4) : 1;
+                $weight = $levelWeights[$bloomLevel] ?? 1.0;
                 
-                // Add remainder to first few questions
-                if ($questionIndex < round($remainder * 10)) {
-                    $points += 0.1;
+                // Essay questions get 1.5x multiplier on top of bloom level
+                if ($qData['type'] === 'essay') {
+                    $weight *= 1.5;
                 }
+                
+                $questionWeights[$qId] = $weight;
+                $totalWeight += $weight;
+            }
+            
+            // Distribute points proportionally based on weights
+            $finalQuestions = [];
+            $distributedTotal = 0;
+            
+            foreach ($selectedQuestions as $qId => $qData) {
+                $weight = $questionWeights[$qId];
+                $points = round(($weight / $totalWeight) * $totalPoints, 2);
+                
+                // Ensure minimum 0.1 points per question
+                $points = max(0.1, $points);
                 
                 $finalQuestions[$qId] = [
                     'order' => $qData['order'],
-                    'points' => round($points, 1)
+                    'points' => $points
                 ];
                 
-                $questionIndex++;
+                $distributedTotal += $points;
             }
             
-            // Verify total is exactly 10
-            $actualTotal = array_sum(array_column($finalQuestions, 'points'));
-            if (abs($actualTotal - 10) > 0.01) {
-                // Adjust last question to make it exactly 10
+            // Adjust total to exactly match exam's total_points
+            $difference = round($totalPoints - $distributedTotal, 2);
+            if (abs($difference) > 0.01) {
+                // Distribute difference to questions proportionally
+                $adjustmentPerQuestion = $difference / $totalQuestions;
+                
+                foreach ($finalQuestions as $qId => &$qData) {
+                    $qData['points'] = round($qData['points'] + $adjustmentPerQuestion, 2);
+                    $qData['points'] = max(0.1, $qData['points']); // Ensure minimum
+                }
+                
+                // Final adjustment to last question to ensure exact total
+                $actualTotal = array_sum(array_column($finalQuestions, 'points'));
+                $finalDifference = round($totalPoints - $actualTotal, 2);
                 $lastKey = array_key_last($finalQuestions);
                 $finalQuestions[$lastKey]['points'] = round(
-                    $finalQuestions[$lastKey]['points'] + (10 - $actualTotal), 
-                    1
+                    $finalQuestions[$lastKey]['points'] + $finalDifference,
+                    2
                 );
             }
+            
+            \Log::info('Point Distribution:', [
+                'total_questions' => $totalQuestions,
+                'total_points' => $totalPoints,
+                'distributed' => array_sum(array_column($finalQuestions, 'points')),
+                'details' => $finalQuestions
+            ]);
             
             // Attach questions to exam
             $exam->questions()->attach($finalQuestions);
@@ -724,9 +811,23 @@ class ExamController extends Controller
             $query->whereNotIn('id', $exclude);
         }
 
-        return $query->inRandomOrder()
+        $results = $query->inRandomOrder()
             ->limit($limit)
             ->get();
+        
+        // Debug logging
+        \Log::info('Question Query:', [
+            'subject_id' => $subjectId,
+            'bloom_level' => $bloomLevel,
+            'type' => $type,
+            'topics' => $topics,
+            'limit' => $limit,
+            'excluded_count' => count($exclude),
+            'found' => $results->count(),
+            'sql' => $query->toSql()
+        ]);
+        
+        return $results;
     }
 }
 

@@ -1,181 +1,250 @@
 @extends('layouts.app')
 
-@section('title', 'Thêm Môn học Mới')
+@section('title', 'Thêm Môn học')
+@section('page-title', 'Thêm Môn học Mới')
+@section('page-description', 'Tạo môn học / danh mục mới trong hệ thống khoá học.')
 
 @section('content')
-<div class="p-6 max-w-4xl mx-auto">
-    <!-- Header -->
+<div class="max-w-4xl mx-auto">
+
+    {{-- Header --}}
     <div class="mb-8">
-        <div class="flex items-center space-x-4 mb-4">
-            <a href="{{ route('teacher.subjects.index') }}" class="text-gray-600 hover:text-gray-900">
+        <div class="flex items-center gap-4 mb-4">
+            <a href="{{ route('teacher.subjects.index') }}"
+               class="text-slate-500 hover:text-slate-900">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Thêm Môn học Mới</h1>
-                <p class="text-gray-600 mt-1">Tạo môn học mới trong hệ thống</p>
+                <h1 class="text-2xl font-semibold text-slate-900">Thêm Môn học Mới</h1>
+                <p class="text-sm text-slate-500 mt-1">Tạo môn học (subject) mới cho hệ thống</p>
             </div>
         </div>
     </div>
 
-    <!-- Error Messages -->
-    @if($errors->any())
-    <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-        <div class="flex items-start">
-            <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <div>
-                <h3 class="text-red-800 font-medium">Có lỗi xảy ra:</h3>
-                <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-                    @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    {{-- Error messages --}}
+    @if ($errors->any())
+        <div class="mb-6 bg-rose-50 border border-rose-200 rounded-2xl px-4 py-3">
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 text-rose-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <h3 class="text-sm font-semibold text-rose-700">Có lỗi xảy ra:</h3>
+                    <ul class="mt-1 text-xs text-rose-700 list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
     @endif
 
-    <!-- Form -->
-    <form action="{{ route('teacher.subjects.store') }}" method="POST" class="bg-white rounded-2xl shadow-lg p-8">
+    {{-- Form --}}
+    <form action="{{ route('teacher.subjects.store') }}" method="POST"
+          class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 space-y-6">
         @csrf
 
-        <!-- Subject Name -->
-        <div class="mb-6">
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                Tên môn học <span class="text-red-500">*</span>
+        {{-- Tên môn học --}}
+        <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+                Tên môn học <span class="text-rose-500">*</span>
             </label>
-            <input 
-                type="text" 
-                id="name" 
-                name="name" 
+            <input
+                type="text"
+                id="name"
+                name="name"
                 value="{{ old('name') }}"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('name') border-red-500 @enderror"
+                class="w-full rounded-xl border text-sm px-4 py-2.5
+                       border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       @error('name') border-rose-400 focus:ring-rose-500 @enderror"
                 placeholder="VD: Giải tích 1, Lập trình Web..."
                 required
             >
             @error('name')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
         </div>
 
-        <!-- Subject Code -->
-        <div class="mb-6">
-            <label for="code" class="block text-sm font-medium text-gray-700 mb-2">
-                Mã môn học <span class="text-red-500">*</span>
+        {{-- Mã môn học --}}
+        <div>
+            <label for="code" class="block text-sm font-medium text-slate-700 mb-2">
+                Mã môn học <span class="text-slate-400 text-xs">(Tùy chọn)</span>
             </label>
-            <input 
-                type="text" 
-                id="code" 
-                name="code" 
+            <input
+                type="text"
+                id="code"
+                name="code"
                 value="{{ old('code') }}"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('code') border-red-500 @enderror"
-                placeholder="VD: MATH101, CS201..."
-                required
+                class="w-full rounded-xl border text-sm px-4 py-2.5
+                       border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       @error('code') border-rose-400 focus:ring-rose-500 @enderror"
+                placeholder="VD: MATH101, CS201... (để trống để tự động tạo)"
             >
             @error('code')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
-            <p class="mt-1 text-sm text-gray-500">Mã môn học phải là duy nhất trong hệ thống</p>
+            <p class="mt-1 text-xs text-slate-500">
+                💡 <strong>Để trống</strong> để hệ thống tự động sinh mã từ tên môn học.
+                <span id="code-preview" class="font-mono text-indigo-600"></span>
+            </p>
         </div>
 
-        <!-- Description -->
-        <div class="mb-6">
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+        {{-- Mô tả --}}
+        <div>
+            <label for="description" class="block text-sm font-medium text-slate-700 mb-2">
                 Mô tả môn học
             </label>
-            <textarea 
-                id="description" 
-                name="description" 
+            <textarea
+                id="description"
+                name="description"
                 rows="4"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('description') border-red-500 @enderror"
+                class="w-full rounded-xl border text-sm px-4 py-2.5
+                       border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       @error('description') border-rose-400 focus:ring-rose-500 @enderror"
                 placeholder="Nhập mô tả chi tiết về môn học..."
             >{{ old('description') }}</textarea>
             @error('description')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
         </div>
 
-        <!-- Status -->
-        <div class="mb-6">
-            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-                Trạng thái <span class="text-red-500">*</span>
+        {{-- Trạng thái --}}
+        <div>
+            <label for="status" class="block text-sm font-medium text-slate-700 mb-2">
+                Trạng thái <span class="text-rose-500">*</span>
             </label>
-            <select 
-                id="status" 
+            <select
+                id="status"
                 name="status"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('status') border-red-500 @enderror"
+                class="w-full rounded-xl border text-sm px-4 py-2.5
+                       border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       @error('status') border-rose-400 focus:ring-rose-500 @enderror"
                 required
             >
-                <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>📝 Nháp - Chưa công khai</option>
-                <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>✅ Hoạt động - Hiển thị cho học sinh</option>
-                <option value="archived" {{ old('status') === 'archived' ? 'selected' : '' }}>📦 Lưu trữ - Đã kết thúc</option>
+                <option value="draft"   {{ old('status') === 'draft'   ? 'selected' : '' }}>📝 Nháp - Chưa công khai</option>
+                <option value="active"  {{ old('status') === 'active'  ? 'selected' : '' }}>✅ Hoạt động - Hiển thị cho học sinh</option>
+                <option value="archived"{{ old('status') === 'archived'? 'selected' : '' }}>📦 Lưu trữ - Đã kết thúc</option>
             </select>
             @error('status')
-            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
             @enderror
         </div>
 
-        <!-- Create Chat Room Option -->
-        <div class="mb-8">
-            <div class="flex items-start space-x-3 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                <input 
-                    type="checkbox" 
-                    id="create_chat_room" 
+        {{-- (Option) Tự tạo nhóm chat – nếu muốn dùng sau này --}}
+        <div class="pt-2">
+            <div class="flex items-start gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                <input
+                    type="checkbox"
+                    id="create_chat_room"
                     name="create_chat_room"
                     value="1"
                     {{ old('create_chat_room') ? 'checked' : '' }}
-                    class="mt-1 w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    class="mt-1 w-5 h-5 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
                 >
-                <div class="flex-1">
-                    <label for="create_chat_room" class="text-sm font-medium text-gray-900 cursor-pointer">
-                        💬 Tự động tạo nhóm chat cho môn học
-                    </label>
-                    <p class="text-sm text-gray-600 mt-1">
-                        Học sinh sẽ tự động được thêm vào nhóm chat khi đăng ký môn học này (UC-GV-015)
-                    </p>
-                </div>
+            <div class="flex-1">
+                <label for="create_chat_room" class="text-sm font-medium text-slate-900 cursor-pointer">
+                    💬 Tự động tạo nhóm chat cho môn học
+                </label>
+                <p class="text-xs text-slate-600 mt-1">
+                    Học sinh sẽ được thêm vào nhóm chat khi đăng ký môn học này (tùy chọn, m có thể xử lý logic sau).
+                </p>
+            </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-4">
-            <button 
-                type="submit"
-                class="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105 flex items-center justify-center space-x-2"
-            >
+        {{-- Buttons --}}
+        <div class="flex items-center gap-4 pt-4">
+            <button type="submit"
+                    class="flex-1 inline-flex items-center justify-center gap-2
+                           rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold
+                           px-6 py-2.5 shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
                 <span>Tạo Môn học</span>
             </button>
-            
-            <a 
-                href="{{ route('teacher.subjects.index') }}"
-                class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-            >
+
+            <a href="{{ route('teacher.subjects.index') }}"
+               class="px-6 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50">
                 Hủy bỏ
             </a>
         </div>
     </form>
 
-    <!-- Info Box -->
-    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    {{-- Info box --}}
+    <div class="mt-6 bg-sky-50 border border-sky-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-sky-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <div class="text-sm text-blue-800">
-                <p class="font-medium mb-1">💡 Lưu ý:</p>
+            <div class="text-xs text-sky-800 space-y-1">
+                <p class="font-semibold">💡 Lưu ý:</p>
                 <ul class="list-disc list-inside space-y-1">
-                    <li>Bạn có thể tạo môn học ở trạng thái "Nháp" và chuyển sang "Hoạt động" sau</li>
-                    <li>Mã môn học không thể thay đổi sau khi tạo</li>
-                    <li>Môn học ở trạng thái "Hoạt động" mới hiển thị cho học sinh</li>
+                    <li>Có thể tạo môn học ở trạng thái <strong>Nháp</strong> rồi chuyển sang <strong>Hoạt động</strong> sau.</li>
+                    <li><strong>Mã môn học</strong> sẽ tự động tạo từ tên nếu bỏ trống (VD: "Giải Tích 1" → "GT1")</li>
+                    <li>Môn học ở trạng thái <strong>Hoạt động</strong> mới hiển thị cho học sinh / giáo viên.</li>
                 </ul>
             </div>
         </div>
     </div>
+
 </div>
+
+@push('scripts')
+<script>
+// Auto-preview code khi nhập tên môn học
+document.getElementById('name').addEventListener('input', function(e) {
+    const name = e.target.value;
+    const codeInput = document.getElementById('code');
+    const codePreview = document.getElementById('code-preview');
+    
+    // Chỉ preview nếu field code đang trống
+    if (codeInput.value === '' && name.length > 0) {
+        // Tạo preview code (giống logic backend)
+        const words = name.toUpperCase().split(' ');
+        let code = '';
+        
+        for (let word of words) {
+            if (word.length > 0) {
+                // Loại bỏ dấu tiếng Việt đơn giản
+                const cleanWord = word
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd')
+                    .replace(/Đ/g, 'D');
+                code += cleanWord.charAt(0);
+            }
+        }
+        
+        if (code.length < 3) {
+            const cleanName = name.toUpperCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'D')
+                .replace(/\s+/g, '');
+            code = cleanName.substring(0, 6);
+        }
+        
+        codePreview.textContent = code ? '(Mã tự động: ' + code + ')' : '';
+    } else {
+        codePreview.textContent = '';
+    }
+});
+
+// Clear preview khi nhập code thủ công
+document.getElementById('code').addEventListener('input', function(e) {
+    if (e.target.value !== '') {
+        document.getElementById('code-preview').textContent = '';
+    }
+});
+</script>
+@endpush
+
 @endsection

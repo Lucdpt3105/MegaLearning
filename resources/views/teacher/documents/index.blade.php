@@ -186,8 +186,8 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $document->subject->name }}</div>
-                            <div class="text-sm text-gray-500">{{ $document->subject->code }}</div>
+                            <div class="text-sm text-gray-900">{{ $document->subject ? $document->subject->name : 'N/A' }}</div>
+                            <div class="text-sm text-gray-500">{{ $document->subject ? $document->subject->code : '' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($document->folder)

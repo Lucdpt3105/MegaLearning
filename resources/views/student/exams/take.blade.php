@@ -9,7 +9,10 @@
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ $exam->title }}</h1>
-                <p class="text-gray-600">{{ $exam->subject->name }} - {{ $exam->classRoom->name }}</p>
+                <p class="text-gray-600">
+                    {{ $exam->subject ? $exam->subject->name : 'Chưa có môn học' }} - 
+                    {{ $exam->classRoom ? $exam->classRoom->name : 'Chưa có lớp' }}
+                </p>
             </div>
             <div class="text-right">
                 <div class="text-sm text-gray-500 mb-1">Thời gian còn lại</div>

@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
-@section('title', 'Quản lý khóa học')
-@section('page-title', 'Quản lý khóa học')
+@section('title', 'Quản lý lớp học')
+@section('page-title', 'Quản lý lớp học')
 @section('page-description', 'Danh sách tất cả các lớp học đang hoạt động trong hệ thống.')
 
 @section('content')
@@ -48,23 +48,27 @@
             </span>
         </div>
 
+        @if($course->subject)
         <p class="text-sm text-slate-500 mt-1">{{ $course->subject->name }}</p>
+        @else
+        <p class="text-sm text-slate-400 mt-1 italic">Chưa có môn học</p>
+        @endif
 
         {{-- Info --}}
         <div class="mt-4 space-y-2 text-sm">
             <div class="flex justify-between">
                 <span class="text-slate-600">Giáo viên:</span>
-                <span class="font-medium">{{ $course->teacher->name }}</span>
+                <span class="font-medium">{{ $course->teacher ? $course->teacher->name : 'Chưa có' }}</span>
             </div>
 
             <div class="flex justify-between">
                 <span class="text-slate-600">Học viên:</span>
-                <span class="font-medium">{{ $course->enrollments_count }} / {{ $course->max_students }}</span>
+                <span class="font-medium">{{ $course->enrollments_count ?? 0 }} / {{ $course->max_students ?? 0 }}</span>
             </div>
 
             <div class="flex justify-between">
                 <span class="text-slate-600">Ngày bắt đầu:</span>
-                <span class="font-medium">{{ $course->start_date }}</span>
+                <span class="font-medium">{{ $course->start_date ?? 'Chưa xác định' }}</span>
             </div>
         </div>
 
