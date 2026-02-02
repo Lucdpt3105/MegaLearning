@@ -41,20 +41,20 @@ class ChatSeeder extends Seeder
 
         // Tạo tin nhắn mẫu
         ChatMessage::create([
-            'room_id' => $generalRoom->room_id,
+            'room_id' => $generalRoom->id,
             'user_id' => $user1->id,
             'message_text' => 'Welcome to General Discussion! 👋',
             'message_type' => 'text',
         ]);
 
         ChatMessage::create([
-            'room_id' => $generalRoom->room_id,
+            'room_id' => $generalRoom->id,
             'user_id' => $user1->id,
             'message_text' => 'Feel free to chat about anything here.',
             'message_type' => 'text',
         ]);
 
-        echo "✅ Room '{$generalRoom->room_name}' created (ID: {$generalRoom->room_id})\n";
+        echo "✅ Room '{$generalRoom->room_name}' created (ID: {$generalRoom->id})\n";
 
         // Tạo Laravel Study Group
         $studyRoom = ChatRoom::create([
@@ -70,13 +70,13 @@ class ChatSeeder extends Seeder
         ]);
 
         ChatMessage::create([
-            'room_id' => $studyRoom->room_id,
+            'room_id' => $studyRoom->id,
             'user_id' => $user1->id,
             'message_text' => 'Let\'s learn Laravel together! 🚀',
             'message_type' => 'text',
         ]);
 
-        echo "✅ Room '{$studyRoom->room_name}' created (ID: {$studyRoom->room_id})\n";
+        echo "✅ Room '{$studyRoom->room_name}' created (ID: {$studyRoom->id})\n";
 
         // Nếu có subject, tạo Subject Room
         $subject = \App\Models\Subject::first();
@@ -95,13 +95,13 @@ class ChatSeeder extends Seeder
             ]);
 
             ChatMessage::create([
-                'room_id' => $subjectRoom->room_id,
+                'room_id' => $subjectRoom->id,
                 'user_id' => $user1->id,
                 'message_text' => 'Welcome to ' . $subject->subject_name . ' discussion room!',
                 'message_type' => 'text',
             ]);
 
-            echo "✅ Room '{$subjectRoom->room_name}' created (ID: {$subjectRoom->room_id})\n";
+            echo "✅ Room '{$subjectRoom->room_name}' created (ID: {$subjectRoom->id})\n";
         }
 
         echo "\n🎉 Chat seeder completed!\n";
