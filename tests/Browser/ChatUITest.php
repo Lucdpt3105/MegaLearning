@@ -4,13 +4,13 @@ namespace Tests\Browser;
 
 use App\Models\User;
 use App\Models\ChatRoom;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ChatUITest extends DuskTestCase
 {
-    use DatabaseMigrations;
+    use RefreshDatabase;
 
     /** @test */
     public function user_can_send_and_receive_messages_in_chat()
