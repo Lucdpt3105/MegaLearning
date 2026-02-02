@@ -5,13 +5,13 @@ namespace Tests\Browser;
 use App\Models\User;
 use App\Models\Exam;
 use App\Models\Subject;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class ExamUITest extends DuskTestCase
 {
-    use DatabaseMigrations;
+    use RefreshDatabase;
 
     /** @test */
     public function student_can_login_and_view_exam_list()
