@@ -96,6 +96,10 @@ Route::prefix('v1')->group(function () {
     Route::get('subjects', [SubjectController::class, 'index']);
     Route::get('subjects/{id}', [SubjectController::class, 'show']);
     
+    // Categories API (returning subjects as categories for now)
+    Route::get('categories', [SubjectController::class, 'index']);
+    Route::get('categories/{id}', [SubjectController::class, 'show']);
+    
     // Protected routes - Require authentication + permissions
     Route::middleware(['auth:sanctum', 'permission:manage-subjects'])->group(function () {
         Route::post('subjects', [SubjectController::class, 'store']);

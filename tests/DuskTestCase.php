@@ -21,6 +21,17 @@ abstract class DuskTestCase extends BaseTestCase
             static::startChromeDriver(['--port=9515']);
         }
     }
+    
+    /**
+     * Setup test environment
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Disable Telescope for browser tests
+        config(['telescope.enabled' => false]);
+    }
 
     /**
      * Create the RemoteWebDriver instance.
