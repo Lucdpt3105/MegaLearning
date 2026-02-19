@@ -9,6 +9,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\SupabaseAuthController;
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -16,6 +17,31 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Supabase OAuth Routes
+Route::post('/auth/supabase/callback', [SupabaseAuthController::class, 'callback'])->name('auth.supabase.callback');
+
+// Email Verification Routes
+Route::get('/email/verify-notice', function () {
+    return view('auth.verify-email');
+})->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/login')->with('success', 'Email đã được xác thực thành công! Bạn có thể đăng nhập ngay. ✅');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
+    // Find user by email from session or re-send
+    $email = $request->input('email') ?? session('verification_email');
+    if ($email) {
+        $user = \App\Models\User::where('email', $email)->first();
+        if ($user && !$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+        }
+    }
+    return back()->with('resent', true);
+})->middleware('throttle:6,1')->name('verification.send');
 
 // Forgot Password Routes (UC-GLOBAL-003)
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
