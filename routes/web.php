@@ -26,10 +26,20 @@ Route::get('/email/verify-notice', function () {
     return view('auth.verify-email');
 })->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request) {
-    $request->fulfill();
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = \App\Models\User::findOrFail($id);
+
+    // Verify the hash matches the user's email
+    if (!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+        abort(403, 'Link xác thực không hợp lệ.');
+    }
+
+    if (!$user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
+
     return redirect('/login')->with('success', 'Email đã được xác thực thành công! Bạn có thể đăng nhập ngay. ✅');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+})->middleware('signed')->name('verification.verify');
 
 Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
     // Find user by email from session or re-send
