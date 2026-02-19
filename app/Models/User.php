@@ -17,6 +17,23 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
 
     /**
+     * Get the avatar URL to display.
+     * Priority: uploaded avatar > Google avatar_url > ui-avatars fallback
+     */
+    public function getDisplayAvatarUrl(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        if ($this->avatar_url) {
+            return $this->avatar_url;
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'User') . '&background=4f46e5&color=fff&bold=true';
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

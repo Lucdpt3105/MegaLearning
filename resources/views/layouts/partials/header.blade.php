@@ -325,17 +325,11 @@
         <!-- User Profile -->
         <a href="{{ route('profile.edit') }}" class="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2 transition">
             @auth
-                @if(Auth::user()->avatar)
-                    <img 
-                        src="{{ asset('storage/' . Auth::user()->avatar) }}" 
-                        alt="{{ Auth::user()->name }}" 
-                        class="w-10 h-10 rounded-full ring-2 ring-purple-100 object-cover"
-                    >
-                @else
-                    <div class="w-10 h-10 rounded-full ring-2 ring-purple-100 bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-                @endif
+                <img 
+                    src="{{ Auth::user()->getDisplayAvatarUrl() }}" 
+                    alt="{{ Auth::user()->name }}" 
+                    class="w-10 h-10 rounded-full ring-2 ring-purple-100 object-cover"
+                >
                 <div class="text-left">
                     <p class="font-semibold text-sm text-gray-800">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-gray-500">{{ ucfirst(Auth::user()->roles->first()?->name ?? 'User') }}</p>
