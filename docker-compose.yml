@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      APP_NAME: MegaLearning
+      APP_ENV: production
+      APP_KEY: base64:W0vhEBMGD4YiM1ssc+CqSO1u8YRZmkwzD1IpzkWDluU=
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8080
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: megalearning
+      DB_USERNAME: megalearning
+      DB_PASSWORD: secret
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      TELESCOPE_ENABLED: "false"
+      LOG_CHANNEL: stderr
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: megalearning
+      MYSQL_USER: megalearning
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
