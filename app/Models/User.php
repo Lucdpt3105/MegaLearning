@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,10 +11,27 @@ use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use App\Notifications\ResetPasswordNotification;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
+
+    /**
+     * Get the avatar URL to display.
+     * Priority: uploaded avatar > Google avatar_url > ui-avatars fallback
+     */
+    public function getDisplayAvatarUrl(): string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        if ($this->avatar_url) {
+            return $this->avatar_url;
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'User') . '&background=4f46e5&color=fff&bold=true';
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +43,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'avatar_url',
         'phone',
         'bio',
         'last_login_at',
@@ -34,6 +52,7 @@ class User extends Authenticatable
         'gender',
         'date_of_birth',
         'address',
+        'supabase_id',
     ];
 
     /**

@@ -18,5 +18,8 @@
         "pusher-js": "^8.4.0-rc2",
         "tailwindcss": "^4.1.17",
         "vite": "^7.0.7"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.97.0"
     }
 }

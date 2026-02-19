@@ -293,7 +293,7 @@
     <!-- Profile Section (Bottom) -->
     <div class="profile-section border-t border-gray-800">
         <button id="profileToggle" class="profile-toggle">
-            <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'User' }}&background=4f46e5&color=fff" alt="Profile" class="profile-avatar">
+            <img src="{{ Auth::check() ? Auth::user()->getDisplayAvatarUrl() : 'https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff' }}" alt="Profile" class="profile-avatar">
             <div class="profile-details">
                 <h4 class="profile-name">{{ Auth::user()->name ?? 'User' }}</h4>
                 <a href="{{ route('profile.edit') }}" class="profile-link">Xem hồ sơ</a>

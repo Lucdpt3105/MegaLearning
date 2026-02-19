@@ -315,10 +315,8 @@
     <!-- Profile Section (Bottom) -->
     <div class="profile-section border-t border-gray-800">
         <button id="profileToggle" class="profile-toggle">
-            @if(Auth::check() && Auth::user()->avatar)
-                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Profile" class="profile-avatar">
-            @elseif(Auth::check())
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'User' }}&background=4f46e5&color=fff" alt="Profile" class="profile-avatar">
+            @if(Auth::check())
+                <img src="{{ Auth::user()->getDisplayAvatarUrl() }}" alt="Profile" class="profile-avatar">
             @else
                 <img src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" alt="Profile" class="profile-avatar">
             @endif
