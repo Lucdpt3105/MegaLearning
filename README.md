@@ -1,680 +1,347 @@
-# 📚 MegaLearning - E-Learning Platform
+# MegaLearning - Nền tảng E-Learning Hiện đại
 
-> Modern e-learning platform built with Laravel 12, featuring video conferencing, AI chat assistant, exam management, and real-time collaboration.
+<div align="center">
 
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)](https://php.net)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)](#)
+![MegaLearning Banner](https://i.ibb.co/1fgWd83s/ladning.png)
 
----
+**Nền tảng học trực tuyến thế hệ mới với Video Call, AI Assistant, Quản lý Thi cử và Cộng tác Real-time**
 
-## 📖 Table of Contents
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
-- [Quick Start](#-quick-start)
-- [Features](#-features)
-- [System Requirements](#-system-requirements)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Usage Guide](#-usage-guide)
-- [API Documentation](#-api-documentation)
-- [Testing](#-testing)
-- [Scripts & Tools](#-scripts--tools)
-- [Troubleshooting](#-troubleshooting)
-- [Project Structure](#-project-structure)
-- [Additional Documentation](#-additional-documentation)
+[Demo](#-screenshots) • [Tính năng](#-tính-năng-chính) • [Tech Stack](#-tech-stack) • [Cài đặt](#-cài-đặt)
+
+</div>
 
 ---
 
-## 🚀 Quick Start
+## 📖 Giới thiệu
 
-### One-Command Setup
+**MegaLearning** là nền tảng e-learning toàn diện được xây dựng với Laravel 12, tích hợp nhiều công nghệ hiện đại nhằm mang lại trải nghiệm học tập trực tuyến tốt nhất cho học sinh, giáo viên và quản trị viên.
+
+### ✨ Điểm nổi bật
+
+- 🎥 **Video Call** tích hợp Zoom API & Jitsi Meet
+- 🤖 **AI Assistant** sử dụng Google Gemini AI miễn phí
+- 📝 **Quản lý thi cử** tự động chấm điểm
+- 💬 **Chat Real-time** với Laravel Echo & Pusher
+- 🔐 **Phân quyền** đa vai trò (Admin/Teacher/Student)
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Trang chủ & Dashboard
+![Trang chủ](https://i.ibb.co/5gYgfrtm/trangchu.png)
+
+---
+
+### 🔐 Đăng nhập / Đăng ký
+![Login Page](https://i.ibb.co/3KZrRFD/dn.png)
+
+---
+
+### 👤 Thông tin cá nhân
+![Profile](https://i.ibb.co/G3CctXbS/infochanges.png)
+
+---
+
+### 📚 Quản lý Môn học
+![Môn học](https://i.ibb.co/MkmWGwBp/monhoc.png)
+
+---
+
+### 📝 Hệ thống Thi cử & Kiểm tra
+
+| Làm bài kiểm tra | Đề thi tự động |
+|------------------|----------------|
+| ![Kiểm tra](https://i.ibb.co/fdqqXKmy/kt.png) | ![Đề thi auto](https://i.ibb.co/dJBQygSy/dethiauto.png) |
+
+---
+
+### ✅ Chấm điểm & Quản lý câu hỏi
+
+| Chấm bài | Quản lý câu hỏi |
+|----------|-----------------|
+| ![Chấm bài](https://i.ibb.co/3y3TtzvW/chambai.png) | ![Câu hỏi](https://i.ibb.co/Xf5CSNPH/questions.png) |
+
+---
+
+### 📁 Tài liệu học tập
+![Tài liệu](https://i.ibb.co/xSFNs6ct/tailieu.png)
+
+---
+
+### 📅 Thời khóa biểu
+![Thời khóa biểu](https://i.ibb.co/gZY2VzjB/tkb.png)
+
+---
+
+### 💬 Diễn đàn Q&A
+![Forum](https://i.ibb.co/QvnZcQNS/forum.png)
+
+---
+
+## 🚀 Tính năng chính
+
+### 🎓 Học tập & Thi cử
+
+| Tính năng | Mô tả |
+|-----------|-------|
+| 📝 **Quản lý bài thi** | Tạo, chỉnh sửa, xóa bài thi với nhiều loại câu hỏi |
+| ✅ **Tự động chấm điểm** | Chấm điểm tự động cho trắc nghiệm, đúng/sai |
+| ⏱️ **Giới hạn thời gian** | Countdown timer, auto-submit khi hết giờ |
+| 🔀 **Ngẫu nhiên hóa** | Xáo trộn câu hỏi và đáp án để chống gian lận |
+| 📊 **Thống kê kết quả** | Biểu đồ, báo cáo chi tiết theo lớp/học sinh |
+| 🏆 **Bảng xếp hạng** | Xếp hạng học sinh theo điểm số |
+
+### 📹 Giao tiếp & Cộng tác
+
+| Tính năng | Mô tả |
+|-----------|-------|
+| 🎥 **Video Call** | Tích hợp Zoom API + Jitsi Meet backup |
+| 💬 **Chat Real-time** | Nhắn tin 1-1, nhóm với Laravel Echo |
+| 🤖 **AI Assistant** | Trợ lý AI Google Gemini hỗ trợ học tập |
+| 📢 **Thông báo** | Push notifications real-time |
+| 💬 **Diễn đàn Q&A** | Hỏi đáp kiểu Stack Overflow với upvote/downvote |
+
+### 🔐 Quản trị & Bảo mật
+
+| Tính năng | Mô tả |
+|-----------|-------|
+| 👥 **Phân quyền RBAC** | 3 vai trò: Admin, Teacher, Student |
+| 🔑 **Xác thực API** | Laravel Sanctum token-based auth |
+| 🔒 **Bảo mật thi** | Chống gian lận, full-screen mode |
+| 📧 **Reset Password** | Email-based + CLI tool backup |
+| 📋 **Quản lý điểm danh** | Điểm danh lớp học tự động |
+
+### 📚 Nội dung & Tài liệu
+
+| Tính năng | Mô tả |
+|-----------|-------|
+| 📁 **Thư viện tài liệu** | Upload, chia sẻ tài liệu học tập |
+| 📂 **Quản lý môn học** | Tổ chức theo cấu trúc phân cấp |
+| 📊 **Import/Export Excel** | Nhập xuất dữ liệu hàng loạt |
+| ☁️ **Google Drive** | Tích hợp lưu trữ cloud |
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+
+| Công nghệ | Version | Mô tả |
+|-----------|---------|-------|
+| ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) | 12.x | PHP Framework chính |
+| ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) | 8.2+ | Ngôn ngữ server-side |
+| ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) | 8.0+ | Cơ sở dữ liệu |
+| ![Sanctum](https://img.shields.io/badge/Sanctum-FF2D20?style=flat-square&logo=laravel&logoColor=white) | 4.2 | API Authentication |
+
+### Frontend
+
+| Công nghệ | Version | Mô tả |
+|-----------|---------|-------|
+| ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) | 4.x | CSS Framework |
+| ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white) | 7.x | Build Tool |
+| ![Blade](https://img.shields.io/badge/Blade-FF2D20?style=flat-square&logo=laravel&logoColor=white) | - | Templating Engine |
+| ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) | ES6+ | Client-side scripting |
+
+### Real-time & APIs
+
+| Công nghệ | Version | Mô tả |
+|-----------|---------|-------|
+| ![Pusher](https://img.shields.io/badge/Pusher-300D4F?style=flat-square&logo=pusher&logoColor=white) | 8.x | WebSocket broadcasting |
+| ![Laravel Echo](https://img.shields.io/badge/Echo-FF2D20?style=flat-square&logo=laravel&logoColor=white) | 1.16 | Real-time events |
+| ![Zoom](https://img.shields.io/badge/Zoom_API-2D8CFF?style=flat-square&logo=zoom&logoColor=white) | - | Video conferencing |
+| ![Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=flat-square&logo=google&logoColor=white) | - | AI Assistant |
+
+### Packages & Libraries
+
+| Package | Mục đích |
+|---------|----------|
+| **Spatie Permission** | Role-Based Access Control (RBAC) |
+| **Maatwebsite Excel** | Import/Export Excel & CSV |
+| **Laravel Telescope** | Debug & Monitoring |
+| **Google Drive Ext** | Cloud Storage Integration |
+| **PHPSpreadsheet** | Xử lý file Excel |
+
+### DevOps & Tools
+
+| Công cụ | Mục đích |
+|---------|----------|
+| ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerization |
+| ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) | Version Control |
+| ![PHPUnit](https://img.shields.io/badge/PHPUnit-3775A9?style=flat-square&logo=php&logoColor=white) | Unit Testing |
+| ![Dusk](https://img.shields.io/badge/Laravel_Dusk-FF2D20?style=flat-square&logo=laravel&logoColor=white) | Browser Testing |
+
+---
+
+## 🏗 Kiến trúc hệ thống
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENT SIDE                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │   Browser   │  │   Mobile    │  │    API Clients      │  │
+│  │  (Blade +   │  │  (Future)   │  │  (Sanctum Token)    │  │
+│  │  Tailwind)  │  │             │  │                     │  │
+│  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘  │
+└─────────┼────────────────┼───────────────────┼──────────────┘
+          │                │                   │
+          ▼                ▼                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     LARAVEL APPLICATION                     │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                    ROUTES                            │    │
+│  │   web.php (Views)  │  api.php (REST API)            │    │
+│  └─────────────────────┬───────────────────────────────┘    │
+│                        ▼                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                  MIDDLEWARE                          │    │
+│  │  Auth │ Role │ Permission │ Sanctum │ CORS          │    │
+│  └─────────────────────┬───────────────────────────────┘    │
+│                        ▼                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                 CONTROLLERS                          │    │
+│  │  Admin │ Teacher │ Student │ API Controllers        │    │
+│  └─────────────────────┬───────────────────────────────┘    │
+│                        ▼                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                   SERVICES                           │    │
+│  │  AIService │ ZoomService │ ExamService │ etc.       │    │
+│  └─────────────────────┬───────────────────────────────┘    │
+│                        ▼                                    │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                    MODELS                            │    │
+│  │  User │ Exam │ Question │ ChatRoom │ VideoCall      │    │
+│  └─────────────────────┬───────────────────────────────┘    │
+└─────────────────────────┼───────────────────────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      DATA LAYER                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │    MySQL     │  │    Redis     │  │ Google Drive │       │
+│  │  (Database)  │  │   (Queue)    │  │   (Storage)  │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  EXTERNAL SERVICES                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
+│  │   Zoom   │  │  Jitsi   │  │  Gemini  │  │  Pusher  │    │
+│  │   API    │  │   Meet   │  │    AI    │  │WebSocket │    │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 💻 Cài đặt
+
+### Yêu cầu hệ thống
+
+- PHP >= 8.2
+- MySQL >= 8.0
+- Composer >= 2.0
+- Node.js >= 18.x
+- npm >= 9.x
+
+### Cài đặt nhanh
+
 ```bash
 # Clone repository
 git clone https://github.com/Lucdpt3105/MegaLearning.git
 cd MegaLearning
 
-# Install dependencies
+# Cài đặt dependencies
 composer install
 npm install
 
-# Setup environment
+# Cấu hình environment
 cp .env.example .env
 php artisan key:generate
 
 # Setup database
 php artisan migrate --seed
 
-# Start development servers
-composer dev
-# 3. Test:
-```
-
-**Access the application:**
-- Web: http://localhost:8000
-- Admin: http://localhost:8000/admin
-- Teacher: http://localhost:8000/teacher
-- Student: http://localhost:8000/student
-
-### Default Test Accounts
-| Email | Password | Role |
-|-------|----------|------|
-| admin@megalearning.com | password | admin |
-| teacher@megalearning.com | password | teacher |
-| student@megalearning.com | password | student |
-
----
-
-## ✨ Features
-
-### 🎓 Core Learning Features
-- **Exam Management** - Create, take, auto-grade exams with multiple question types
-- **Subject & Topic Management** - Organize courses with hierarchical structure
-- **Document Library** - Upload and share learning materials
-- **Forum & Q&A** - Stack Overflow-style forum with voting system
-- **Student Rankings** - Leaderboards and achievement tracking
-- **Attendance Tracking** - Class attendance management
-
-### 📹 Communication & Collaboration
-- **Video Conferencing** - Zoom API integration + Jitsi fallback
-- **Real-time Chat** - Group chat, private messages, AI assistant
-- **AI Chat Assistant** - Google Gemini AI-powered Q&A (FREE)
-- **Notifications** - Real-time notifications for all activities
-
-### 🔐 Security & Administration
-- **Role-Based Access Control** - Admin, Teacher, Student roles
-- **Password Reset** - Email-based + CLI tool
-- **Exam Security** - Anti-cheating measures, time limits, randomization
-- **API Authentication** - Sanctum token-based auth
-
-### 🛠️ Developer Features
-- **RESTful API** - Full API with Sanctum authentication
-- **Testing Suite** - 36+ test cases (PHPUnit + Dusk)
-- **API Testing** - Thunder Client integration
-- **Database Seeding** - Demo data generators
-- **Helper Scripts** - 20+ utility scripts
-
----
-
-## 💻 System Requirements
-
-- **PHP** >= 8.2
-- **MySQL** >= 8.0 or MariaDB >= 10.3
-- **Composer** >= 2.0
-- **Node.js** >= 18.x & npm
-- **Git** (for version control)
-
-**Optional:**
-- **ChromeDriver** (for Dusk browser tests)
-- **Zoom Account** (for video conferencing)
-- **Google Gemini API Key** (for AI assistant)
-
----
-
-## 📦 Installation
-
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/Lucdpt3105/MegaLearning.git
-cd MegaLearning
-composer install
-npm install
-```
-
-### 2. Environment Configuration
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Edit `.env` and configure:
-```env
-DB_DATABASE=learning3
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
-
-### 3. Database Setup
-```bash
-# Create database
-mysql -u root -p -e "CREATE DATABASE learning3"
-
-# Run migrations and seeders
-php artisan migrate --seed
-```
-
-### 4. Build Assets
-```bash
+# Build assets
 npm run build
-# Or for development with hot reload
-npm run dev
-```
 
-### 5. Start Server
-```bash
+# Chạy server
 php artisan serve
 ```
 
----
+### Tài khoản demo
 
-## ⚙️ Configuration
-
-### Required Configuration
-
-#### Database (Required)
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=learning3
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
-
-### Optional Configuration
-
-#### Zoom Video Calls (Optional - 5 min setup)
-1. Create Server-to-Server OAuth app at https://marketplace.zoom.us/develop/create
-2. Add these scopes: `meeting:write:admin`, `meeting:read:admin`, `user:read:admin`
-3. Configure in `.env`:
-```env
-ZOOM_ACCOUNT_ID=your_account_id
-ZOOM_CLIENT_ID=your_client_id
-ZOOM_CLIENT_SECRET=your_client_secret
-```
-
-**Quick Setup:**
-```bash
-scripts\setup-zoom.bat
-```
-
-**Verify:**
-```bash
-php scripts/check-zoom-config.php
-php scripts/test-zoom-meeting.php
-```
-
-**Fallback:** Jitsi is available without any configuration!
-
-#### Google Gemini AI (Optional - 2 min setup)
-Get free API key from https://makersuite.google.com/app/apikey
-
-```env
-GEMINI_API_KEY=your_api_key
-GEMINI_MODEL=gemini-2.0-flash-exp
-```
-
-**Quick Setup:**
-```bash
-scripts\setup-gemini.bat
-```
-
-**Test:**
-```bash
-php scripts/test-gemini.php
-```
-
-#### Email (Optional)
-For development, emails are logged to `storage/logs/laravel.log`.
-
-For production SMTP:
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-MAIL_FROM_ADDRESS=your_email@gmail.com
-
-```
+| Email | Password | Vai trò |
+|-------|----------|---------|
+| admin@megalearning.com | password | Admin |
+| teacher@megalearning.com | password | Teacher |
+| student@megalearning.com | password | Student |
 
 ---
 
-## 📘 Usage Guide
+## 📊 Database Schema
 
-### For Teachers
+<details>
+<summary>📋 Các bảng chính</summary>
 
-#### Create Video Call
-1. Login as teacher
-2. Navigate to **Video Calls** → **Create New**
-3. Choose platform (Zoom or Jitsi)
-4. Fill in details and submit
-5. Share join link with students
+| Bảng | Mô tả |
+|------|-------|
+| `users` | Thông tin người dùng |
+| `exams` | Bài thi |
+| `questions` | Câu hỏi |
+| `answers` | Đáp án |
+| `submissions` | Bài làm |
+| `chat_rooms` | Phòng chat |
+| `chat_messages` | Tin nhắn |
+| `video_calls` | Cuộc gọi video |
+| `subjects` | Môn học |
+| `documents` | Tài liệu |
 
-#### Create Exam
-1. Go to **Exams** → **Create Exam**
-2. Add questions (multiple choice, true/false, essay)
-3. Set duration and grading options
-4. Publish to students
-
-#### Grade Submissions
-- Auto-grading for objective questions
-- Manual grading for essay questions
-- Bulk grading support
-
-### For Students
-
-#### Take Exam
-1. Go to **My Exams**
-2. Click **Start Exam**
-3. Answer questions within time limit
-4. Submit for grading
-
-#### Join Video Call
-1. View **Upcoming Video Calls**
-2. Click **Join** button
-3. Enter Zoom/Jitsi meeting
-
-#### Use Chat & AI Assistant
-1. Access **Chat** from sidebar
-2. Ask questions to AI assistant
-3. Get instant AI-powered answers
-
-### For Admins
-
-#### Manage Users
-```bash
-# List all users
-php scripts/list-all-users.php
-
-# Reset password (fastest way)
-php scripts/reset-user-password.php user@email.com newpass
-
-# Create test users
-php scripts/create-test-chat-users.php
-```
-
-#### System Monitoring
-```bash
-# Check system status
-scripts\system-check.bat
-
-# Check Zoom config
-php scripts/check-zoom-config.php
-```
-
----
-
-## 🔌 API Documentation
-
-### Authentication
-
-#### Get Dev Token (Development Only)
-```http
-POST /api/dev-token
-Content-Type: application/json
-
-{
-  "email": "teacher@megalearning.com"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "access_token": "1|xyz...",
-  "token_type": "Bearer"
-}
-```
-
-### API Endpoints
-
-#### Categories API
-```http
-GET    /api/v1/categories           # List all
-GET    /api/v1/categories/{id}      # Show one
-POST   /api/v1/categories           # Create (auth)
-PUT    /api/v1/categories/{id}      # Update (auth)
-DELETE /api/v1/categories/{id}      # Delete (auth)
-```
-
-#### Subjects API
-```http
-GET    /api/v1/subjects             # List all
-GET    /api/v1/subjects/{id}        # Show one
-POST   /api/v1/subjects             # Create (auth)
-PUT    /api/v1/subjects/{id}        # Update (auth)
-DELETE /api/v1/subjects/{id}        # Delete (auth)
-```
-
-**Authentication:**
-Add header: `Authorization: Bearer {token}`
-
-**Full API Guide:** See [docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)
+</details>
 
 ---
 
 ## 🧪 Testing
 
-### Run All Tests
 ```bash
+# Chạy tất cả tests
 php artisan test
-```
 
-### Run Specific Test Suites
-```bash
-# Feature tests
+# Chạy feature tests
 php artisan test --testsuite=Feature
 
-# Unit tests
-php artisan test --testsuite=Unit
-
-# Browser tests (requires ChromeDriver)
+# Chạy browser tests
 php artisan dusk
 ```
 
-### Test Coverage
-- **26 Feature Tests** - Exam management, Chat system, Integration tests
-- **10 Browser Tests** - UI automation with Laravel Dusk
-- **36 Total Test Cases**
-
-**Detailed Guide:** See [docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)
+**Test Coverage:**
+- ✅ 26 Feature Tests
+- ✅ 10 Browser Tests  
+- ✅ 36 Total Test Cases
 
 ---
 
-## 🛠️ Scripts & Tools
+## 👥 Team
 
-### Password Management
-```bash
-# Reset any user password (fastest way)
-php scripts/reset-user-password.php user@email.com newpassword
+**Nhóm 5 - Nhập Môn Công Nghệ Phần Mềm - 2025-2026**
 
-# Example
-php scripts/reset-user-password.php student@megalearning.com 12345678
-```
-
-### Zoom Management
-```bash
-# Setup wizard
-scripts\setup-zoom.bat
-
-# Check configuration
-php scripts/check-zoom-config.php
-
-# Test API
-php scripts/test-zoom-api.php
-
-# Test meeting creation
-php scripts/test-zoom-meeting.php
-```
-
-### AI Assistant
-```bash
-# Setup wizard
-scripts\setup-gemini.bat
-
-# Test Gemini AI
-php scripts/test-gemini.php
-```
-
-### Database Management
-```bash
-# Fresh install with demo data
-php artisan migrate:fresh --seed
-
-# Check database status
-php scripts/check-database.php
-```
-
-### System Checks
-```bash
-# Full system verification
-scripts\system-check.bat
-
-# List all scripts
-dir scripts\*.bat
-dir scripts\*.php
-```
-
-**All Scripts:** See [scripts/README.md](scripts/README.md)
-
----
-
-## 🐛 Troubleshooting
-
-### Database Issues
-
-**Error: Access denied for user**
-```bash
-# Check credentials in .env
-DB_USERNAME=root
-DB_PASSWORD=your_password
-
-# Clear config cache
-php artisan config:clear
-```
-
-**Error: Database not found**
-```bash
-# Create database
-mysql -u root -p -e "CREATE DATABASE learning3"
-
-# Then migrate
-php artisan migrate
-```
-
-### Zoom API Issues
-
-**Error: Invalid credentials**
-```bash
-# Verify credentials at https://marketplace.zoom.us
-# Re-run setup wizard
-scripts\setup-zoom.bat
-
-# Or check config
-php scripts/check-zoom-config.php
-```
-
-**Error: Insufficient permissions**
-- Go to Zoom App → Scopes
-- Add: meeting:write, meeting:read, user:read
-- Click "Activate"
-
-### Password Reset Issues
-
-**Can't access email?**
-```bash
-# Use CLI tool instead
-php scripts/reset-user-password.php user@email.com newpass123
-```
-
-**Forgot all passwords?**
-```bash
-# Reset all test accounts
-php scripts/reset-user-password.php admin@megalearning.com password
-php scripts/reset-user-password.php teacher@megalearning.com password
-php scripts/reset-user-password.php student@megalearning.com password
-```
-
-### Common Fixes
-```bash
-# Clear all caches
-php artisan optimize:clear
-
-# Regenerate autoload
-composer dump-autoload
-
-# Rebuild assets
-npm run build
-
-# Restart server
-php artisan serve
-```
-
----
-
-## 📁 Project Structure
-
-```
-MegaLearning/
-├── app/
-│   ├── Http/Controllers/      # Controllers
-│   │   ├── Admin/             # Admin controllers
-│   │   ├── Teacher/           # Teacher controllers
-│   │   ├── Student/           # Student controllers
-│   │   └── Api/               # API controllers
-│   ├── Models/                # Eloquent models
-│   ├── Services/              # Business logic
-│   │   ├── ZoomService.php    # Zoom API integration
-│   │   └── AIService.php      # Gemini AI integration
-│   └── Policies/              # Authorization policies
-│
-├── database/
-│   ├── migrations/            # Database migrations
-│   ├── seeders/               # Database seeders
-│   └── factories/             # Model factories
-│
-├── resources/
-│   ├── views/                 # Blade templates
-│   │   ├── admin/             # Admin views
-│   │   ├── teacher/           # Teacher views
-│   │   ├── student/           # Student views
-│   │   ├── auth/              # Authentication views
-│   │   └── chat/              # Chat views
-│   ├── css/                   # Stylesheets
-│   └── js/                    # JavaScript
-│
-├── routes/
-│   ├── web.php                # Web routes
-│   ├── api.php                # API routes
-│   └── channels.php           # Broadcasting channels
-│
-├── scripts/                   # Helper scripts
-│   ├── setup-zoom.bat         # Zoom setup wizard
-│   ├── setup-gemini.bat       # AI setup wizard
-│   ├── reset-user-password.php
-│   ├── test-zoom-api.php
-│   └── test-gemini.php
-│
-├── tests/
-│   ├── Feature/               # Feature tests
-│   │   ├── ExamManagementTest.php
-│   │   ├── ChatSystemTest.php
-│   │   └── IntegrationTest.php
-│   └── Browser/               # Browser tests
-│       ├── ExamUITest.php
-│       └── ChatUITest.php
-│
-└── docs/                      # Documentation
-    ├── SETUP_VERIFICATION.md  # Setup status report
-    └── DATABASE_SEEDING.md    # Seeding guide
-```
-
-**Full Structure:** See [docs/STRUCTURE.md](docs/STRUCTURE.md)
-
----
-
-## 🎯 Quick Reference
-
-### Most Used Commands
-```bash
-# Development
-php artisan serve              # Start server
-npm run dev                    # Start Vite (hot reload)
-composer dev                   # Run both servers
-
-# Database
-php artisan migrate:fresh --seed    # Reset database
-php artisan migrate                 # Run migrations
-php artisan db:seed                 # Seed only
-
-# Testing
-php artisan test               # Run all tests
-php artisan dusk               # Run browser tests
-
-# Cache
-php artisan optimize:clear     # Clear all caches
-php artisan config:clear       # Clear config cache
-php artisan view:clear         # Clear view cache
-
-# Utilities
-php artisan route:list         # List all routes
-php artisan tinker             # Laravel REPL
-```
-
-### Key URLs
-- Homepage: http://localhost:8000
-- Admin Panel: http://localhost:8000/admin
-- Teacher Dashboard: http://localhost:8000/teacher
-- Student Dashboard: http://localhost:8000/student
-- API Base: http://localhost:8000/api/v1
-- Password Reset: http://localhost:8000/forgot-password
-
----
-
-## 📚 Additional Documentation
-
-### Setup & Configuration
-- **[docs/setup/SETUP_VERIFICATION.md](docs/setup/SETUP_VERIFICATION.md)** - Detailed setup status report
-- **[docs/setup/ZOOM_SETUP_GUIDE.md](docs/setup/ZOOM_SETUP_GUIDE.md)** - Complete Zoom integration guide
-- **[docs/setup/SETUP_SUMMARY.md](docs/setup/SETUP_SUMMARY.md)** - All features overview
-
-### User Guides
-- **[docs/guides/PASSWORD_RESET_GUIDE.md](docs/guides/PASSWORD_RESET_GUIDE.md)** - Password reset methods
-- **[docs/guides/ZOOM_QUICK_REF.md](docs/guides/ZOOM_QUICK_REF.md)** - Zoom quick reference
-
-### Testing & API
-- **[docs/testing/TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)** - Testing documentation
-- **[docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)** - API testing guide
-
-### Project Structure
-- **[docs/STRUCTURE.md](docs/STRUCTURE.md)** - Detailed project structure
-- **[docs/DATABASE_SEEDING.md](docs/DATABASE_SEEDING.md)** - Database seeding guide
-- **[scripts/README.md](scripts/README.md)** - All helper scripts documentation
-
----
-
-## 🎉 Status
-
-✅ **FULLY OPERATIONAL & PRODUCTION READY**
-
-- [x] Core learning features
-- [x] Video conferencing (Zoom + Jitsi)
-- [x] AI chat assistant (Gemini)
-- [x] Real-time chat
-- [x] Exam management
-- [x] API with authentication
-- [x] Testing suite (36 tests)
-- [x] Documentation complete
-
-**Ready for:**
-- Development ✅
-- Testing ✅
-- Demo/Presentation ✅
-- Production Deployment ✅
-
----
-
-## 📞 Support
-
-**Need Help?**
-
-1. Check [Troubleshooting](#-troubleshooting) section
-2. Review documentation in [docs/](docs/) folder
-3. Run system check: `scripts\system-check.bat`
-4. Check specific guides:
-   - Password issues → [docs/guides/PASSWORD_RESET_GUIDE.md](docs/guides/PASSWORD_RESET_GUIDE.md)
-   - Zoom issues → [docs/setup/ZOOM_SETUP_GUIDE.md](docs/setup/ZOOM_SETUP_GUIDE.md)
-   - API issues → [docs/api/THUNDER_CLIENT_API_GUIDE.md](docs/api/THUNDER_CLIENT_API_GUIDE.md)
-
-**Quick Diagnostics:**
-```bash
-php scripts/check-zoom-config.php    # Check Zoom
-scripts\system-check.bat             # Full system check
-```
+| Thành viên | Vai trò | GitHub |
+|------------|---------|--------|
+| Luc Dang | Lead Developer | [@Lucdpt3105](https://github.com/Lucdpt3105) |
+| *Thành viên 2* | *Vai trò* | *@github* |
+| *Thành viên 3* | *Vai trò* | *@github* |
+| *Thành viên 4* | *Vai trò* | *@github* |
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Authors
-
-- **Luc Dang** - *Initial work* - [Lucdpt3105](https://github.com/Lucdpt3105)
+Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ---
 
@@ -682,83 +349,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ using Laravel**
 
-**Nhóm 5 - Nhập Môn Công Nghệ Phần Mềm - 2025-2026**
+[![Star](https://img.shields.io/github/stars/Lucdpt3105/MegaLearning?style=social)](https://github.com/Lucdpt3105/MegaLearning)
 
-[⬆ Back to Top](#-megalearning---e-learning-platform)
+[⬆ Về đầu trang](#-megalearning---nền-tảng-e-learning-hiện-đại)
 
-</div># 3. Push lên GitHub
-git push origin feature/webrtc-video-call
-# Thay tên branch tương ứng: feature/chat-system, feature/forum-qna, v.v.
-```
-
-### **Pull code mới nhất từ GitHub**
-
-```bash
-# Cập nhật branch hiện tại
-git pull origin <branch-name>
-
-# Ví dụ:
-git pull origin feature/webrtc-video-call
-```
-
-### **Merge Branch vào Main (sau khi hoàn thành)**
-
-```bash
-# 1. Chuyển về main
-git checkout main
-
-# 2. Pull code mới nhất
-git pull origin main
-
-# 3. Merge branch feature vào main
-git merge feature/webrtc-video-call
-
-# 4. Push lên GitHub
-git push origin main
-```
-
-### **📋 Phân công Branches cho Team**
-
-| Thành viên | Branch | Nhiệm vụ |
-|-----------|--------|----------|
-| Person A | `feature/webrtc-video-call` | Video call học nhóm, screen sharing |
-| Person B | `feature/chat-system` | Real-time chat, group messaging |
-| Person C | `feature/forum-qna` | Diễn đàn Q&A, upvote/downvote |
-| Person D | `feature/ai-integration` | AI chatbot, auto-grading |
-
----
-
-## 📚 Tài liệu Tham khảo
-
-- [Laravel Documentation](https://laravel.com/docs/11.x)
-- [Tailwind CSS v4](https://tailwindcss.com/docs)
-- [Vite Documentation](https://vitejs.dev/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
-- [Git Documentation](https://git-scm.com/doc)
-
----
-
-## 👥 Team Members
-
-- **Luc Dang** - [GitHub](https://github.com/Lucdpt3105)
-- *Thêm tên các thành viên khác ở đây*
-
----
-
-## 📄 License
-
-This project is for educational purposes only (NMCNPM - 2025).
-
----
-
-## 🆘 Support
-
-Nếu gặp vấn đề, vui lòng:
-
-1. Kiểm tra phần [Troubleshooting](#-troubleshooting)
-2. Tạo issue trên GitHub
-3. Liên hệ team members
-
----
-
-**Happy Coding! 🚀**
+</div>
