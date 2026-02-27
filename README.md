@@ -319,35 +319,6 @@ php artisan test --testsuite=Feature
 php artisan dusk
 ```
 
-**Test Coverage:**
-- ✅ 26 Feature Tests
-- ✅ 10 Browser Tests  
-- ✅ 36 Total Test Cases
-
----
-
-## 👥 Team
-
-**Nhóm 5 - Nhập Môn Công Nghệ Phần Mềm - 2025-2026**
-
-| Thành viên | Vai trò | GitHub |
-|------------|---------|--------|
-| Luc Dang | Lead Developer | [@Lucdpt3105](https://github.com/Lucdpt3105) |
-| *Thành viên 2* | *Vai trò* | *@github* |
-| *Thành viên 3* | *Vai trò* | *@github* |
-| *Thành viên 4* | *Vai trò* | *@github* |
-
----
-
-## 📄 License
-
-Dự án này được cấp phép theo giấy phép MIT - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
-
----
-
-<div align="center">
-
-**Made with ❤️ using Laravel**
 
 [![Star](https://img.shields.io/github/stars/Lucdpt3105/MegaLearning?style=social)](https://github.com/Lucdpt3105/MegaLearning)
 
