@@ -22,6 +22,33 @@ services:
       QUEUE_CONNECTION: database
       TELESCOPE_ENABLED: "false"
       LOG_CHANNEL: stderr
+
+      # Supabase Auth (Google OAuth)
+      SUPABASE_URL: https://ncymmvezqqibpeifvdtl.supabase.co
+      SUPABASE_ANON_KEY: sb_publishable_-IK4R3w4RdNoeEOVg4oCNg_ZXk-f4lN
+      SUPABASE_SERVICE_ROLE_KEY: ""
+
+      # Gemini AI
+      GEMINI_API_KEY: AIzaSyA-QxSigqfMdIkxxml3cUX-TknanxkBT7A
+      GEMINI_MODEL: gemini-2.0-flash-exp
+      AI_NAME: "AI Assistant"
+      GEMINI_MAX_TOKENS: "500"
+
+      # Zoom
+      ZOOM_ACCOUNT_ID: 0KM705emTZasJolW2fV7Cw
+      ZOOM_CLIENT_ID: 6hpv4p7OQm2tseblMJAjiQ
+      ZOOM_CLIENT_SECRET: Gf1arzBazP1MqoyzagRvvdW6ffcxpvtA
+      ZOOM_SECRET_TOKEN: NfGPCiKORoehGQdZuch-Qw
+
+      # Mail
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: "587"
+      MAIL_USERNAME: lucksnow1108@gmail.com
+      MAIL_PASSWORD: friuxuoucdzbashk
+      MAIL_ENCRYPTION: tls
+      MAIL_FROM_ADDRESS: lucksnow1108@gmail.com
+      MAIL_FROM_NAME: MegaLearning
     depends_on:
       mysql:
         condition: service_healthy
@@ -39,7 +66,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 5s
       retries: 10

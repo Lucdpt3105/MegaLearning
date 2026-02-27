@@ -60,3 +60,4 @@ class ForumAnswerPolicy
         return false;
     }
 }
+

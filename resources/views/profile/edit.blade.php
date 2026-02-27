@@ -51,14 +51,10 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Ảnh đại diện</label>
                             <div class="flex items-center space-x-6">
                                 <div class="shrink-0">
-                                    @if($user->avatar)
-                                        <img id="avatar-preview" class="h-20 w-20 object-cover rounded-full" 
-                                             src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}">
-                                    @else
-                                        <div id="avatar-preview" class="h-20 w-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                                        </div>
-                                    @endif
+                                    <div id="avatar-preview">
+                                        <img class="h-20 w-20 object-cover rounded-full" 
+                                             src="{{ $user->getDisplayAvatarUrl() }}" alt="{{ $user->name }}">
+                                    </div>
                                 </div>
                                 <div class="flex-1">
                                     <input type="file" name="avatar" id="avatar" accept="image/*" 
@@ -237,6 +233,12 @@
 function previewImage(event) {
     const file = event.target.files[0];
     if (file) {
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ảnh không được vượt quá 2MB');
+            event.target.value = '';
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(e) {
             const preview = document.getElementById('avatar-preview');
